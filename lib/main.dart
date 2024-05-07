@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import './screens/login_page.dart';
-// import './screens/signup_page.dart';
+import './screens/signup_page.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -14,7 +14,7 @@ void main() {
     routes: {
       // set the routes of the pages
       '/': (context) => const LoginPage(),
-      // '/signup': (context) => const SignupPage(),
+      '/signup': (context) => const SignupPage(),
     },
   ));
 }
