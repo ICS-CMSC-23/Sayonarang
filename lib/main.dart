@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './screens/login_page.dart';
+// import './screens/signup_page.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -11,21 +13,8 @@ void main() {
     initialRoute: '/',
     routes: {
       // set the routes of the pages
-      '/': (context) => const TemporaryPage(),
+      '/': (context) => const LoginPage(),
+      // '/signup': (context) => const SignupPage(),
     },
   ));
-}
-
-class TemporaryPage extends StatelessWidget {
-  const TemporaryPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Donation Application'),
-      ),
-      body: Text('This is a temporary page'),
-    );
-  }
 }
