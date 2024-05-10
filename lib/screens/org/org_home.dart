@@ -131,7 +131,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: colorScheme.background,
       body: ListView.builder(
         itemCount: donations.length,
         itemBuilder: (context, index) {
@@ -149,6 +149,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                 // );
               },
               child: Card(
+                surfaceTintColor: Colors.transparent,
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Column(
@@ -180,7 +181,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
                               category,
                             ),
                             backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
+                                Theme.of(context).colorScheme.primary,
+                            side: BorderSide.none,
                             labelStyle: TextStyle(color: Colors.white),
                           );
                         }).toList(),
