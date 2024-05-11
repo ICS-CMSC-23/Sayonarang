@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:donation_app/providers/user_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -82,8 +84,14 @@ class _LoginPageState extends State<LoginPage> {
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).colorScheme.primary,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           // Navigator.pushNamed(context, '/');
+                          // TODO: add validation
+
+                          await context.read<MyAuthProvider>().signIn(
+                                _emailController.text.trim(),
+                                _passwordController.text.trim(),
+                              );
                         },
                         child: const Text('Log In',
                             style: TextStyle(color: Colors.white)),

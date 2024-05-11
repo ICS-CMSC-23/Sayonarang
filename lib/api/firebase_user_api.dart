@@ -62,6 +62,7 @@ class FirebaseAuthAPI {
           email: email, password: password);
 
       // print(credential);
+      print('Successfully logged in!');
       return '';
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

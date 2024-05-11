@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:donation_app/providers/user_provider.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -47,8 +49,23 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
             style: ElevatedButton.styleFrom(
               primary: Theme.of(context).colorScheme.primary,
             ),
-            onPressed: () {
+            onPressed: () async {
               // Navigator.pushNamed(context, '/');
+              // TODO: add validation
+
+              await context.read<MyAuthProvider>().signUp(
+                  _nameController.text,
+                  _usernameController.text,
+                  _emailController.text,
+                  _passwordController.text,
+                  _contactNumController.text,
+                  // addressFields
+                  //     .map((e) => (e as Row).children[0] as TextField)
+                  //     .map((e) => e.controller!.text)
+                  //     .toList(),
+                  _addressController.text,
+                  '',
+                  tabController.index == 0 ? 'donor' : 'org');
             },
             child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
           ),
