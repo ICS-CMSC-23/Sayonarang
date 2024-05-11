@@ -12,6 +12,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   // text controllers for the text fields
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _contactNumController = TextEditingController();
@@ -20,6 +21,17 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _addressController.dispose();
+    _contactNumController.dispose();
+    super.dispose();
   }
 
   Widget signupButton() {
@@ -62,6 +74,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
           children: [
             textField('Name', _nameController),
             textField('Username', _usernameController),
+            textField('Email', _emailController),
             textField('Password', _passwordController),
             textField('Address', _addressController),
             textField('Contact Number', _contactNumController),
@@ -81,6 +94,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
           children: [
             textField('Name', _nameController),
             textField('Username', _usernameController),
+            textField('Email', _emailController),
             textField('Password', _passwordController),
             textField('Address', _addressController),
             textField('Contact Number', _contactNumController),
