@@ -10,12 +10,39 @@ class _LoginPageState extends State<LoginPage> {
   // text controllers for the text fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscureText = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Widget textField(
+      String label, TextEditingController textController, bool isPassword) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: TextField(
+        obscureText: isPassword ? _obscureText : false,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                )
+              : null,
+        ),
+        controller: textController,
+      ),
+    );
   }
 
   @override
@@ -43,8 +70,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    textField('Email', _emailController),
-                    textField('Password', _passwordController),
+                    textField('Email', _emailController, false),
+                    textField('Password', _passwordController, true),
 
                     // log in button
                     Container(
@@ -82,20 +109,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-Widget textField(String label, TextEditingController textController) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    child: TextField(
-      decoration: InputDecoration(
-        // focusedBorder: const UnderlineInputBorder(
-        //   borderSide: BorderSide(color: Colors.purple),
-        // ),
-        labelText: label,
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      controller: textController,
-    ),
-  );
 }

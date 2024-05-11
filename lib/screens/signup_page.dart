@@ -16,6 +16,9 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _contactNumController = TextEditingController();
+  bool _obscureText = true;
+
+  List<Widget> addressFields = [];
 
   @override
   void initState() {
@@ -72,13 +75,46 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         child: ListView(
           shrinkWrap: true,
           children: [
-            textField('Name', _nameController),
-            textField('Username', _usernameController),
-            textField('Email', _emailController),
-            textField('Password', _passwordController),
-            textField('Address', _addressController),
-            textField('Contact Number', _contactNumController),
-            const SizedBox(height: 20), // spacing purposes
+            textField('Name', _nameController, false),
+            textField('Username', _usernameController, false),
+            textField('Email', _emailController, false),
+            textField('Password', _passwordController, true),
+            textField('Contact Number', _contactNumController, false),
+            textField('Address', _addressController, false),
+            ...addressFields,
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  addressFields.add(
+                    Row(
+                      children: [
+                        Expanded(
+                            child: textField(
+                                'Address', TextEditingController(), false)),
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              addressFields.removeLast();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                });
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add),
+                  SizedBox(width: 5),
+                  Text('Add Address'),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10), // spacing purposes
             signupButton(),
           ],
         ));
@@ -92,12 +128,44 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         child: ListView(
           shrinkWrap: true,
           children: [
-            textField('Name', _nameController),
-            textField('Username', _usernameController),
-            textField('Email', _emailController),
-            textField('Password', _passwordController),
-            textField('Address', _addressController),
-            textField('Contact Number', _contactNumController),
+            textField('Name of Organization', _nameController, false),
+            textField('Username', _usernameController, false),
+            textField('Email', _emailController, false),
+            textField('Password', _passwordController, true),
+            textField('Contact Number', _contactNumController, false),
+            textField('Address', _addressController, false),
+            ...addressFields,
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  addressFields.add(
+                    Row(
+                      children: [
+                        Expanded(
+                            child: textField(
+                                'Address', TextEditingController(), false)),
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            setState(() {
+                              addressFields.removeLast();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                });
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.add),
+                  SizedBox(width: 5),
+                  Text('Add Address'),
+                ],
+              ),
+            ),
 
             Container(
               margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
@@ -130,6 +198,32 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
             signupButton(),
           ],
         ));
+  }
+
+  Widget textField(
+      String label, TextEditingController textController, bool isPassword) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: TextField(
+        obscureText: isPassword ? _obscureText : false,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                )
+              : null,
+        ),
+        controller: textController,
+      ),
+    );
   }
 
   @override
@@ -186,20 +280,4 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
       ),
     );
   }
-}
-
-Widget textField(String label, TextEditingController textController) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    child: TextField(
-      decoration: InputDecoration(
-        // focusedBorder: const UnderlineInputBorder(
-        //   borderSide: BorderSide(color: Colors.purple),
-        // ),
-        labelText: label,
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-      controller: textController,
-    ),
-  );
 }
