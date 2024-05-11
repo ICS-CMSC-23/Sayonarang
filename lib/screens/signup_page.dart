@@ -29,10 +29,13 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
           width: MediaQuery.of(context).size.width,
           margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
           child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: () {
               // Navigator.pushNamed(context, '/');
             },
-            child: const Text('Sign Up'),
+            child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
           ),
         ),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -50,70 +53,83 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   }
 
   Widget signUpDonor() {
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        textField('Name', _nameController),
-        textField('Username', _usernameController),
-        textField('Password', _passwordController),
-        textField('Address', _addressController),
-        textField('Contact Number', _contactNumController),
-        const SizedBox(height: 20), // spacing purposes
-        signupButton(),
-      ],
-    );
+    return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            textField('Name', _nameController),
+            textField('Username', _usernameController),
+            textField('Password', _passwordController),
+            textField('Address', _addressController),
+            textField('Contact Number', _contactNumController),
+            const SizedBox(height: 20), // spacing purposes
+            signupButton(),
+          ],
+        ));
   }
 
   Widget signUpOrganization() {
-    return ListView(shrinkWrap: true, children: [
-      textField('Name of Organization', _nameController),
-      textField('Username', _usernameController),
-      textField('Password', _passwordController),
-      textField('Address', _addressController),
-      textField('Contact Number', _contactNumController),
-
-      Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-        child: const Align(
-          alignment: Alignment.centerLeft,
-          child: Text('Proof of Legitimacy',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+    return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-      ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            textField('Name', _nameController),
+            textField('Username', _usernameController),
+            textField('Password', _passwordController),
+            textField('Address', _addressController),
+            textField('Contact Number', _contactNumController),
 
-      // upload a file for proof of legitimacy
-      Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        width: MediaQuery.of(context).size.width,
-        height: 100,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.orange),
-        ),
-        child: TextButton(
-          onPressed: () {
-            // TODO: display filename
-          },
-          child: const Text('Upload File'),
-        ),
-      ),
+            Container(
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: const Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Proof of Legitimacy',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+            ),
 
-      signupButton(),
-    ]);
+            // upload a file for proof of legitimacy
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              width: MediaQuery.of(context).size.width,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.primary),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  // TODO: display filename
+                },
+                child: const Text('Upload a File'),
+              ),
+            ),
+
+            signupButton(),
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        toolbarHeight: 50,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        toolbarHeight: MediaQuery.of(context).size.height * 0.05,
         automaticallyImplyLeading: false, // remove back button
       ),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.95,
           child: Card(
             color: Colors.white,
             shape: const RoundedRectangleBorder(
@@ -122,9 +138,9 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     topRight: Radius.circular(40))),
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 40, bottom: 30, left: 16, right: 16),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  top: 40, bottom: 10, left: 16, right: 16),
+              child: ListView(
+                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     const Text('Create an Account',
                         style: TextStyle(
@@ -134,19 +150,16 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
 
                     // container for tab bar
                     Container(
-                      child: TabBar(
-                          controller: tabController,
-                          indicatorColor: Colors.orange,
-                          tabs: const [
-                            Tab(text: 'As a Donor'),
-                            Tab(text: 'As an Organization'),
-                          ]),
+                      child: TabBar(controller: tabController, tabs: const [
+                        Tab(text: 'As a Donor'),
+                        Tab(text: 'As an Organization'),
+                      ]),
                     ),
 
                     // container for contents of tab bar
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: 520,
+                      height: MediaQuery.of(context).size.height * 0.65,
                       child: TabBarView(
                         controller: tabController,
                         children: [signUpDonor(), signUpOrganization()],
@@ -166,9 +179,9 @@ Widget textField(String label, TextEditingController textController) {
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     child: TextField(
       decoration: InputDecoration(
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.purple),
-        ),
+        // focusedBorder: const UnderlineInputBorder(
+        //   borderSide: BorderSide(color: Colors.purple),
+        // ),
         labelText: label,
         labelStyle: const TextStyle(fontWeight: FontWeight.bold),
       ),
