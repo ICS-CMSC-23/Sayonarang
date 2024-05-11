@@ -1,3 +1,4 @@
+import 'package:donation_app/providers/donation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,28 +9,6 @@ import 'package:donation_app/screens/org/org_donation_drives.dart';
 import 'package:donation_app/screens/org/org_home.dart';
 import 'package:donation_app/screens/org/org_profile.dart';
 
-// void main() {
-//   runApp(MaterialApp(
-//     title: 'Donation Application',
-//     theme: ThemeData(
-//       colorScheme:
-//           ColorScheme.fromSeed(seedColor: Color.fromARGB(1, 231, 35, 38)),
-//       brightness: Brightness.light,
-//       primaryColor: Color.fromARGB(1, 231, 35, 38),
-//       useMaterial3: true,
-//     ),
-//     initialRoute: '/org/home',
-//     routes: {
-//       // set the routes of the pages
-//       '/': (context) => const LoginPage(),
-//       '/signup': (context) => const SignupPage(),
-//       '/org/home': (context) => const OrgHomePage(),
-//       '/org/profile': (context) => const OrgProfilePage(),
-//       '/org/drives': (context) => const OrgDonationDrivesPage(),
-//     },
-//   ));
-// }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -37,16 +16,16 @@ void main() async {
   );
 
   runApp(
-      // MultiProvider(
-      //   providers: [
-      //     // ChangeNotifierProvider(create: ((context) => DonationProvider())),
-      //     // ChangeNotifierProvider(create: ((context) => DonationDriveProvider())),
-      //     // ChangeNotifierProvider(create: ((context) => UserProvider())),
-      //     // ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
-      //   ],
-      //   child: MyApp(),
-      // ),
-      MyApp());
+    MultiProvider(
+      providers: [
+        // ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
+        // ChangeNotifierProvider(create: ((context) => UserProvider())),
+        ChangeNotifierProvider(create: ((context) => DonationProvider())),
+        // ChangeNotifierProvider(create: ((context) => DonationDriveProvider())),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
