@@ -12,7 +12,31 @@ class _LoginPageState extends State<LoginPage> {
   // text controllers for the text fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  bool isEmailValid = true;
+  bool isPasswordValid = true;
   bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _emailController.addListener(() {
+      if (_emailController.text.isNotEmpty) {
+        setState(() {
+          isEmailValid = true;
+        });
+      }
+    });
+
+    _passwordController.addListener(() {
+      if (_passwordController.text.isNotEmpty) {
+        setState(() {
+          isPasswordValid = true;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -21,14 +45,15 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Widget textField(
-      String label, TextEditingController textController, bool isPassword) {
+  Widget textField(String label, TextEditingController textController,
+      bool isPassword, bool isValid, String errorMessage) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TextField(
         obscureText: isPassword ? _obscureText : false,
         decoration: InputDecoration(
           labelText: label,
+          errorText: isValid ? null : errorMessage,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           suffixIcon: isPassword
               ? IconButton(
@@ -70,10 +95,13 @@ class _LoginPageState extends State<LoginPage> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    textField('Email', _emailController, false),
-                    textField('Password', _passwordController, true),
+                    textField('Email', _emailController, false, isEmailValid,
+                        'Email is required'),
+
+                    textField('Password', _passwordController, true,
+                        isPasswordValid, 'Password is required'),
 
                     // log in button
                     Container(
@@ -82,16 +110,22 @@ class _LoginPageState extends State<LoginPage> {
                           const EdgeInsets.only(left: 16, right: 16, top: 16),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).colorScheme.primary,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                         ),
                         onPressed: () async {
-                          // Navigator.pushNamed(context, '/');
-                          // TODO: add validation
+                          setState(() {
+                            isEmailValid = _emailController.text.isNotEmpty;
+                            isPasswordValid =
+                                _passwordController.text.isNotEmpty;
+                          });
 
-                          await context.read<MyAuthProvider>().signIn(
-                                _emailController.text.trim(),
-                                _passwordController.text.trim(),
-                              );
+                          if (isEmailValid && isPasswordValid) {
+                            await context.read<MyAuthProvider>().signIn(
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
+                          }
                         },
                         child: const Text('Log In',
                             style: TextStyle(color: Colors.white)),

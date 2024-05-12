@@ -18,14 +18,72 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _contactNumController = TextEditingController();
+
+  bool _nameValid = true;
+  bool _usernameValid = true;
+  bool _emailValid = true;
+  bool _passwordValid = true;
+  bool _addressValid = true;
+  bool _contactNumValid = true;
   bool _obscureText = true;
 
   List<Widget> addressFields = [];
+
+  RegExp get _emailRegex =>
+      RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$');
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+
+    _nameController.addListener(() {
+      if (_nameController.text.isNotEmpty) {
+        setState(() {
+          _nameValid = true;
+        });
+      }
+    });
+
+    _usernameController.addListener(() {
+      if (_usernameController.text.isNotEmpty) {
+        setState(() {
+          _usernameValid = true;
+        });
+      }
+    });
+
+    _emailController.addListener(() {
+      if (_emailController.text.isNotEmpty) {
+        setState(() {
+          _emailValid = true;
+        });
+      }
+    });
+
+    _passwordController.addListener(() {
+      if (_passwordController.text.isNotEmpty) {
+        setState(() {
+          _passwordValid = true;
+        });
+      }
+    });
+
+    _addressController.addListener(() {
+      if (_addressController.text.isNotEmpty) {
+        setState(() {
+          _addressValid = true;
+        });
+      }
+    });
+
+    _contactNumController.addListener(() {
+      if (_contactNumController.text.isNotEmpty) {
+        setState(() {
+          _contactNumValid = true;
+        });
+      }
+    });
   }
 
   @override
@@ -47,25 +105,37 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
           margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
             onPressed: () async {
-              // Navigator.pushNamed(context, '/');
-              // TODO: add validation
+              setState(() {
+                _nameValid = _nameController.text.isNotEmpty;
+                _usernameValid = _usernameController.text.isNotEmpty;
+                _emailValid = _emailController.text.isNotEmpty &&
+                    _emailRegex.hasMatch(_emailController.text);
+                _passwordValid = _passwordController.text.isNotEmpty &&
+                    _passwordController.text.length >= 6;
+                _addressValid = _addressController.text.isNotEmpty;
+                _contactNumValid = _contactNumController.text.isNotEmpty;
+              });
 
-              await context.read<MyAuthProvider>().signUp(
-                  _nameController.text,
-                  _usernameController.text,
-                  _emailController.text,
-                  _passwordController.text,
-                  _contactNumController.text,
-                  // addressFields
-                  //     .map((e) => (e as Row).children[0] as TextField)
-                  //     .map((e) => e.controller!.text)
-                  //     .toList(),
-                  _addressController.text,
-                  '',
-                  tabController.index == 0 ? 'donor' : 'org');
+              // validate text fields
+              if (_nameValid &&
+                  _usernameValid &&
+                  _emailValid &&
+                  _passwordValid &&
+                  _addressValid &&
+                  _contactNumValid) {
+                await context.read<MyAuthProvider>().signUp(
+                    _nameController.text,
+                    _usernameController.text,
+                    _emailController.text,
+                    _passwordController.text,
+                    _contactNumController.text,
+                    _addressController.text,
+                    '', // TODO: proof of legitimacy link
+                    tabController.index == 0 ? 'donor' : 'org');
+              }
             },
             child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
           ),
@@ -92,12 +162,18 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         child: ListView(
           shrinkWrap: true,
           children: [
-            textField('Name', _nameController, false),
-            textField('Username', _usernameController, false),
-            textField('Email', _emailController, false),
-            textField('Password', _passwordController, true),
-            textField('Contact Number', _contactNumController, false),
-            textField('Address', _addressController, false),
+            textField('Name', _nameController, false, _nameValid,
+                'Please enter your name'),
+            textField('Username', _usernameController, false, _usernameValid,
+                'Please enter your username'),
+            textField('Email', _emailController, false, _emailValid,
+                'Please enter a valid email'),
+            textField('Password', _passwordController, true, _passwordValid,
+                'Password must be six or more characters'),
+            textField('Contact Number', _contactNumController, false,
+                _contactNumValid, 'Please enter your contact number'),
+            textField('Address', _addressController, false, _addressValid,
+                'Please enter your address'),
             ...addressFields,
             TextButton(
               onPressed: () {
@@ -106,8 +182,8 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     Row(
                       children: [
                         Expanded(
-                            child: textField(
-                                'Address', TextEditingController(), false)),
+                            child: textField('Address', TextEditingController(),
+                                false, true, '')),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
@@ -145,12 +221,18 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         child: ListView(
           shrinkWrap: true,
           children: [
-            textField('Name of Organization', _nameController, false),
-            textField('Username', _usernameController, false),
-            textField('Email', _emailController, false),
-            textField('Password', _passwordController, true),
-            textField('Contact Number', _contactNumController, false),
-            textField('Address', _addressController, false),
+            textField('Name of Organization', _nameController, false,
+                _nameValid, 'Please enter your name'),
+            textField('Username', _usernameController, false, _usernameValid,
+                'Please enter your username'),
+            textField('Email', _emailController, false, _emailValid,
+                'Please enter a valid email'),
+            textField('Password', _passwordController, true, _passwordValid,
+                'Password must be six or more characters'),
+            textField('Contact Number', _contactNumController, false,
+                _contactNumValid, 'Please enter your contact number'),
+            textField('Address', _addressController, false, _addressValid,
+                'Please enter your address'),
             ...addressFields,
             TextButton(
               onPressed: () {
@@ -159,8 +241,8 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     Row(
                       children: [
                         Expanded(
-                            child: textField(
-                                'Address', TextEditingController(), false)),
+                            child: textField('Address', TextEditingController(),
+                                false, true, '')),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
@@ -217,14 +299,15 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         ));
   }
 
-  Widget textField(
-      String label, TextEditingController textController, bool isPassword) {
+  Widget textField(String label, TextEditingController textController,
+      bool isPassword, bool isValid, String errorMessage) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TextField(
         obscureText: isPassword ? _obscureText : false,
         decoration: InputDecoration(
           labelText: label,
+          errorText: isValid ? null : errorMessage,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           suffixIcon: isPassword
               ? IconButton(
@@ -284,7 +367,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     // container for contents of tab bar
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.65,
+                      height: MediaQuery.of(context).size.height * 0.7,
                       child: TabBarView(
                         controller: tabController,
                         children: [signUpDonor(), signUpOrganization()],
