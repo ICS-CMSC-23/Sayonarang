@@ -6,17 +6,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DriveProvider with ChangeNotifier {
   late FirebaseDriveAPI firebaseService;
   late Stream<QuerySnapshot> _drivesStream;
+  late Stream<QuerySnapshot> _drivesByOrgStream;
 
   DriveProvider() {
     firebaseService = FirebaseDriveAPI();
-    fetchDrives();
+    // fetchDrives();
   }
 
   // getter
   Stream<QuerySnapshot> get drives => _drivesStream;
+  Stream<QuerySnapshot> get drivesByOrg => _drivesByOrgStream;
 
   void fetchDrives() {
     _drivesStream = firebaseService.getAllDrives();
+    notifyListeners();
+  }
+
+  void fetchDrivesByOrg(String orgId) {
+    _drivesByOrgStream = firebaseService.getDrivesByOrg(orgId);
     notifyListeners();
   }
 

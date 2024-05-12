@@ -6,17 +6,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DonationProvider with ChangeNotifier {
   late FirebaseDonationAPI firebaseService;
   late Stream<QuerySnapshot> _donationsStream;
+  late Stream<QuerySnapshot> _donationsByDonorStream;
+  late Stream<QuerySnapshot> _donationsToOrgStream;
 
   DonationProvider() {
     firebaseService = FirebaseDonationAPI();
-    fetchDonations();
+    // fetchDonations();
   }
 
   // getter
   Stream<QuerySnapshot> get donations => _donationsStream;
+  Stream<QuerySnapshot> get donationsByDonor => _donationsByDonorStream;
+  Stream<QuerySnapshot> get donationsToOrg => _donationsToOrgStream;
 
   void fetchDonations() {
     _donationsStream = firebaseService.getAllDonations();
+    notifyListeners();
+  }
+
+  void fetchDonationsByDonor(String donorId) {
+    _donationsByDonorStream = firebaseService.getDonationsByDonor(donorId);
+    notifyListeners();
+  }
+
+  void fetchDonationsToOrg(String orgId) {
+    _donationsToOrgStream = firebaseService.getDonationsToOrg(orgId);
     notifyListeners();
   }
 
