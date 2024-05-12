@@ -28,8 +28,7 @@ class MyAuthProvider with ChangeNotifier {
       String email,
       String password,
       String contactNum,
-      // List<String> addresses,
-      String addresses,
+      List<String> addresses,
       String proof,
       String role) async {
     await authService.signUp(

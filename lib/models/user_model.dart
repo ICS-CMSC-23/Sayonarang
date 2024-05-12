@@ -4,8 +4,7 @@ class User {
   String? userId;
   String name;
   String username;
-  // List<String> addresses;
-  String addresses;
+  List<String> addresses;
   String contactNumber;
   String proof;
   String role; // admin, donor, org

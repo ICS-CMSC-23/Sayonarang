@@ -18,6 +18,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _contactNumController = TextEditingController();
+  final List<TextEditingController> otherAddressesControllers = [];
 
   bool _nameValid = true;
   bool _usernameValid = true;
@@ -126,13 +127,22 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                   _passwordValid &&
                   _addressValid &&
                   _contactNumValid) {
+                // get the addresses from the text controllers
+                List<String> addresses = [_addressController.text];
+                for (TextEditingController controller
+                    in otherAddressesControllers) {
+                  if (controller.text.isNotEmpty) {
+                    addresses.add(controller.text);
+                  }
+                }
+
                 await context.read<MyAuthProvider>().signUp(
                     _nameController.text,
                     _usernameController.text,
                     _emailController.text,
                     _passwordController.text,
                     _contactNumController.text,
-                    _addressController.text,
+                    addresses,
                     '', // TODO: proof of legitimacy link
                     tabController.index == 0 ? 'donor' : 'org');
               }
@@ -177,24 +187,35 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
             ...addressFields,
             TextButton(
               onPressed: () {
+                // new text controller for the new address field
+                TextEditingController newAddressController =
+                    TextEditingController();
+
                 setState(() {
+                  // add the new address widget to the list
                   addressFields.add(
                     Row(
                       children: [
                         Expanded(
-                            child: textField('Address', TextEditingController(),
+                            child: textField('Address', newAddressController,
                                 false, true, '')),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             setState(() {
-                              addressFields.removeLast();
+                              int index = otherAddressesControllers
+                                  .indexOf(newAddressController);
+                              otherAddressesControllers.removeAt(index);
+                              addressFields.removeAt(index);
                             });
                           },
                         ),
                       ],
                     ),
                   );
+
+                  // add the new text controller to the list
+                  otherAddressesControllers.add(newAddressController);
                 });
               },
               child: const Row(
@@ -236,24 +257,35 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
             ...addressFields,
             TextButton(
               onPressed: () {
+                // new text controller for the new address field
+                TextEditingController newAddressController =
+                    TextEditingController();
+
                 setState(() {
+                  // add the new address widget to the list
                   addressFields.add(
                     Row(
                       children: [
                         Expanded(
-                            child: textField('Address', TextEditingController(),
+                            child: textField('Address', newAddressController,
                                 false, true, '')),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             setState(() {
-                              addressFields.removeLast();
+                              int index = otherAddressesControllers
+                                  .indexOf(newAddressController);
+                              otherAddressesControllers.removeAt(index);
+                              addressFields.removeAt(index);
                             });
                           },
                         ),
                       ],
                     ),
                   );
+
+                  // add the new text controller to the list
+                  otherAddressesControllers.add(newAddressController);
                 });
               },
               child: const Row(
