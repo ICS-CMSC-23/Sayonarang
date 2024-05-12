@@ -1,12 +1,13 @@
-import 'package:donation_app/providers/donation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import './screens/login_page.dart';
-import './screens/signup_page.dart';
-import './providers/user_provider.dart';
-import 'package:donation_app/screens/org/org_donation_drives.dart';
+import 'package:donation_app/providers/donation_provider.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/providers/drive_provider.dart';
+import 'package:donation_app/screens/auth/login_page.dart';
+import 'package:donation_app/screens/auth/signup_page.dart';
+import 'package:donation_app/screens/org/org_drives.dart';
 import 'package:donation_app/screens/org/org_home.dart';
 import 'package:donation_app/screens/org/org_profile.dart';
 
@@ -20,7 +21,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: ((context) => DonationProvider())),
-        // ChangeNotifierProvider(create: ((context) => DonationDriveProvider())),
+        ChangeNotifierProvider(create: ((context) => DriveProvider())),
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
       ],
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/org/home',
       routes: {
         // set the routes of the pages
         '/': (context) => const LoginPage(),
