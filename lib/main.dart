@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import './screens/login_page.dart';
 import './screens/signup_page.dart';
+import './providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_donation_drives.dart';
 import 'package:donation_app/screens/org/org_home.dart';
 import 'package:donation_app/screens/org/org_profile.dart';
@@ -18,13 +19,14 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
-        // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => DonationProvider())),
         // ChangeNotifierProvider(create: ((context) => DonationDriveProvider())),
+        // ChangeNotifierProvider(create: ((context) => UserProvider())),
+        ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
       ],
-      child: const MyApp(),
+      child: MyApp(),
     ),
+    // MyApp()
   );
 }
 
@@ -55,7 +57,7 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/org/home',
+      initialRoute: '/',
       routes: {
         // set the routes of the pages
         '/': (context) => const LoginPage(),

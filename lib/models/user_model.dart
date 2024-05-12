@@ -1,34 +1,37 @@
 import 'dart:convert';
 
 class User {
-  String? id;
+  String? userId;
   String name;
   String username;
   List<String> addresses;
-  List<String> contactNumber;
+  String contactNumber;
   String proof;
   String role; // admin, donor, org
+  String status; // pending, approved, rejected (for org)
 
   User({
-    this.id,
+    this.userId,
     required this.name,
     required this.username,
-    required this.addresses, // TODO: only for donor and org, decide if required or not
-    required this.contactNumber, // TODO: only for donor and org, decide if required or not
-    required this.proof, // TODO: only for org, decide if required or not
+    required this.addresses, // only for donor and org
+    required this.contactNumber, // only for donor and org
+    required this.proof, // only for org
     required this.role,
+    required this.status, // only for org
   });
 
   // Factory constructor to instantiate object from json format
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
+      userId: json['userId'],
       name: json['name'],
       username: json['username'],
       addresses: json['addresses'],
       contactNumber: json['contactNumber'],
       proof: json['proof'],
       role: json['role'],
+      status: json['status'],
     );
   }
 
@@ -45,6 +48,7 @@ class User {
       'contactNumber': user.contactNumber,
       'proof': user.proof,
       'role': user.role,
+      'status': user.status,
     };
   }
 }
