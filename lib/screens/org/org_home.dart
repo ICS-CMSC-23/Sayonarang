@@ -130,103 +130,99 @@ class _OrgHomePageState extends State<OrgHomePage> {
       }
     }
 
-    return Scaffold(
-      backgroundColor: colorScheme.background,
-      body: ListView.builder(
-        itemCount: donations.length,
-        itemBuilder: (context, index) {
-          final donation = donations[index];
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: InkWell(
-              onTap: () {
-                // Navigate to the donation details page
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => DonationDetailsPage(donation: donation),
-                //   ),
-                // );
-              },
-              child: Card(
-                surfaceTintColor: Colors.transparent,
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        donation.donorName,
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1, // Limit name to one line
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Donated on ${DateFormat('MMMM dd, yyyy').format(DateTime.parse(donation.date))}',
-                        style: TextStyle(
-                            fontSize: 16, fontStyle: FontStyle.italic),
-                      ),
-                      SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: donation.categories
-                            // Limit the categories to at most 3 sinceall categories will be displayed in the donation details
-                            .take(3)
-                            .map((category) {
-                          return Chip(
-                            label: Text(
-                              category,
-                            ),
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            side: BorderSide.none,
-                            labelStyle: TextStyle(color: Colors.white),
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(height: 8),
-                      // TODO: Display mode only in the donation details page
-                      // Row(
-                      //   children: [
-                      //     Icon(Icons.directions_car),
-                      //     SizedBox(width: 4),
-                      //     Text(
-                      //       '{donation.mode.toLowerCase()}',
-                      //       style: TextStyle(fontSize: 16),
-                      //     ),
-                      //   ],
-                      // ),
-                      SizedBox(width: 16),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            getIconForStatus(donation.status),
-                            color: getColorForStatus(donation.status),
+    return ListView.builder(
+      itemCount: donations.length,
+      itemBuilder: (context, index) {
+        final donation = donations[index];
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: InkWell(
+            onTap: () {
+              // Navigate to the donation details page
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => DonationDetailsPage(donation: donation),
+              //   ),
+              // );
+            },
+            child: Card(
+              surfaceTintColor: Colors.transparent,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      donation.donorName,
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1, // Limit name to one line
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Donated on ${DateFormat('MMMM dd, yyyy').format(DateTime.parse(donation.date))}',
+                      style:
+                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                    ),
+                    SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: donation.categories
+                          // Limit the categories to at most 3 sinceall categories will be displayed in the donation details
+                          .take(3)
+                          .map((category) {
+                        return Chip(
+                          label: Text(
+                            category,
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            donation.status.substring(0, 1).toUpperCase() +
-                                donation.status.substring(1).toLowerCase(),
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: getColorForStatus(donation.status),
-                                fontStyle: FontStyle.italic),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          side: BorderSide.none,
+                          labelStyle: TextStyle(color: Colors.white),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(height: 8),
+                    // TODO: Display mode only in the donation details page
+                    // Row(
+                    //   children: [
+                    //     Icon(Icons.directions_car),
+                    //     SizedBox(width: 4),
+                    //     Text(
+                    //       '{donation.mode.toLowerCase()}',
+                    //       style: TextStyle(fontSize: 16),
+                    //     ),
+                    //   ],
+                    // ),
+                    SizedBox(width: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          getIconForStatus(donation.status),
+                          color: getColorForStatus(donation.status),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          donation.status.substring(0, 1).toUpperCase() +
+                              donation.status.substring(1).toLowerCase(),
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: getColorForStatus(donation.status),
+                              fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ),
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: OrgBottomNavigationBar(currentIndex: 0),
+          ),
+        );
+      },
     );
   }
 }

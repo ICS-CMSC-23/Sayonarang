@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
 
-class OrgDonationDrivesPage extends StatefulWidget {
-  const OrgDonationDrivesPage({super.key});
+class OrgDrivesPage extends StatefulWidget {
+  const OrgDrivesPage({super.key});
   @override
-  _OrgDonationDrivesPageState createState() => _OrgDonationDrivesPageState();
+  _OrgDrivesPageState createState() => _OrgDrivesPageState();
 }
 
-class _OrgDonationDrivesPageState extends State<OrgDonationDrivesPage> {
+class _OrgDrivesPageState extends State<OrgDrivesPage> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.primary,
-      body: Text("Org Donation Drives"),
-      bottomNavigationBar: OrgBottomNavigationBar(currentIndex: 1),
+    return Container(
+      child: Text("Org Donation Drives"),
     );
   }
 }

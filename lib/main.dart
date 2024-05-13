@@ -5,14 +5,11 @@ import 'firebase_options.dart';
 import 'package:donation_app/providers/donation_provider.dart';
 import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/providers/drive_provider.dart';
+import 'package:donation_app/providers/admin_provider.dart';
 import 'package:donation_app/screens/auth/login_page.dart';
 import 'package:donation_app/screens/auth/signup_page.dart';
-import 'package:donation_app/screens/org/org_drives.dart';
-import 'package:donation_app/screens/org/org_home.dart';
-import 'package:donation_app/screens/org/org_profile.dart';
-
-import 'providers/admin_provider.dart';
-import 'screens/admin/admin_home.dart';
+import 'package:donation_app/screens/org/org_main.dart';
+import 'package:donation_app/screens/admin/admin_home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,14 +59,12 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/org/home',
+      initialRoute: '/org',
       routes: {
         // set the routes of the pages
         '/': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
-        '/org/home': (context) => const OrgHomePage(),
-        '/org/profile': (context) => const OrgProfilePage(),
-        '/org/drives': (context) => const OrgDonationDrivesPage(),
+        '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
       },
     );
