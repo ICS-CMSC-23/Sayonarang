@@ -13,20 +13,28 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetching Donors
+  // Fetching Donors and Organization
   late FirebaseAdminAPI firebaseService;
   late Stream<QuerySnapshot> _donorStream;
+  late Stream<QuerySnapshot> _orgStream;
 
-// Constructor initializes the FirebaseTodoAPI instance and fetches the list of friends.
+  // Constructor initializes the FirebaseTodoAPI instance and fetches the list of donors and org.
   AdminProvider() {
     firebaseService = FirebaseAdminAPI();
     fetchDonors();
+    fetchOrgs();
   }
 
   Stream<QuerySnapshot> get donorList => _donorStream;
+  Stream<QuerySnapshot> get orgList => _orgStream;
 
   fetchDonors() {
     _donorStream = firebaseService.getAllDonors();
+    notifyListeners();
+  }
+
+  fetchOrgs() {
+    _orgStream = firebaseService.getAllOrgs();
     notifyListeners();
   }
 }

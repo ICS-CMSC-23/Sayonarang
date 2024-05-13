@@ -9,6 +9,11 @@ class FirebaseAdminAPI {
     return db.collection("users").where("role", isEqualTo: "donor").snapshots();
   }
 
+  // Retrieves a stream of all donors from the Firestore collection.
+  Stream<QuerySnapshot> getAllOrgs() {
+    return db.collection("users").where("role", isEqualTo: "org").snapshots();
+  }
+
   // Adds a friend to the Firestore collection.
   // Future<String> addFriend(Map<String, dynamic> friend) async {
   //   try {

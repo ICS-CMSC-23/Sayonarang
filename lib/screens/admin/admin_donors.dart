@@ -1,5 +1,6 @@
 //admin_donors.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -78,7 +79,11 @@ class _ViewDonorsState extends State<ViewDonors> {
                     // TODO: Implement navigating to user details
                   },
                   child: ListTile(
-                    leading: Icon(Icons.person), // Icon for the person/account
+                    leading: Icon(
+                      CupertinoIcons.person_crop_circle_fill,
+                      size: 40,
+                    ), // Icon for the person/account
+
                     title: Text(
                       donor.name,
                       style: TextStyle(
