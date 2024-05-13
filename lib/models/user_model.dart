@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class User {
-  String? userId;
+  String? id;
   String name;
   String username;
   List<String> addresses;
@@ -11,7 +11,7 @@ class User {
   String status; // pending, approved, rejected (for org)
 
   User({
-    this.userId,
+    this.id,
     required this.name,
     required this.username,
     required this.addresses, // only for donor and org
@@ -24,7 +24,7 @@ class User {
   // Factory constructor to instantiate object from json format
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      userId: json['userId'],
+      id: json['id'],
       name: json['name'],
       username: json['username'],
       addresses: json['addresses'],

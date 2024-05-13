@@ -29,8 +29,8 @@ class FirebaseAuthAPI {
       // print(credential);
 
       // save user's other details to Firestore
-      final docRef = await db.collection("users").add({
-        'userId': credential.user!.uid,
+      // specify own id by calling the set method
+      await db.collection("users").doc(credential.user!.uid).set({
         'name': name,
         'username': username,
         'contactNum': contactNum,
@@ -40,7 +40,7 @@ class FirebaseAuthAPI {
         'status': role == 'org' ? 'pending' : '',
       });
 
-      print('New User added with ID: ${docRef.id}');
+      print('Successfully signed up!');
     } on FirebaseAuthException catch (e) {
       //possible to return something more useful
       //than just print an error message to improve UI/UX
