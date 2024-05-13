@@ -9,6 +9,9 @@ import 'package:donation_app/screens/org/org_donation_drives.dart';
 import 'package:donation_app/screens/org/org_home.dart';
 import 'package:donation_app/screens/org/org_profile.dart';
 
+import 'providers/admin_provider.dart';
+import 'screens/admin/admin_home.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -22,6 +25,7 @@ void main() async {
         // ChangeNotifierProvider(create: ((context) => DonationDriveProvider())),
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
+        ChangeNotifierProvider(create: ((context) => AdminProvider())),
       ],
       child: MyApp(),
     ),
@@ -56,7 +60,7 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/admin',
       routes: {
         // set the routes of the pages
         '/': (context) => const LoginPage(),
@@ -64,6 +68,7 @@ class MyApp extends StatelessWidget {
         '/org/home': (context) => const OrgHomePage(),
         '/org/profile': (context) => const OrgProfilePage(),
         '/org/drives': (context) => const OrgDonationDrivesPage(),
+        '/admin': (context) => const AdminView(),
       },
     );
   }
