@@ -9,9 +9,22 @@ class FirebaseAdminAPI {
     return db.collection("users").where("role", isEqualTo: "donor").snapshots();
   }
 
-  // Retrieves a stream of all donors from the Firestore collection.
+  // Retrieves a stream of all approved orgs from the Firestore collection.
   Stream<QuerySnapshot> getAllOrgs() {
-    return db.collection("users").where("role", isEqualTo: "org").snapshots();
+    return db
+        .collection("users")
+        .where("role", isEqualTo: "org")
+        .where("status", isEqualTo: "approved")
+        .snapshots();
+  }
+
+// Retrieves a stream of all approved orgs from the Firestore collection.
+  Stream<QuerySnapshot> getAllPending() {
+    return db
+        .collection("users")
+        .where("role", isEqualTo: "org")
+        .where("status", isEqualTo: "pending")
+        .snapshots();
   }
 
   // Adds a friend to the Firestore collection.

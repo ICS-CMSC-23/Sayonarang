@@ -80,7 +80,8 @@ class _ViewDonorsState extends State<ViewDonors> {
                   },
                   child: ListTile(
                     leading: Icon(
-                      CupertinoIcons.person_crop_circle_fill,
+                      // CupertinoIcons.person_crop_circle_fill,
+                      Icons.account_box_rounded,
                       size: 40,
                     ), // Icon for the person/account
 

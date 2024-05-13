@@ -55,7 +55,7 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
               children: [
                 // Display a message if there are no orgs
                 Text(
-                  'No donors yet!',
+                  'No organizations yet!',
                   style: TextStyle(
                     fontSize: 20, // Increased font size for no org message
                     fontStyle: FontStyle.italic,
@@ -91,9 +91,10 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                   },
                   child: ListTile(
                     leading: Icon(
-                      CupertinoIcons.person_crop_circle_fill,
+                      // CupertinoIcons.person_crop_circle_fill,
+                      Icons.verified_user_rounded,
                       size: 40,
-                    ), // Icon for the person/account
+                    ), // Icon for the verified organization
                     title: Text(
                       org.name,
                       style: TextStyle(
