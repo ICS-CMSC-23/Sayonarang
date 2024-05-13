@@ -21,16 +21,14 @@ class AdminView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text(_pageTitles[provider.selectedIndex])),
+        title: Text(_pageTitles[provider.selectedIndex]),
       ),
-      body: Center(
-        child: _AdminPages.elementAt(provider.selectedIndex),
-      ),
+      body: _AdminPages.elementAt(provider.selectedIndex),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
+            const DrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
