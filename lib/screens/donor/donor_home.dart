@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
+import 'package:donation_app/screens/donor/donor_navbar.dart';
 
-class Donation {
+class Organization {
   final String donorId;
   final String donorName;
   final List<String> categories;
@@ -15,7 +15,7 @@ class Donation {
   final String contactNumber;
   final String status;
 
-  Donation({
+  Organization({
     required this.donorId,
     required this.donorName,
     required this.categories,
@@ -30,20 +30,20 @@ class Donation {
   });
 }
 
-class OrgHomePage extends StatefulWidget {
-  const OrgHomePage({super.key});
+class DonorHomePage extends StatefulWidget {
+  const DonorHomePage({super.key});
   @override
-  _OrgHomePageState createState() => _OrgHomePageState();
+  _DonorHomePageState createState() => _DonorHomePageState();
 }
 
-class _OrgHomePageState extends State<OrgHomePage> {
+class _DonorHomePageState extends State<DonorHomePage> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     // TODO: Fetch donations from database
-    final List<Donation> donations = [
-      Donation(
+    final List<Organization> organizations = [
+      Organization(
         donorId: '1',
         donorName: 'John Doe',
         categories: ['Food', 'Necessities'],
@@ -57,7 +57,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         contactNumber: '123-456-7890',
         status: "pending",
       ),
-      Donation(
+      Organization(
         donorId: '2',
         donorName: 'Jane Smith',
         categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
@@ -70,7 +70,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         contactNumber: '987-654-3210',
         status: "confirmed",
       ),
-      Donation(
+      Organization(
         donorId: '2',
         donorName: 'Jane Smith',
         categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
@@ -83,7 +83,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
         contactNumber: '987-654-3210',
         status: "confirmed",
       ),
-      Donation(
+      Organization(
         donorId: '2',
         donorName: 'Jane Smith',
         categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
@@ -131,9 +131,9 @@ class _OrgHomePageState extends State<OrgHomePage> {
     }
 
     return ListView.builder(
-      itemCount: donations.length,
+      itemCount: organizations.length,
       itemBuilder: (context, index) {
-        final donation = donations[index];
+        final donation = organizations[index];
         return Padding(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: InkWell(

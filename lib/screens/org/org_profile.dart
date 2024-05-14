@@ -12,10 +12,8 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.primary,
-      body: Text("Org Profile"),
-      bottomNavigationBar: OrgBottomNavigationBar(currentIndex: 2),
+    return Container(
+      child: Text("Org Profile"),
     );
   }
 }
