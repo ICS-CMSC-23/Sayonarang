@@ -7,7 +7,9 @@ class MyAuthProvider with ChangeNotifier {
   late Stream<User?> uStream;
   User? userObj;
 
-  String message = '';
+  Map<String, dynamic> signupStatus = {};
+  Map<String, dynamic> userDetails =
+      {}; // {success: true/false, response: map/string}
 
   MyAuthProvider() {
     authService = FirebaseAuthAPI();
@@ -31,13 +33,13 @@ class MyAuthProvider with ChangeNotifier {
       List<String> addresses,
       String proof,
       String role) async {
-    await authService.signUp(
+    signupStatus = await authService.signUp(
         name, username, email, password, contactNum, addresses, proof, role);
     notifyListeners();
   }
 
   Future<void> signIn(String email, String password) async {
-    message = await authService.signIn(email, password);
+    userDetails = await authService.signIn(email, password);
     notifyListeners();
   }
 
