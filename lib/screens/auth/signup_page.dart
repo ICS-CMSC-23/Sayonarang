@@ -136,7 +136,9 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                   }
                 }
 
-                await context.read<MyAuthProvider>().signUp(
+                final myAuthProvider = context.read<MyAuthProvider>();
+
+                await myAuthProvider.signUp(
                     _nameController.text,
                     _usernameController.text,
                     _emailController.text,
@@ -145,6 +147,23 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     addresses,
                     '', // TODO: proof of legitimacy link
                     tabController.index == 0 ? 'donor' : 'org');
+
+                // check if sign up is successful
+                if (myAuthProvider.signupStatus['success']) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Successfully signed up!'),
+                    ),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Error: ${myAuthProvider.signupStatus['response']}'),
+                    ),
+                  );
+                }
               }
             },
             child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
