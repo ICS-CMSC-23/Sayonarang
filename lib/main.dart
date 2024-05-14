@@ -10,6 +10,8 @@ import 'package:donation_app/screens/auth/login_page.dart';
 import 'package:donation_app/screens/auth/signup_page.dart';
 import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
+import 'package:donation_app/screens/donor/donor_main.dart';
+import 'package:donation_app/providers/donor_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +27,7 @@ void main() async {
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
+        ChangeNotifierProvider(create: ((context) => DonorProfileProvider())),
       ],
       child: MyApp(),
     ),
@@ -59,13 +62,15 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/org',
+      
+      initialRoute: '/',
       routes: {
         // set the routes of the pages
         '/': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
+        '/donor': (context) => const DonorMainPage(),
       },
     );
   }
