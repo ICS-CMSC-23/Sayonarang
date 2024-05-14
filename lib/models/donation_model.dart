@@ -3,7 +3,9 @@ import 'dart:convert';
 class Donation {
   String? id;
   final String donorId; // id of user who made the donation
-  final String? orgId; // id of user whom the donation will be given to
+  final String orgId; // id of user whom the donation will be given to
+  final String
+      driveId; // id of donation drive where the org linked the donation to
   List<String>
       categories; // food, clothes, cash, necessities, others (can add as necessary)
   List<String> addresses;
@@ -12,11 +14,13 @@ class Donation {
   String contactNumber;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
+  // TODO: Add time and date fields
 
   Donation({
     this.id,
     required this.donorId,
     required this.orgId,
+    required this.driveId,
     required this.categories,
     required this.addresses,
     required this.mode,
@@ -31,6 +35,7 @@ class Donation {
       id: json['id'],
       donorId: json['donorId'],
       orgId: json['orgId'],
+      driveId: json['driveId'],
       categories: json['categories'],
       addresses: json['addresses'],
       mode: json['mode'],
@@ -49,6 +54,7 @@ class Donation {
     return {
       'donorId': donation.donorId,
       'orgId': donation.orgId,
+      'driveId': donation.driveId,
       'categories': donation.categories,
       'addresses': donation.addresses,
       'mode': donation.mode,

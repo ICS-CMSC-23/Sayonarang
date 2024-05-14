@@ -41,8 +41,14 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void editDonation(String id, String status) async {
-    String message = await firebaseService.editDonation(id, status);
+  void editDonationStatus(String id, String status) async {
+    String message = await firebaseService.editDonationStatus(id, status);
+    print(message);
+    notifyListeners();
+  }
+
+  void editLinkedDrive(String id, String driveId) async {
+    String message = await firebaseService.editLinkedDrive(id, driveId);
     print(message);
     notifyListeners();
   }
