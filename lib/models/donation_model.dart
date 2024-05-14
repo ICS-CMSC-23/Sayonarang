@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Donation {
   String? id;
   final String donorId; // id of user who made the donation
@@ -14,20 +16,24 @@ class Donation {
   String contactNumber;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
-  // TODO: Add time and date fields
+  DateTime date;
+  String time;
+  DateTime timestamp; // date of when the donor made the donation
 
-  Donation({
-    this.id,
-    required this.donorId,
-    required this.orgId,
-    required this.driveId,
-    required this.categories,
-    required this.addresses,
-    required this.mode,
-    required this.weight,
-    required this.contactNumber,
-    required this.status,
-  });
+  Donation(
+      {this.id,
+      required this.donorId,
+      required this.orgId,
+      required this.driveId,
+      required this.categories,
+      required this.addresses,
+      required this.mode,
+      required this.weight,
+      required this.contactNumber,
+      required this.status,
+      required this.date,
+      required this.time,
+      required this.timestamp});
 
   // Factory constructor to instantiate object from json format
   factory Donation.fromJson(Map<String, dynamic> json) {
@@ -36,12 +42,15 @@ class Donation {
       donorId: json['donorId'],
       orgId: json['orgId'],
       driveId: json['driveId'],
-      categories: json['categories'],
-      addresses: json['addresses'],
+      categories: (json['categories'] as List).cast<String>(),
+      addresses: (json['categories'] as List).cast<String>(),
       mode: json['mode'],
       weight: json['weight'],
       contactNumber: json['contactNumber'],
       status: json['status'],
+      date: json['date'].toDate(), // convert Timestamp to DateTime
+      time: json['time'],
+      timestamp: json['timestamp'].toDate(),
     );
   }
 
@@ -61,6 +70,9 @@ class Donation {
       'weight': donation.weight,
       'contactNumber': donation.contactNumber,
       'status': donation.status,
+      'date': donation.date,
+      'time': donation.time,
+      'timestamp': donation.timestamp,
     };
   }
 }

@@ -1,34 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
-
-class Donation {
-  final String donorId;
-  final String donorName;
-  final List<String> categories;
-  final String mode;
-  final double weight;
-  final String photoUrl;
-  final String date;
-  final String time;
-  final String address;
-  final String contactNumber;
-  final String status;
-
-  Donation({
-    required this.donorId,
-    required this.donorName,
-    required this.categories,
-    required this.mode,
-    required this.weight,
-    required this.photoUrl,
-    required this.date,
-    required this.time,
-    required this.address,
-    required this.contactNumber,
-    required this.status,
-  });
-}
+import 'package:donation_app/providers/donation_provider.dart';
+import 'package:donation_app/models/donation_model.dart';
 
 class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key});
@@ -37,66 +12,27 @@ class OrgHomePage extends StatefulWidget {
 }
 
 class _OrgHomePageState extends State<OrgHomePage> {
+  // TODO: Use id of logged in org user
+  final String orgId = 'dPA5rWi1FbcTElkLvoLw6lt91t12';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // execute initialization of the stream after the layout is completed
+    // https://stackoverflow.com/questions/49466556/flutter-run-method-on-widget-build-complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DonationProvider>().fetchDonationsToOrg(orgId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // access donations in the provider
+    Stream<QuerySnapshot> donationsStream =
+        context.watch<DonationProvider>().donationsToOrg;
 
-    // TODO: Fetch donations from database
-    final List<Donation> donations = [
-      Donation(
-        donorId: '1',
-        donorName: 'John Doe',
-        categories: ['Food', 'Necessities'],
-        mode: "pickup",
-        weight: 0.5,
-        photoUrl:
-            'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg',
-        date: '2022-05-23',
-        time: '10:00 AM',
-        address: '123 Main St, City',
-        contactNumber: '123-456-7890',
-        status: "pending",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-    ];
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     IconData getIconForStatus(String status) {
       switch (status.toLowerCase()) {
@@ -114,6 +50,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
       }
     }
 
+    // TODO: Update colors
     Color getColorForStatus(String status) {
       switch (status.toLowerCase()) {
         case 'pending':
@@ -130,99 +67,123 @@ class _OrgHomePageState extends State<OrgHomePage> {
       }
     }
 
-    return ListView.builder(
-      itemCount: donations.length,
-      itemBuilder: (context, index) {
-        final donation = donations[index];
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: InkWell(
-            onTap: () {
-              // Navigate to the donation details page
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DonationDetailsPage(donation: donation),
-              //   ),
-              // );
-            },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      donation.donorName,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1, // Limit name to one line
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Donated on ${DateFormat('MMMM dd, yyyy').format(DateTime.parse(donation.date))}',
-                      style:
-                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: donation.categories
-                          // Limit the categories to at most 3 sinceall categories will be displayed in the donation details
-                          .take(3)
-                          .map((category) {
-                        return Chip(
-                          label: Text(
-                            category,
+    // TODO: make stream builder
+
+    return StreamBuilder(
+        stream: donationsStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+            return Center(
+                child: const Text(
+              'No friends yet!',
+              style: TextStyle(fontSize: 18),
+            ));
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.data?.docs.length,
+            itemBuilder: (context, index) {
+              Donation donation = Donation.fromJson(
+                  snapshot.data?.docs[index].data() as Map<String, dynamic>);
+              donation.id = snapshot.data?.docs[index].id;
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: InkWell(
+                  onTap: () {
+                    // Navigate to the donation details page
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => DonationDetailsPage(donation: donation),
+                    //   ),
+                    // );
+                  },
+                  child: Card(
+                    surfaceTintColor: Colors.transparent,
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            donation.donorId, // TODO: Change to donor name
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1, // Limit name to one line
                           ),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          side: BorderSide.none,
-                          labelStyle: TextStyle(color: Colors.white),
-                        );
-                      }).toList(),
+                          SizedBox(height: 8),
+                          Text(
+                            'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                            style: TextStyle(
+                                fontSize: 16, fontStyle: FontStyle.italic),
+                          ),
+                          SizedBox(height: 8),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: donation.categories
+                                // Limit the categories to at most 3 sinceall categories will be displayed in the donation details
+                                .take(3)
+                                .map((category) {
+                              return Chip(
+                                label: Text(
+                                  category,
+                                ),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide.none,
+                                labelStyle: TextStyle(color: Colors.white),
+                              );
+                            }).toList(),
+                          ),
+                          SizedBox(height: 8),
+                          // TODO: Display mode only in the donation details page
+                          // Row(
+                          //   children: [
+                          //     Icon(Icons.directions_car),
+                          //     SizedBox(width: 4),
+                          //     Text(
+                          //       '{donation.mode.toLowerCase()}',
+                          //       style: TextStyle(fontSize: 16),
+                          //     ),
+                          //   ],
+                          // ),
+                          SizedBox(width: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                getIconForStatus(donation.status),
+                                color: getColorForStatus(donation.status),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                donation.status.substring(0, 1).toUpperCase() +
+                                    donation.status.substring(1).toLowerCase(),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: getColorForStatus(donation.status),
+                                    fontStyle: FontStyle.italic),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 8),
-                    // TODO: Display mode only in the donation details page
-                    // Row(
-                    //   children: [
-                    //     Icon(Icons.directions_car),
-                    //     SizedBox(width: 4),
-                    //     Text(
-                    //       '{donation.mode.toLowerCase()}',
-                    //       style: TextStyle(fontSize: 16),
-                    //     ),
-                    //   ],
-                    // ),
-                    SizedBox(width: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          getIconForStatus(donation.status),
-                          color: getColorForStatus(donation.status),
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          donation.status.substring(0, 1).toUpperCase() +
-                              donation.status.substring(1).toLowerCase(),
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: getColorForStatus(donation.status),
-                              fontStyle: FontStyle.italic),
-                        ),
-                      ],
-                    )
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          );
+        });
   }
 }
