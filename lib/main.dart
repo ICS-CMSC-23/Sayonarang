@@ -25,6 +25,7 @@ void main() async {
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
+        ChangeNotifierProvider(create: ((context) => DonorProfileProvider())),
       ],
       child: MyApp(),
     ),
@@ -66,6 +67,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
+        '/donor': (context) => const DonorMainPage(),
       },
     );
   }
