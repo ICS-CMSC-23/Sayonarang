@@ -62,6 +62,7 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
+      
       initialRoute: '/',
       routes: {
         // set the routes of the pages
