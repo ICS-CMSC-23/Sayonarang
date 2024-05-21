@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   // https://stackoverflow.com/a/62989332
   final ColorScheme colorScheme = const ColorScheme(
     brightness: Brightness.light,
-    primary: Color.fromRGBO(231, 35, 28, 1),
+    primary: Color.fromRGBO(245, 71, 65, 1),
     onPrimary: Color.fromRGBO(255, 255, 255, 1),
     secondary: Color.fromRGBO(255, 255, 255, 1),
     onSecondary: Color.fromRGBO(21, 26, 38, 1),
@@ -62,7 +62,6 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      
       initialRoute: '/',
       routes: {
         // set the routes of the pages
