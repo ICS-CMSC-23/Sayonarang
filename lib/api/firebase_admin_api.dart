@@ -18,7 +18,7 @@ class FirebaseAdminAPI {
         .snapshots();
   }
 
-// Retrieves a stream of all approved orgs from the Firestore collection.
+  // Retrieves a stream of all approved orgs from the Firestore collection.
   Stream<QuerySnapshot> getAllPending() {
     return db
         .collection("users")
@@ -27,25 +27,14 @@ class FirebaseAdminAPI {
         .snapshots();
   }
 
-  // Adds a friend to the Firestore collection.
-  // Future<String> addFriend(Map<String, dynamic> friend) async {
-  //   try {
-  //     await db.collection("friends").add(friend);
-  //     return "Successfully added friend!";
-  //   } on FirebaseException catch (e) {
-  //     return "Failed with error '${e.code}: ${e.message}";
-  //   }
-  // }
-
-  // Deletes a friend from the Firestore collection by their ID.
-  // Future<String> deleteFriend(String? id) async {
-  //   try {
-  //     await db.collection("friends").doc(id).delete();
-  //     return "Successfully deleted friend!";
-  //   } on FirebaseException catch (e) {
-  //     return "Failed with error '${e.code}: ${e.message}";
-  //   }
-  // }
+  // Retrieves a stream of all rejected orgs from the Firestore collection.
+  Stream<QuerySnapshot> getAllRejected() {
+    return db
+        .collection("users")
+        .where("role", isEqualTo: "org")
+        .where("status", isEqualTo: "rejected")
+        .snapshots();
+  }
 
   // Edits a friend's information in the Firestore collection.
   Future<String> editFriend(
@@ -79,6 +68,18 @@ class FirebaseAdminAPI {
       await db.collection("friends").doc(id).update({"motto": motto});
 
       return "Successfully edited friend!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  Future<String> updateOrganizationStatus(String orgId, String status) async {
+    try {
+      await db.collection('users').doc(orgId).update({
+        'status': status,
+      });
+
+      return "Successfully updated organization status to $status!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
     }

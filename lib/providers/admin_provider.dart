@@ -19,11 +19,13 @@ class AdminProvider with ChangeNotifier {
   late Stream<QuerySnapshot> _donorStream;
   late Stream<QuerySnapshot> _orgStream;
   late Stream<QuerySnapshot> _pendingStream;
+  late Stream<QuerySnapshot> _rejectedStream;
 
   // Getters
   Stream<QuerySnapshot> get donorList => _donorStream;
   Stream<QuerySnapshot> get orgList => _orgStream;
   Stream<QuerySnapshot> get pendingList => _pendingStream;
+  Stream<QuerySnapshot> get rejectedList => _rejectedStream;
 
   fetchDonors() {
     _donorStream = firebaseService.getAllDonors();
@@ -40,11 +42,30 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  fetchRejected() {
+    _rejectedStream = firebaseService.getAllRejected();
+    notifyListeners();
+  }
+
   // Constructor initializes the FirebaseTodoAPI instance and fetches the list of donors and org.
   AdminProvider() {
     firebaseService = FirebaseAdminAPI();
     fetchDonors();
     fetchOrgs();
     fetchPending();
+    fetchRejected();
+  }
+
+  // Future<void> updateOrganizationStatus(String orgId, String status) async {
+  //   await FirebaseFirestore.instance.collection('users').doc(orgId).update({
+  //     'status': status,
+  //   });
+  // }
+
+  void updateOrgStatus(String orgId, String status) async {
+    String message =
+        await firebaseService.updateOrganizationStatus(orgId, status);
+    print(message);
+    notifyListeners();
   }
 }

@@ -1,22 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
-
-// class AdminApprovalWaitList extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Text(
-//         'List of organizations that signed up',
-//         style: TextStyle(fontSize: 20),
-//       ),
-//     );
-//   }
-// }
+import 'admin_waitlist_details.dart';
+// import 'pending_org_detail_page.dart';
 
 class AdminApprovalWaitList extends StatefulWidget {
   const AdminApprovalWaitList({Key? key}) : super(key: key);
@@ -29,11 +17,38 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context);
-    Stream<QuerySnapshot> pendingStream =
-        context.watch<AdminProvider>().pendingList;
 
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildOrganizationList(
+            context,
+            provider.pendingList,
+            'Pending Organizations',
+            Icons.access_time,
+            Colors.orange,
+          ),
+          _buildOrganizationList(
+            context,
+            provider.rejectedList,
+            'Rejected Organizations',
+            Icons.cancel,
+            Colors.red,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrganizationList(
+    BuildContext context,
+    Stream<QuerySnapshot> stream,
+    String title,
+    IconData icon,
+    Color iconColor,
+  ) {
     return StreamBuilder(
-      stream: pendingStream,
+      stream: stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
@@ -54,81 +69,86 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Display a message if there are no orgs
                 Text(
-                  'No pending organizations...',
+                  'No $title...',
                   style: TextStyle(
-                    fontSize: 20, // Increased font size for no org message
+                    fontSize: 20,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
                 SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    provider.updateIndex(1);
-                  },
-                  child: Text("View Approved Organizations"),
-                ),
+                if (title == 'Pending Organizations')
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<AdminProvider>(context, listen: false)
+                          .updateIndex(1);
+                    },
+                    child: Text("View Approved Organizations"),
+                  ),
               ],
             ),
           );
         }
 
-        // Calculate the height of the container based on the number of donors
-        // double containerHeight = (snapshot.data!.docs.length * 600.0) + 32.0;
+        return Card(
+          margin: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16),
+                color: iconColor.withOpacity(0.1),
+                child: Center(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: iconColor,
+                    ),
+                  ),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) {
+                  User org = User.fromJson(snapshot.data!.docs[index].data()
+                      as Map<String, dynamic>);
+                  org.id = snapshot.data!.docs[index].id;
 
-        return Container(
-          // height: containerHeight,
-          // margin: EdgeInsets.all(16.0),
-          // padding: EdgeInsets.all(8.0),
-          // decoration: BoxDecoration(
-          //   borderRadius: BorderRadius.circular(12.0),
-          //   color: Color.fromARGB(255, 227, 227, 227),
-          // ),
-          child: ListView.builder(
-            itemCount: snapshot.data?.docs.length,
-            itemBuilder: ((context, index) {
-              User org = User.fromJson(
-                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
-
-              org.id = snapshot.data!.docs[index].id;
-
-              return Container(
-                child: InkWell(
-                  onTap: () {
-                    // TODO: Implement navigating to user details
-                  },
-                  child: ListTile(
+                  return ListTile(
                     leading: Icon(
-                      Icons.access_time, // Use an appropriate pending icon
+                      icon,
                       size: 40,
-                      color: Colors.orange,
-                    ), // Icon for the pending organization
-                    // Icon(
-                    //   CupertinoIcons.person_crop_circle_fill,
-                    //   size: 40,
-                    // ), // Icon for the person/account
+                      color: iconColor,
+                    ),
                     title: Text(
                       org.name,
                       style: TextStyle(
-                        fontSize: 22, // Adjusted font size for donor name
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
                       org.username,
                       style: TextStyle(
-                        fontSize: 16, // Adjusted font size for username
+                        fontSize: 16,
                         color: Colors.blue,
                       ),
                     ),
                     onTap: () {
-                      // TODO: Implement navigating to user details
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PendingOrgDetailPage(org: org),
+                        ),
+                      );
                     },
-                  ),
-                ),
-              );
-            }),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },
