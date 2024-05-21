@@ -83,8 +83,7 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
               User org = User.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
 
-              org.userId = snapshot.data!.docs[index].id;
-
+              org.id = snapshot.data!.docs[index].id;
 
               return Container(
                 child: InkWell(

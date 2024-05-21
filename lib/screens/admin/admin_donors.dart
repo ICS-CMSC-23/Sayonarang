@@ -71,9 +71,8 @@ class _ViewDonorsState extends State<ViewDonors> {
             itemBuilder: ((context, index) {
               User donor = User.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
-              
-              donor.userId = snapshot.data!.docs[index].id;
 
+              donor.id = snapshot.data!.docs[index].id;
 
               return Container(
                 child: InkWell(
