@@ -9,7 +9,7 @@ class Donation {
   List<String> addresses;
   String mode; // pickup or drop-off
   double weight; // weight in kg
-  String contactNumber;
+  String contactNum;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
 
@@ -21,7 +21,7 @@ class Donation {
     required this.addresses,
     required this.mode,
     required this.weight,
-    required this.contactNumber,
+    required this.contactNum,
     required this.status,
   });
 
@@ -31,11 +31,13 @@ class Donation {
       id: json['id'],
       donorId: json['donorId'],
       orgId: json['orgId'],
-      categories: json['categories'],
-      addresses: json['addresses'],
+      categories: List<String>.from(
+          json['categories']), // change this into a list of strings
+      addresses: List<String>.from(
+          json['addresses']), // change this into a list of strings
       mode: json['mode'],
-      weight: json['weight'],
-      contactNumber: json['contactNumber'],
+      weight: (json['weight'] as num).toDouble(),
+      contactNum: json['contactNum'],
       status: json['status'],
     );
   }
@@ -53,7 +55,7 @@ class Donation {
       'addresses': donation.addresses,
       'mode': donation.mode,
       'weight': donation.weight,
-      'contactNumber': donation.contactNumber,
+      'contactNum': donation.contactNum,
       'status': donation.status,
     };
   }

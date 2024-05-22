@@ -81,16 +81,16 @@ class FirebaseAuthAPI {
       Map<String, dynamic> currentUser =
           await getUserDetails(credential.user!.uid);
 
-      // Check if org account is still pending before being able to login
-      if (currentUser['status'] == 'pending') {
-        await auth.signOut();
-        return {
-          'success': false,
-          'response': 'Your account is still pending approval.',
-        };
-      }
+      // // Check if org account is still pending before being able to login
+      // if (currentUser['status'] == 'pending') {
+      //   await auth.signOut();
+      //   return {
+      //     'success': false,
+      //     'response': 'Your account is still pending approval.',
+      //   };
+      // }
       // Check if org account was rejected
-      else if (currentUser['status'] == 'rejected') {
+      if (currentUser['status'] == 'rejected') {
         await auth.signOut();
         return {
           'success': false,
