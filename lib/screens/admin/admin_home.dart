@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
+import '../../providers/user_provider.dart';
+import '../auth/login_page.dart';
 import 'admin_donors.dart';
 import 'admin_organizations.dart';
 import 'admin_waitlist.dart';
@@ -54,6 +56,13 @@ class AdminView extends StatelessWidget {
               onTap: () {
                 // Handle Log out tap
                 // Implement log out logic here
+                context.read<MyAuthProvider>().signOut(); // Log-out
+                // Go to Log-in
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
               },
             ),
           ],
