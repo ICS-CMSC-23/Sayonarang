@@ -36,9 +36,24 @@ class PendingOrgDetailPage extends StatelessWidget {
             SizedBox(height: 8),
             Text('Addresses: ${org.addresses.join(', ')}'),
             SizedBox(height: 8),
-            Text('Proof: ${org.proof}'),
-            SizedBox(height: 8),
             Text('Status: ${org.status}'),
+            SizedBox(height: 8),
+            // TODO: whether to use web image or file upload image as proof
+            Text('Proof: ${org.proof}'), // uses file upload
+            // Uses web image
+            // Text(
+            //   'Proof of Legitimacy',
+            //   style: TextStyle(
+            //     fontSize: 20,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            // // Proof of legitimacy image is from the web
+            // SizedBox(height: 8),
+            // org.proof.isNotEmpty
+            //     ? Image.network(org.proof)
+            //     : Text('No proof of legitimacy provided.'),
+
             SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

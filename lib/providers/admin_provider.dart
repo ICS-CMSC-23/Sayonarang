@@ -72,4 +72,8 @@ class AdminProvider with ChangeNotifier {
   Future<DocumentSnapshot> getOrgById(String orgId) async {
     return firebaseService.getOrganizationById(orgId);
   }
+
+  Future<DocumentSnapshot> getDonorById(String orgId) async {
+    return firebaseService.getOrganizationById(orgId);
+  }
 }

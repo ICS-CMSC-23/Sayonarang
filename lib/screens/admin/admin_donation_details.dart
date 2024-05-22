@@ -3,11 +3,15 @@ import '../../models/donation_model.dart';
 
 class DonationDetailScreen extends StatelessWidget {
   final Donation donation;
-  final String orgName;
+  final String userName;
+  final String userRole; // Add userRole to handle donor or organization
 
-  const DonationDetailScreen(
-      {Key? key, required this.donation, required this.orgName})
-      : super(key: key);
+  const DonationDetailScreen({
+    Key? key,
+    required this.donation,
+    required this.userName,
+    required this.userRole, // Initialize userRole
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +24,26 @@ class DonationDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Organization: $orgName'),
+            Text(
+              userRole == 'Donor'
+                  ? 'Organization: $userName'
+                  : 'Donor: $userName',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
             Text('Categories: ${donation.categories.join(', ')}'),
+            SizedBox(height: 8),
             Text('Addresses: ${donation.addresses.join(', ')}'),
+            SizedBox(height: 8),
             Text('Mode: ${donation.mode}'),
+            SizedBox(height: 8),
             Text('Weight: ${donation.weight} kg'),
+            SizedBox(height: 8),
             Text('Contact Number: ${donation.contactNum}'),
+            SizedBox(height: 8),
             Text('Status: ${donation.status}'),
           ],
         ),

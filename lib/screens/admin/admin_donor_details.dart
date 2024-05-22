@@ -19,7 +19,7 @@ class _DonorDetailsViewState extends State<DonorDetailsView> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Donor Details'),
+          title: Text(widget.donor.name),
           bottom: TabBar(
             tabs: [
               Tab(text: 'Donations'),

@@ -6,10 +6,10 @@ import '../../providers/donation_provider.dart';
 import '../../providers/admin_provider.dart'; // Import the admin provider
 import 'admin_donation_details.dart';
 
-class DonorDonationsList extends StatelessWidget {
-  final String donorId;
+class OrgDonationsList extends StatelessWidget {
+  final String orgId;
 
-  const DonorDonationsList({Key? key, required this.donorId}) : super(key: key);
+  const OrgDonationsList({Key? key, required this.orgId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +17,10 @@ class DonorDonationsList extends StatelessWidget {
     final donationProvider =
         Provider.of<DonationProvider>(context, listen: false);
     final adminProvider = Provider.of<AdminProvider>(context, listen: false);
-    donationProvider.fetchDonationsByDonor(donorId);
+    donationProvider.fetchDonationsToOrg(orgId);
 
     return StreamBuilder(
-      stream: donationProvider.donationsByDonor,
+      stream: donationProvider.donationsToOrg,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
@@ -55,35 +55,35 @@ class DonorDonationsList extends StatelessWidget {
                 snapshot.data!.docs[index].data() as Map<String, dynamic>);
 
             return FutureBuilder<DocumentSnapshot>(
-              future: adminProvider.getOrgById(donation.orgId ?? ''),
-              builder: (context, orgSnapshot) {
-                if (orgSnapshot.connectionState == ConnectionState.waiting) {
+              future: adminProvider.getDonorById(donation.donorId),
+              builder: (context, donorSnapshot) {
+                if (donorSnapshot.connectionState == ConnectionState.waiting) {
                   return ListTile(
                     title: Text('Loading organization...'),
                     subtitle: Text('Status: ${donation.status}'),
                   );
-                } else if (orgSnapshot.hasError) {
+                } else if (donorSnapshot.hasError) {
                   return ListTile(
                     title: Text('Error loading organization'),
                     subtitle: Text('Status: ${donation.status}'),
                   );
                 } else {
-                  var orgData =
-                      orgSnapshot.data!.data() as Map<String, dynamic>?;
-                  String orgName = orgData?['name'] ?? 'Unknown Organization';
+                  var donorData =
+                      donorSnapshot.data!.data() as Map<String, dynamic>?;
+                  String donorName =
+                      donorData?['name'] ?? 'Unknown Organization';
 
                   return ListTile(
-                    title: Text(orgName),
+                    title: Text(donorName),
                     subtitle: Text('Status: ${donation.status}'),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DonationDetailScreen(
-                            donation: donation,
-                            userName: orgName,
-                            userRole: 'Donor',
-                          ),
+                              donation: donation,
+                              userName: donorName,
+                              userRole: 'Organization'),
                         ),
                       );
                     },

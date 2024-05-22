@@ -11,7 +11,10 @@ class DonationProvider with ChangeNotifier {
 
   DonationProvider() {
     firebaseService = FirebaseDonationAPI();
-    // fetchDonations();
+    // Initialize streams with empty streams to avoid late initialization errors
+    // _donationsStream = Stream<QuerySnapshot>.empty();
+    // _donationsByDonorStream = Stream<QuerySnapshot>.empty();
+    // _donationsToOrgStream = Stream<QuerySnapshot>.empty();
   }
 
   // getter

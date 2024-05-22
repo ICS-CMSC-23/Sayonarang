@@ -42,6 +42,12 @@ class FirebaseAdminAPI {
     return db.collection('users').doc(orgId).get();
   }
 
+  // Retrieve specific donor by id
+  Future<DocumentSnapshot<Map<String, dynamic>>> getDonorById(
+      String donorId) async {
+    return db.collection('users').doc(donorId).get();
+  }
+
   // Edits a friend's information in the Firestore collection.
   Future<String> editFriend(
       String? id,
