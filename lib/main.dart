@@ -27,7 +27,7 @@ void main() async {
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
-        ChangeNotifierProvider(create: ((context) => DonorProfileProvider())),
+        ChangeNotifierProvider(create: ((context) => DonorProvider())),
       ],
       child: MyApp(),
     ),
