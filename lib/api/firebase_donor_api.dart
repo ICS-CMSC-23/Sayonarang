@@ -1,15 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirebaseAdminAPI {
-  // A class that provides methods to interact with Firebase Firestore for friend-related operations.
+class FirebaseDonorAPI {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
 
-  // Retrieves a stream of all donors from the Firestore collection.
-  Stream<QuerySnapshot> getAllDonors() {
+  Stream<QuerySnapshot> getDonor() {
     return db.collection("users").where("role", isEqualTo: "donor").snapshots();
   }
 
-  // Retrieves a stream of all approved orgs from the Firestore collection.
   Stream<QuerySnapshot> getAllOrgs() {
     return db
         .collection("users")
@@ -18,25 +15,6 @@ class FirebaseAdminAPI {
         .snapshots();
   }
 
-  // Retrieves a stream of all approved orgs from the Firestore collection.
-  Stream<QuerySnapshot> getAllPending() {
-    return db
-        .collection("users")
-        .where("role", isEqualTo: "org")
-        .where("status", isEqualTo: "pending")
-        .snapshots();
-  }
-
-  // Retrieves a stream of all rejected orgs from the Firestore collection.
-  Stream<QuerySnapshot> getAllRejected() {
-    return db
-        .collection("users")
-        .where("role", isEqualTo: "org")
-        .where("status", isEqualTo: "rejected")
-        .snapshots();
-  }
-
-  // Edits a friend's information in the Firestore collection.
   Future<String> editFriend(
       String? id,
       String nickname,
@@ -82,6 +60,16 @@ class FirebaseAdminAPI {
       return "Successfully updated organization status to $status!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  // New method to retrieve user data by ID
+  Future<DocumentSnapshot> getUserById(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await db.collection('users').doc(userId).get();
+      return userDoc;
+    } on FirebaseException catch (e) {
+      throw Exception("Failed to retrieve user: ${e.message}");
     }
   }
 }

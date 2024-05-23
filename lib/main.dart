@@ -10,7 +10,7 @@ import 'package:donation_app/screens/auth/login_page.dart';
 import 'package:donation_app/screens/auth/signup_page.dart';
 import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
-import 'package:donation_app/screens/donor/donor_main.dart';
+import 'package:donation_app/screens/donor/donor_home.dart';
 import 'package:donation_app/providers/donor_provider.dart';
 
 void main() async {
@@ -27,7 +27,7 @@ void main() async {
         // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
-        ChangeNotifierProvider(create: ((context) => DonorProfileProvider())),
+        ChangeNotifierProvider(create: ((context) => DonorProvider())),
       ],
       child: MyApp(),
     ),
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   // https://stackoverflow.com/a/62989332
   final ColorScheme colorScheme = const ColorScheme(
     brightness: Brightness.light,
-    primary: Color.fromRGBO(231, 35, 28, 1),
+    primary: Color.fromRGBO(245, 71, 65, 1),
     onPrimary: Color.fromRGBO(255, 255, 255, 1),
     secondary: Color.fromRGBO(255, 255, 255, 1),
     onSecondary: Color.fromRGBO(21, 26, 38, 1),
@@ -62,7 +62,6 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      
       initialRoute: '/',
       routes: {
         // set the routes of the pages
@@ -70,7 +69,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
-        '/donor': (context) => const DonorMainPage(),
+        '/donor': (context) => const DonorView(),
       },
     );
   }
