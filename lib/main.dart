@@ -10,7 +10,7 @@ import 'package:donation_app/screens/auth/login_page.dart';
 import 'package:donation_app/screens/auth/signup_page.dart';
 import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
-import 'package:donation_app/screens/donor/donor_main.dart';
+import 'package:donation_app/screens/donor/donor_home.dart';
 import 'package:donation_app/providers/donor_provider.dart';
 
 void main() async {
