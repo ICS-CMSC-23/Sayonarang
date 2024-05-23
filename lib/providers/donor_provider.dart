@@ -1,56 +1,52 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:donation_app/models/donor_profile_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class DonorProfileProvider with ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  DonorProfileModel? _donorProfile;
+import '../api/firebase_donor_api.dart';
 
-  String get donorName => _donorProfile?.name ?? '';
-  String get username => _donorProfile?.username ?? '';
+class DonorProvider with ChangeNotifier {
+  // For Bottom nav
+  int _selectedIndex = 0;
 
-  DonorProfileProvider() {
-    fetchDonorProfile();
+  int get selectedIndex => _selectedIndex;
+
+  void updateIndex(int index) {
+    _selectedIndex = index;
+    notifyListeners();
   }
 
-  Stream<DonorProfileModel?> get donorProfileStream {
+  // Fetching Donors and Organization
+  final FirebaseDonorAPI firebaseService = FirebaseDonorAPI();
+  late Stream<QuerySnapshot> _donorStream;
+  late Stream<QuerySnapshot> _orgStream;
 
-    final userId = "vy0ppldmGdadSHa1vhxHoX2bwk13";
-    //final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId != null) {
-      print('Fetching donor profile for user ID: $userId');
-      return _firestore
-          .collection('users')
-          .where('role', isEqualTo: 'donor')
-          .where('uid', isEqualTo: userId)
-          .snapshots()
-          .map((snapshot) {
-        print('Donor profile snapshot: $snapshot');
-        if (snapshot.docs.isNotEmpty) {
-          final donorProfile = DonorProfileModel.fromMap(snapshot.docs.first.data());
-          print('Donor profile: $donorProfile');
-          return donorProfile;
-        } else {
-          return null;
-        }
-      });
-    } else {
-      print('No user ID found');
-      return Stream.value(null);
-    }
+  // Getters
+  Stream<QuerySnapshot> get donorList => _donorStream;
+  Stream<QuerySnapshot> get orgList => _orgStream;
+
+  // Fetch data methods
+  void fetchDonors() {
+    _donorStream = firebaseService.getDonor();
+    notifyListeners();
   }
 
-  void fetchDonorProfile() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId != null) {
-      final userRef = _firestore.collection('users').where('role', isEqualTo: 'donor').where('uid', isEqualTo: userId);
-      final userSnapshot = await userRef.get();
-      if (userSnapshot.docs.isNotEmpty) {
-        _donorProfile = DonorProfileModel.fromMap(userSnapshot.docs.first.data());
-        print('Donor profile fetched: $_donorProfile');
-        notifyListeners();
-      }
+  void fetchOrgs() {
+    _orgStream = firebaseService.getAllOrgs();
+    notifyListeners();
+  }
+
+  // Constructor initializes the streams for donors and orgs
+  DonorProvider() {
+    fetchDonors();
+    fetchOrgs();
+  }
+
+  // Method to fetch user by ID
+  Future<DocumentSnapshot> getUserById(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await firebaseService.getUserById(userId);
+      return userDoc;
+    } catch (e) {
+      throw Exception("Failed to retrieve user: ${e.toString()}");
     }
   }
 }
