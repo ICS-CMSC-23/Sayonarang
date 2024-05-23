@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
-        '/donor': (context) => const DonorMainPage(),
+        '/donor': (context) => const DonorView(),
       },
     );
   }
