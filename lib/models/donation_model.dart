@@ -13,7 +13,7 @@ class Donation {
   List<String> addresses;
   String mode; // pickup or drop-off
   double weight; // weight in kg
-  String contactNumber;
+  String contactNum;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
   DateTime date;
@@ -29,7 +29,7 @@ class Donation {
       required this.addresses,
       required this.mode,
       required this.weight,
-      required this.contactNumber,
+      required this.contactNum,
       required this.status,
       required this.date,
       required this.time,
@@ -47,7 +47,7 @@ class Donation {
       addresses: (json['categories'] as List).cast<String>(),
       mode: json['mode'],
       weight: json['weight'],
-      contactNumber: json['contactNumber'],
+      contactNum: json['contactNum'],
       status: json['status'],
       date: json['date'].toDate(), // convert Timestamp to DateTime
       time: json['time'],
@@ -69,7 +69,7 @@ class Donation {
       'addresses': donation.addresses,
       'mode': donation.mode,
       'weight': donation.weight,
-      'contactNumber': donation.contactNumber,
+      'contactNum': donation.contactNum,
       'status': donation.status,
       'date': donation.date,
       'time': donation.time,
