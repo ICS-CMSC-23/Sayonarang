@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import "package:image_picker/image_picker.dart";
-import 'package:donation_app/screens/donor/donor_navbar.dart';
 import 'package:donation_app/models/donate_data.dart';
 import 'package:donation_app/providers/donate_provider.dart';
 import 'package:provider/provider.dart';
@@ -656,109 +655,6 @@ Widget _buildAddressFields() {
     
   );
 }
-
-
-
-
-
-//   Widget _buildAddressFields() {
-//   return Column(
-//     children: [
-//       ...addressFields.asMap().entries.map((entry) {
-//         int index = entry.key;
-//         TextEditingController controller;
-//         if (index < addressControllers.length) {
-//           controller = addressControllers[index];
-//         } else {
-//           controller = TextEditingController();
-//           addressControllers.add(controller);
-//         }
-
-//         return Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//           child: Row(
-//             children: [
-//               Expanded(
-//                 child: TextField(
-//                   controller: controller,
-//                   decoration: const InputDecoration(
-//                     border: OutlineInputBorder(),
-//                     hintText: "Address",
-//                     labelText: "Address",
-//                   ),
-//                   onChanged: (String value) {
-//                     formValues["Address"][index] = value;
-//                   },
-//                 ),
-//               ),
-//               IconButton(
-//                 icon: const Icon(Icons.remove),
-//                 onPressed: () {
-//                   setState(() {
-//                     addressFields.removeAt(index);
-//                     addressControllers.removeAt(index);
-//                     formValues["Address"].removeAt(index);
-//                   });
-//                 },
-//               ),
-//             ],
-//           ),
-//         );
-//       }).toList(),
-//       Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//         child: Row(
-//           children: [
-//             Expanded(
-//               child: IconButton(
-//                 icon: const Icon(Icons.add),
-//                 onPressed: () {
-//                   setState(() {
-//                     TextEditingController newController = TextEditingController();
-//                     addressControllers.add(newController);
-//                     addressFields.add(
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//                         child: Row(
-//                           children: [
-//                             Expanded(
-//                               child: TextField(
-//                                 controller: newController,
-//                                 decoration: const InputDecoration(
-//                                   border: OutlineInputBorder(),
-//                                   hintText: "Address",
-//                                   labelText: "Address",
-//                                 ),
-//                                 onChanged: (String value) {
-//                                   formValues["Address"].add(value);
-//                                 },
-//                               ),
-//                             ),
-//                             IconButton(
-//                               icon: const Icon(Icons.remove),
-//                               onPressed: () {
-//                                 setState(() {
-//                                   int index = addressFields.length - 1;
-//                                   addressFields.removeAt(index);
-//                                   addressControllers.removeAt(index);
-//                                   formValues["Address"].removeAt(index);
-//                                 });
-//                               },
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     );
-//                   });
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     ],
-//   );
-// }
 
 }
 
