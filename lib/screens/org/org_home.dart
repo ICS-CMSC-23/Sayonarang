@@ -1,3 +1,4 @@
+import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -112,13 +113,16 @@ class _OrgHomePageState extends State<OrgHomePage> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: InkWell(
             onTap: () {
-              // Navigate to the donation details page
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DonationDetailsPage(donation: donation),
-              //   ),
-              // );
+              // change selected donation
+              context.read<DonationProvider>().changeSelectedDonation(donation);
+
+              // navigate to the donation details page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DonationDetailsPage(),
+                ),
+              );
             },
             child: Card(
               surfaceTintColor: Colors.transparent,
