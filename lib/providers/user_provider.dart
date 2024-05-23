@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import '../api/firebase_user_api.dart';
+import 'package:donation_app/api/firebase_user_api.dart';
 import 'dart:io';
 
 class MyAuthProvider with ChangeNotifier {
@@ -81,6 +81,15 @@ class MyAuthProvider with ChangeNotifier {
     } catch (e) {
       print(e);
       return 'error';
+    }
+  }
+
+  Future<Map<String, dynamic>> getUserDetails(String userId) async {
+    try {
+      Map<String, dynamic> userDoc = await authService.getUserDetails(userId);
+      return userDoc;
+    } catch (e) {
+      throw Exception("Failed to retrieve details of user: ${e.toString()}");
     }
   }
 }

@@ -15,7 +15,7 @@ class _DonationDetailsPageState extends State<DonationDetailsPage> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    Donation? selectedDonation = context.read<DonationProvider>().selected;
+    Donation selectedDonation = context.read<DonationProvider>().selected;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +26,7 @@ class _DonationDetailsPageState extends State<DonationDetailsPage> {
           color: colorScheme.primary,
         ),
       )),
-      body: Text("${selectedDonation.donorId}"),
+      body: Text("${selectedDonation.id}"),
     );
   }
 }

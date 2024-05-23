@@ -1,9 +1,12 @@
+import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_donation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:donation_app/providers/donation_provider.dart';
+import 'package:donation_app/models/donation_model.dart';
 import 'package:donation_app/models/donation_model.dart';
 
 class OrgHomePage extends StatefulWidget {
@@ -14,22 +17,42 @@ class OrgHomePage extends StatefulWidget {
 }
 
 class _OrgHomePageState extends State<OrgHomePage> {
-  // TODO: Use id of logged in org user
-  final String orgId = 'dPA5rWi1FbcTElkLvoLw6lt91t12';
+  late User? currentUser;
+  Map<String, dynamic>? userDetails;
 
   @override
   void initState() {
     super.initState();
+    // TODO: Remove, move implementation to org profile page
+    // fetch user details
+    currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      fetchUserDetails(); // TODO: Remove, move implementation to org profile page
+      // execute initialization of the stream after the layout is completed
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<DonationProvider>().fetchDonationsToOrg(currentUser!.uid);
+      });
+    }
+  }
 
-    // Execute initialization of the stream after the layout is completed
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DonationProvider>().fetchDonationsToOrg(orgId);
+  // TODO: Remove, move implementation to org profile page
+  Future<void> fetchUserDetails() async {
+    final details =
+        await context.read<MyAuthProvider>().getUserDetails(currentUser!.uid);
+    setState(() {
+      userDetails = details;
     });
+  }
+
+  Future<String> _fetchDonorName(String donorId) async {
+    final userDetails =
+        await context.read<MyAuthProvider>().getUserDetails(donorId);
+    return userDetails['name'] as String? ?? 'Unknown Donor';
   }
 
   @override
   Widget build(BuildContext context) {
-    // Access donations in the provider
+    // access donations in the provider
     Stream<QuerySnapshot> donationsStream =
         context.watch<DonationProvider>().donationsToOrg;
 
@@ -77,7 +100,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               );
             }
 
-            // Convert data from donations stream to a list
+            // convert data from donations stream to a list
             List<Donation> donations = snapshot.data!.docs.map((doc) {
               Donation donation =
                   Donation.fromJson(doc.data() as Map<String, dynamic>);
@@ -90,8 +113,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
                 _buildDonationList(donations, 'pending'),
                 _buildDonationList(donations, 'confirmed'),
                 _buildDonationList(donations, 'scheduled for pickup'),
-                _buildDonationList(donations, 'cancelled'),
                 _buildDonationList(donations, 'completed'),
+                _buildDonationList(donations, 'cancelled'),
               ],
             );
           },
@@ -105,71 +128,95 @@ class _OrgHomePageState extends State<OrgHomePage> {
       return donation.status.toLowerCase() == status.toLowerCase();
     }).toList();
 
+    if (filteredDonations.isEmpty) {
+      return Center(
+        child: Text(
+          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
+    }
+
     return ListView.builder(
       itemCount: filteredDonations.length,
       itemBuilder: (context, index) {
         Donation donation = filteredDonations[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: InkWell(
-            onTap: () {
-              // change selected donation
-              context.read<DonationProvider>().changeSelectedDonation(donation);
-
-              // navigate to the donation details page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DonationDetailsPage(),
-                ),
-              );
-            },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      donation.donorId, // TODO: Change to donor name
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1, // Limit name to one line
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: donation.categories.take(3).map((category) {
-                        return Chip(
-                          label: Text(category),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          side: BorderSide.none,
-                          labelStyle: const TextStyle(color: Colors.white),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        return FutureBuilder<String>(
+          future: _fetchDonorName(donation.donorId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return LinearProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error encountered! ${snapshot.error}');
+            }
+            String donorName = snapshot.data ?? 'Donor';
+            return _buildDonationCard(donation, donorName);
+          },
         );
       },
+    );
+  }
+
+  Widget _buildDonationCard(Donation donation, String donorName) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        onTap: () {
+          // change selected donation
+          context.read<DonationProvider>().changeSelectedDonation(donation);
+
+          // navigate to the donation details page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DonationDetailsPage(),
+            ),
+          );
+        },
+        child: Card(
+          surfaceTintColor: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  donorName, // Display the fetched donor name
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1, // Limit name to one line
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  // limit categories to be displayed to 3
+                  children: donation.categories.take(3).map((category) {
+                    return Chip(
+                      label: Text(category),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      side: BorderSide.none,
+                      labelStyle: const TextStyle(color: Colors.white),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
