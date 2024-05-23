@@ -28,16 +28,33 @@ class ProfileHeader extends StatelessWidget {
             ),
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 donorName,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent, 
+                ),
               ),
+              SizedBox(height: 22), 
+              Text(
+                'Username:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey, 
+                ),
+              ),
+              SizedBox(height: 4),
               Text(
                 username,
-                style: Theme.of(context).textTheme.bodyText1,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black, 
+                ),
               ),
             ],
           ),
