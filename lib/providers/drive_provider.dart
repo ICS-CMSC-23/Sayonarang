@@ -11,7 +11,10 @@ class DriveProvider with ChangeNotifier {
 
   DriveProvider() {
     firebaseService = FirebaseDriveAPI();
-    // fetchDrives();
+    fetchDrives();
+    _drivesStream = const Stream
+        .empty(); // initialize with an empty stream to prevent LateInitializationError
+    _drivesByOrgStream = const Stream.empty();
   }
 
   // getter

@@ -1,12 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:donation_app/providers/donation_provider.dart';
-import 'package:donation_app/models/donation_model.dart';
 import 'package:donation_app/models/donation_model.dart';
 
 class OrgHomePage extends StatefulWidget {
@@ -17,20 +16,20 @@ class OrgHomePage extends StatefulWidget {
 }
 
 class _OrgHomePageState extends State<OrgHomePage> {
-  late User? currentUser;
-  Map<String, dynamic>? userDetails;
+  late User? _currentUser;
+  Map<String, dynamic>? _userDetails;
 
   @override
   void initState() {
     super.initState();
     // TODO: Remove, move implementation to org profile page
     // fetch user details
-    currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null) {
+    _currentUser = FirebaseAuth.instance.currentUser;
+    if (_currentUser != null) {
       fetchUserDetails(); // TODO: Remove, move implementation to org profile page
       // execute initialization of the stream after the layout is completed
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<DonationProvider>().fetchDonationsToOrg(currentUser!.uid);
+        context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
       });
     }
   }
@@ -38,16 +37,16 @@ class _OrgHomePageState extends State<OrgHomePage> {
   // TODO: Remove, move implementation to org profile page
   Future<void> fetchUserDetails() async {
     final details =
-        await context.read<MyAuthProvider>().getUserDetails(currentUser!.uid);
+        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
     setState(() {
-      userDetails = details;
+      _userDetails = details;
     });
   }
 
   Future<String> _fetchDonorName(String donorId) async {
-    final userDetails =
+    final _userDetails =
         await context.read<MyAuthProvider>().getUserDetails(donorId);
-    return userDetails['name'] as String? ?? 'Unknown Donor';
+    return _userDetails['name'] as String? ?? 'Unknown Donor';
   }
 
   @override
@@ -175,25 +174,24 @@ class _OrgHomePageState extends State<OrgHomePage> {
         },
         child: Card(
           surfaceTintColor: Colors.transparent,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+          child: ListTile(
+            title: Text(
+              donorName, // display the fetched donor name
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1, // limit name to one line
+            ),
+            subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  donorName, // Display the fetched donor name
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1, // Limit name to one line
-                ),
                 const SizedBox(height: 8),
                 Text(
                   'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -211,9 +209,9 @@ class _OrgHomePageState extends State<OrgHomePage> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 8),
               ],
             ),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ),
         ),
       ),
