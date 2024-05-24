@@ -3,14 +3,14 @@ import "package:donation_app/providers/donation_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
-class DriveDetailsPage extends StatefulWidget {
-  const DriveDetailsPage({super.key});
+class DriveFormPage extends StatefulWidget {
+  const DriveFormPage({super.key});
 
   @override
-  State<DriveDetailsPage> createState() => DriveDetailsPageState();
+  State<DriveFormPage> createState() => DriveFormPageState();
 }
 
-class DriveDetailsPageState extends State<DriveDetailsPage> {
+class DriveFormPageState extends State<DriveFormPage> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -20,13 +20,13 @@ class DriveDetailsPageState extends State<DriveDetailsPage> {
     return Scaffold(
       appBar: AppBar(
           title: Text(
-        "Donation Drive Details",
+        "Create Donation Drive",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: colorScheme.primary,
         ),
       )),
-      body: Text("${selectedDonation.id}"),
+      body: Text(""),
     );
   }
 }

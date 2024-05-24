@@ -82,7 +82,6 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
             itemBuilder: ((context, index) {
               User org = User.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
-
               org.id = snapshot.data!.docs[index].id;
 
               return Container(

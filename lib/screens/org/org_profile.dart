@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
 
 class OrgProfilePage extends StatefulWidget {
   const OrgProfilePage({super.key});

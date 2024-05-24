@@ -45,6 +45,8 @@ class _OrgMainPageState extends State<OrgMainPage> {
               label: 'Profile',
             )
           ],
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
         ));
   }
 }
