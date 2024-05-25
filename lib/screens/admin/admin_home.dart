@@ -5,6 +5,7 @@ import '../../providers/user_provider.dart';
 import '../auth/login_page.dart';
 import 'admin_donors.dart';
 import 'admin_organizations.dart';
+import 'admin_profile.dart';
 import 'admin_waitlist.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -46,8 +47,11 @@ class AdminView extends StatelessWidget {
               leading: Icon(Icons.person),
               title: Text('Profile'),
               onTap: () {
-                // Handle Profile tap
-                // Navigator.pushNamed(context, '/profile');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
               },
             ),
             ListTile(
