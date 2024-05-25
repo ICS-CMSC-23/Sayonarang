@@ -1,4 +1,3 @@
-//admin_donors.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
+import 'admin_donor_details.dart';
 
 class ViewDonors extends StatefulWidget {
   const ViewDonors({Key? key}) : super(key: key);
@@ -42,11 +42,10 @@ class _ViewDonorsState extends State<ViewDonors> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Display a message if there are no donors
                 Text(
                   'No donors yet!',
                   style: TextStyle(
-                    fontSize: 20, // Increased font size for no donors message
+                    fontSize: 20,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -55,58 +54,41 @@ class _ViewDonorsState extends State<ViewDonors> {
           );
         }
 
-        // Calculate the height of the container based on the number of donors
-        // double containerHeight = (snapshot.data!.docs.length * 600.0) + 32.0;
+        return ListView.builder(
+          itemCount: snapshot.data?.docs.length,
+          itemBuilder: (context, index) {
+            User donor = User.fromJson(
+                snapshot.data!.docs[index].data() as Map<String, dynamic>);
+            donor.id = snapshot.data!.docs[index].id;
 
-        return Container(
-          // height: containerHeight,
-          // margin: EdgeInsets.all(16.0),
-          // padding: EdgeInsets.all(8.0),
-          // decoration: BoxDecoration(
-          //   borderRadius: BorderRadius.circular(12.0),
-          //   color: Color.fromARGB(255, 227, 227, 227),
-          // ),
-          child: ListView.builder(
-            itemCount: snapshot.data?.docs.length,
-            itemBuilder: ((context, index) {
-              User donor = User.fromJson(
-                  snapshot.data!.docs[index].data() as Map<String, dynamic>);
-              donor.id = snapshot.data!.docs[index].id;
-
-              return Container(
-                child: InkWell(
-                  onTap: () {
-                    // TODO: Implement navigating to user details
-                  },
-                  child: ListTile(
-                    leading: Icon(
-                      // CupertinoIcons.person_crop_circle_fill,
-                      Icons.account_box_rounded,
-                      size: 40,
-                    ), // Icon for the person/account
-
-                    title: Text(
-                      donor.name,
-                      style: TextStyle(
-                        fontSize: 22, // Adjusted font size for donor name
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      donor.username,
-                      style: TextStyle(
-                        fontSize: 16, // Adjusted font size for username
-                        color: Colors.blue,
-                      ),
-                    ),
-                    onTap: () {
-                      // TODO: Implement navigating to user details
-                    },
-                  ),
+            return ListTile(
+              leading: Icon(
+                Icons.account_box_rounded,
+                size: 40,
+              ),
+              title: Text(
+                donor.name,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
-              );
-            }),
-          ),
+              ),
+              subtitle: Text(
+                donor.username,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => DonorDetailsView(donor: donor),
+                  ),
+                );
+              },
+            );
+          },
         );
       },
     );

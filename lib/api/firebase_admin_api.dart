@@ -84,4 +84,16 @@ class FirebaseAdminAPI {
       return "Failed with error '${e.code}: ${e.message}";
     }
   }
+
+  // Retrieve specific org by id
+  Future<DocumentSnapshot<Map<String, dynamic>>> getOrganizationById(
+      String orgId) async {
+    return db.collection('users').doc(orgId).get();
+  }
+
+  // Retrieve specific donor by id
+  Future<DocumentSnapshot<Map<String, dynamic>>> getDonorById(
+      String donorId) async {
+    return db.collection('users').doc(donorId).get();
+  }
 }
