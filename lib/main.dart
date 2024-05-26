@@ -62,10 +62,10 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/org',
       routes: {
         // set the routes of the pages
-        '/': (context) => const LoginPage(),
+        '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),

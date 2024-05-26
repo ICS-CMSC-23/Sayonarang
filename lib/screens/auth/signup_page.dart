@@ -171,7 +171,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                       content: Text('Successfully signed up!'),
                     ),
                   );
-                  Navigator.pop(context);
+                  if (context.mounted) Navigator.pop(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
