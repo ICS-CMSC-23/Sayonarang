@@ -68,4 +68,12 @@ class AdminProvider with ChangeNotifier {
     print(message);
     notifyListeners();
   }
+
+  Future<DocumentSnapshot> getOrgById(String orgId) async {
+    return firebaseService.getOrganizationById(orgId);
+  }
+
+  Future<DocumentSnapshot> getDonorById(String orgId) async {
+    return firebaseService.getOrganizationById(orgId);
+  }
 }
