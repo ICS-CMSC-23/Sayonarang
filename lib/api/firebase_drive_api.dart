@@ -29,17 +29,16 @@ class FirebaseDriveAPI {
   }
 
   // the donation drive can be edited to update its description and list of donations linked
-  Future<String> editDrive(
-    String? id,
-    String description,
-    List<String> donationIds,
-  ) async {
+  Future<String> editDrive(String? id, String title, String description,
+      List<String> donationIds, DateTime endDate) async {
     try {
       print("Description: $description");
       print("Donation IDs: $donationIds");
       await db.collection("drives").doc(id).update({
+        "title": title,
         "description": description,
         "donationIds": donationIds,
+        "endDate": endDate
       });
 
       return "Successfully edited donation drive!";

@@ -13,8 +13,6 @@ class DonationDetailsPage extends StatefulWidget {
 class _DonationDetailsPageState extends State<DonationDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     Donation selectedDonation = context.read<DonationProvider>().selected;
 
     return Scaffold(
@@ -23,7 +21,7 @@ class _DonationDetailsPageState extends State<DonationDetailsPage> {
         "Donation Details",
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: colorScheme.primary,
+          color: Theme.of(context).colorScheme.primary,
         ),
       )),
       body: Text("${selectedDonation.id}"),
