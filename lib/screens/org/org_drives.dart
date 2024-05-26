@@ -1,6 +1,6 @@
 import 'package:donation_app/models/drive_model.dart';
 import 'package:donation_app/screens/org/org_drive.dart';
-import 'package:donation_app/screens/org/org_form.dart';
+import 'package:donation_app/screens/org/org_drive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -35,8 +35,6 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
     Stream<QuerySnapshot> drivesStream =
         context.watch<DriveProvider>().drivesByOrg;
 
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -45,7 +43,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             "Donation Drives",
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           bottom: const TabBar(
@@ -97,7 +95,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriveFormPage(),
+                builder: (context) => DriveFormPage(mode: "add"),
               ),
             );
           },
@@ -143,11 +141,11 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
           // change selected drive
           context.read<DriveProvider>().changeSelectedDrive(drive);
 
-          // navigate to the drive details page
+          // navigate to the drive form page with view as mode
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DriveDetailsPage(),
+              builder: (context) => DriveFormPage(mode: "view"),
             ),
           );
         },
