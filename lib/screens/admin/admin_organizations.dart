@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
-import 'admin_org_details.dart';
+import 'admin_user_details.dart';
 
 class ViewOrganizations extends StatefulWidget {
   const ViewOrganizations({Key? key}) : super(key: key);
@@ -69,7 +69,7 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OrganizationDetailsView(org: org),
+                        builder: (context) => UserDetailsView(user: org),
                       ),
                     );
                   },
