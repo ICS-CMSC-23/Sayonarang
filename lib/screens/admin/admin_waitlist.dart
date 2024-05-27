@@ -17,24 +17,42 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context);
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildOrganizationList(
-            context,
-            provider.pendingList,
-            'Pending Organizations',
-            Icons.access_time,
-            Colors.orange,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: Container(
+            color: Colors.white,
+            child: const TabBar(
+              labelColor: Color(0xFFF54642),
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: Color(0xFFF54642),
+              tabs: [
+                Tab(text: 'Pending'),
+                Tab(text: 'Rejected'),
+              ],
+            ),
           ),
-          _buildOrganizationList(
-            context,
-            provider.rejectedList,
-            'Rejected Organizations',
-            Icons.cancel,
-            Colors.red,
-          ),
-        ],
+        ),
+        body: TabBarView(
+          children: [
+            _buildOrganizationList(
+              context,
+              provider.pendingList,
+              'Pending Organizations',
+              Icons.access_time,
+              Colors.orange,
+            ),
+            _buildOrganizationList(
+              context,
+              provider.rejectedList,
+              'Rejected Organizations',
+              Icons.cancel,
+              Colors.red,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -53,14 +71,14 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
           return Center(
             child: Text(
               "Error encountered! ${snapshot.error}",
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.red,
               ),
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -70,85 +88,57 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
               children: [
                 Text(
                   'No $title...',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                SizedBox(height: 16),
-                if (title == 'Pending Organizations')
-                  ElevatedButton(
-                    onPressed: () {
-                      Provider.of<AdminProvider>(context, listen: false)
-                          .updateIndex(1);
-                    },
-                    child: Text("View Approved Organizations"),
-                  ),
               ],
             ),
           );
         }
 
-        return Card(
-          margin: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.all(16),
-                color: iconColor.withOpacity(0.1),
-                child: Center(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: iconColor,
-                    ),
+        return ListView.builder(
+          itemCount: snapshot.data?.docs.length,
+          itemBuilder: (context, index) {
+            User org = User.fromJson(
+                snapshot.data!.docs[index].data() as Map<String, dynamic>);
+            org.id = snapshot.data!.docs[index].id;
+
+            return Card(
+              margin:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              elevation: 4,
+              child: ListTile(
+                leading: Icon(
+                  icon,
+                  size: 40,
+                  color: iconColor,
+                ),
+                title: Text(
+                  org.name,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: snapshot.data?.docs.length,
-                itemBuilder: (context, index) {
-                  User org = User.fromJson(snapshot.data!.docs[index].data()
-                      as Map<String, dynamic>);
-                  org.id = snapshot.data!.docs[index].id;
-
-                  return ListTile(
-                    leading: Icon(
-                      icon,
-                      size: 40,
-                      color: iconColor,
+                subtitle: Text(
+                  org.username,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PendingOrgDetailPage(org: org),
                     ),
-                    title: Text(
-                      org.name,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      org.username,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => PendingOrgDetailPage(org: org),
-                        ),
-                      );
-                    },
                   );
                 },
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
