@@ -163,9 +163,15 @@ class OrgDonationsList extends StatelessWidget {
           var orgData = orgSnapshot.data!.data() as Map<String, dynamic>?;
           String orgName = orgData?['name'] ?? 'Unknown Organization';
 
+          // You can directly access the drive ID from the document snapshot
+          // String? driveId = drive.id;
+
           return ListTile(
             title: Text(drive.title),
-            subtitle: Text('Description: ${drive.description}'),
+            subtitle: Text(
+              // 'Description: ${drive.description} DriveId: $driveId OrgId: ${drive.orgId}',
+              'Description: ${drive.description} ',
+            ),
             onTap: () {
               Navigator.push(
                 context,

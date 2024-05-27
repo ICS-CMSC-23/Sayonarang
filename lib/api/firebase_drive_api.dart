@@ -5,7 +5,8 @@ class FirebaseDriveAPI {
 
   Future<String> addDrive(Map<String, dynamic> drive) async {
     try {
-      await db.collection("drives").add(drive);
+      // Explicitly set the document ID to the drive ID
+      await db.collection("drives").doc(drive['id']).set(drive);
 
       return "Successfully added donation drive!";
     } on FirebaseException catch (e) {
