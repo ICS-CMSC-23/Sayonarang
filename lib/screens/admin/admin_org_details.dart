@@ -24,7 +24,7 @@ class _OrganizationDetailsViewState extends State<OrganizationDetailsView> {
           title: Text(widget.org.name),
           bottom: TabBar(
             tabs: [
-              Tab(text: 'Donations'),
+              Tab(text: 'Donation Drives'),
               Tab(text: 'Account Details'),
             ],
           ),
