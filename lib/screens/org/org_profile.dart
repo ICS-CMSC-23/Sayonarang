@@ -20,6 +20,6 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
                 onPressed: () {
                   context.read<MyAuthProvider>().signOut();
                 },
-                child: const Text("Logut"))));
+                child: const Text("Logout"))));
   }
 }

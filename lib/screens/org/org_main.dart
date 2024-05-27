@@ -27,34 +27,6 @@ class _OrgMainPageState extends State<OrgMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    Stream<User?> userStream = context.watch<MyAuthProvider>().userStream;
-
-    userStream.listen((User? user) {
-      if (user != null) {
-        print('User ID: ${user.uid}');
-      } else {
-        print('No user');
-      }
-    });
-
-    return StreamBuilder(
-        stream: userStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error encountered: ${snapshot.error}'));
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (!snapshot.hasData) {
-            print('No user data');
-            return const LoginPage();
-          }
-
-          print('User data found');
-          return displayPage(context);
-        });
-  }
-
-  Scaffold displayPage(BuildContext context) {
     return Scaffold(
         body: pages[currentPage],
         bottomNavigationBar: BottomNavigationBar(

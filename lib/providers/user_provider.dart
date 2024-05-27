@@ -9,6 +9,7 @@ class MyAuthProvider with ChangeNotifier {
   late FirebaseAuthAPI authService;
   late Stream<User?> uStream;
   User? userObj;
+  String? role;
 
   Map<String, dynamic> signupStatus = {};
   Map<String, dynamic> userDetails =
@@ -23,6 +24,17 @@ class MyAuthProvider with ChangeNotifier {
 
   void fetchAuthentication() {
     uStream = authService.getUser();
+
+    // get user role based on id
+    uStream.first.then((user) async {
+      if (user != null) {
+        print('## User ID: ${user.uid}');
+
+        role = await authService.getUserRole(user.uid);
+        print('## Role: $role');
+        notifyListeners();
+      }
+    });
 
     notifyListeners();
   }
@@ -90,6 +102,16 @@ class MyAuthProvider with ChangeNotifier {
       return userDoc;
     } catch (e) {
       throw Exception("Failed to retrieve details of user: ${e.toString()}");
+    }
+  }
+
+  Future<String> getUserRole(String userId) async {
+    try {
+      role = await authService.getUserRole(userId);
+      notifyListeners();
+      return role ?? '';
+    } catch (e) {
+      throw Exception("Failed to retrieve role of user: ${e.toString()}");
     }
   }
 }
