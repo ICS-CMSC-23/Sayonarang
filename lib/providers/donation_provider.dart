@@ -8,6 +8,7 @@ class DonationProvider with ChangeNotifier {
   late Stream<QuerySnapshot> _donationsStream;
   late Stream<QuerySnapshot> _donationsByDonorStream;
   late Stream<QuerySnapshot> _donationsToOrgStream;
+  late Stream<QuerySnapshot> _donationsByDriveStream;
   Donation? _selectedDonation;
 
   DonationProvider() {
@@ -23,6 +24,7 @@ class DonationProvider with ChangeNotifier {
   Stream<QuerySnapshot> get donations => _donationsStream;
   Stream<QuerySnapshot> get donationsByDonor => _donationsByDonorStream;
   Stream<QuerySnapshot> get donationsToOrg => _donationsToOrgStream;
+  Stream<QuerySnapshot> get donationsByDrive => _donationsByDriveStream;
   Donation get selected => _selectedDonation!;
 
   changeSelectedDonation(Donation donation) {
@@ -41,6 +43,11 @@ class DonationProvider with ChangeNotifier {
 
   void fetchDonationsToOrg(String orgId) {
     _donationsToOrgStream = firebaseService.getDonationsToOrg(orgId);
+    notifyListeners();
+  }
+
+  void fetchDonationsByDrive(String driveId) {
+    _donationsByDriveStream = firebaseService.getDonationsByDrive(driveId);
     notifyListeners();
   }
 

@@ -39,6 +39,17 @@ class FirebaseDonationAPI {
     }
   }
 
+  Stream<QuerySnapshot> getDonationsByDrive(String driveId) {
+    try {
+      return db
+          .collection("donations")
+          .where("driveId", isEqualTo: driveId)
+          .snapshots();
+    } catch (e) {
+      throw "Failed to get donations by drive: $e";
+    }
+  }
+
   // TODO: add api for getting donations given categories as a filter
 
   Future<String> editDonationStatus(
