@@ -15,7 +15,7 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Color(0xFFF54741)),
+        iconTheme: const IconThemeData(color: Color(0xFFF54741)),
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0),

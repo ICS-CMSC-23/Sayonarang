@@ -35,6 +35,7 @@ class UserAccountDetails extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 10),
                   const Center(
                     child: Text(
                       'ACCOUNT DETAILS',
@@ -47,12 +48,11 @@ class UserAccountDetails extends StatelessWidget {
                   const SizedBox(height: 16),
                   ListTile(
                     leading: Container(
-                      width: 50, // Adjust the width and height as needed
+                      width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.blue, // Change color as needed
-                        borderRadius:
-                            BorderRadius.circular(8), // Make it square
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         isDonor ? Icons.person : Icons.business,
@@ -76,7 +76,7 @@ class UserAccountDetails extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 15),
                   const Text(
                     'Contact Number:',
                     style: TextStyle(
@@ -96,7 +96,7 @@ class UserAccountDetails extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 15),
                   const Text(
                     'Addresses:',
                     style: TextStyle(
@@ -122,7 +122,7 @@ class UserAccountDetails extends StatelessWidget {
                     }).toList(),
                   ),
                   if (!isDonor) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 15),
                     const Text(
                       'Proof:',
                       style: TextStyle(
@@ -154,6 +154,7 @@ class UserAccountDetails extends StatelessWidget {
                       },
                     ),
                   ],
+                  const SizedBox(height: 15),
                 ],
               ),
             ),

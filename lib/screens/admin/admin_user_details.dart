@@ -20,13 +20,21 @@ class _UserDetailsViewState extends State<UserDetailsView> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.user.name),
+          title: Text(
+            widget.user.name,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFF54741),
+            ),
+          ),
+          backgroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Color(0xFFF54741)),
           bottom: TabBar(
             tabs: [
               widget.user.role == 'org'
-                  ? Tab(text: 'Donation Drives')
-                  : Tab(text: 'Donations'),
-              Tab(text: 'Account Details'),
+                  ? const Tab(text: 'Donation Drives')
+                  : const Tab(text: 'Donations'),
+              const Tab(text: 'Account Details'),
             ],
           ),
         ),
