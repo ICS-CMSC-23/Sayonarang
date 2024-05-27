@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
-import 'admin_org_account_details.dart';
 import 'admin_org_donations_list.dart';
+import 'admin_user_account_details.dart';
 
 class OrganizationDetailsView extends StatefulWidget {
   final User org;
@@ -22,7 +22,7 @@ class _OrganizationDetailsViewState extends State<OrganizationDetailsView> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.org.name),
-          bottom: TabBar(
+          bottom: const TabBar(
             tabs: [
               Tab(text: 'Donation Drives'),
               Tab(text: 'Account Details'),
@@ -32,7 +32,7 @@ class _OrganizationDetailsViewState extends State<OrganizationDetailsView> {
         body: TabBarView(
           children: [
             OrgDonationsList(orgId: widget.org.id!),
-            OrgAccountDetails(org: widget.org),
+            UserAccountDetails(user: widget.org),
           ],
         ),
       ),
