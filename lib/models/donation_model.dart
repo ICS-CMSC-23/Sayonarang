@@ -44,7 +44,7 @@ class Donation {
       driveId: json['driveId'],
       categories: (json['categories'] as List)
           .cast<String>(), // convert List<dynamic> to List<String>
-      addresses: (json['categories'] as List).cast<String>(),
+      addresses: (json['addresses'] as List).cast<String>(),
       mode: json['mode'],
       weight: json['weight'],
       contactNum: json['contactNum'],
