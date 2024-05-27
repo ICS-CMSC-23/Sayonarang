@@ -18,13 +18,24 @@ class AdminView extends StatelessWidget {
     'Donors'
   ];
 
+  static const Color customRed =
+      Color(0xFFF54741); // Define the custom color here
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pageTitles[provider.selectedIndex]),
+        title: Text(
+          _pageTitles[provider.selectedIndex],
+          style: TextStyle(
+            color: customRed, // Set the text color to customRed
+            fontWeight: FontWeight.bold, // Make the text bold
+          ),
+        ),
+        backgroundColor:
+            Colors.white, // Optional: Set the AppBar background to white
       ),
       body: _AdminPages.elementAt(provider.selectedIndex),
       drawer: Drawer(
@@ -33,7 +44,7 @@ class AdminView extends StatelessWidget {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: customRed, // Set the DrawerHeader color to customRed
               ),
               child: Text(
                 'Admin',
@@ -88,7 +99,8 @@ class AdminView extends StatelessWidget {
           ),
         ],
         currentIndex: provider.selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor:
+            customRed, // Set the selected item color to customRed
         onTap: (index) => provider.updateIndex(index),
       ),
     );
