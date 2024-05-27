@@ -56,12 +56,6 @@ class AdminProvider with ChangeNotifier {
     fetchRejected();
   }
 
-  // Future<void> updateOrganizationStatus(String orgId, String status) async {
-  //   await FirebaseFirestore.instance.collection('users').doc(orgId).update({
-  //     'status': status,
-  //   });
-  // }
-
   void updateOrgStatus(String orgId, String status) async {
     String message =
         await firebaseService.updateOrganizationStatus(orgId, status);
@@ -75,5 +69,9 @@ class AdminProvider with ChangeNotifier {
 
   Future<DocumentSnapshot> getDonorById(String orgId) async {
     return firebaseService.getOrganizationById(orgId);
+  }
+
+  Future<String?> getProofImageUrl(String filename) async {
+    return firebaseService.getProofImageUrl(filename);
   }
 }

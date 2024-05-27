@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseAdminAPI {
   // A class that provides methods to interact with Firebase Firestore for friend-related operations.
@@ -95,5 +96,17 @@ class FirebaseAdminAPI {
   Future<DocumentSnapshot<Map<String, dynamic>>> getDonorById(
       String donorId) async {
     return db.collection('users').doc(donorId).get();
+  }
+
+  // Retrieve image proof of org
+  Future<String?> getProofImageUrl(String filename) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child("proof/$filename");
+      return await imageRef.getDownloadURL();
+    } catch (e) {
+      print("Failed to retrieve image: $e");
+      return null;
+    }
   }
 }

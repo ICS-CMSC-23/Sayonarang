@@ -18,6 +18,12 @@ class AdminView extends StatelessWidget {
     'Donors'
   ];
 
+  static List<Widget> _AdminPages = <Widget>[
+    AdminApprovalWaitList(),
+    ViewOrganizations(),
+    ViewDonors(),
+  ];
+
   static const Color customRed =
       Color(0xFFF54741); // Define the custom color here
 
@@ -29,13 +35,12 @@ class AdminView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           _pageTitles[provider.selectedIndex],
-          style: TextStyle(
-            color: customRed, // Set the text color to customRed
-            fontWeight: FontWeight.bold, // Make the text bold
+          style: const TextStyle(
+            color: customRed,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor:
-            Colors.white, // Optional: Set the AppBar background to white
+        backgroundColor: Colors.white,
       ),
       body: _AdminPages.elementAt(provider.selectedIndex),
       drawer: Drawer(
@@ -44,7 +49,7 @@ class AdminView extends StatelessWidget {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: customRed, // Set the DrawerHeader color to customRed
+                color: customRed,
               ),
               child: Text(
                 'Admin',
@@ -69,8 +74,6 @@ class AdminView extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Log out'),
               onTap: () {
-                // Handle Log out tap
-                // Implement log out logic here
                 context.read<MyAuthProvider>().signOut(); // Log-out
                 // Go to Log-in
                 Navigator.of(context).pushReplacement(
@@ -105,10 +108,4 @@ class AdminView extends StatelessWidget {
       ),
     );
   }
-
-  static List<Widget> _AdminPages = <Widget>[
-    AdminApprovalWaitList(),
-    ViewOrganizations(),
-    ViewDonors(),
-  ];
 }

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
 import 'admin_waitlist_details.dart';
-// import 'pending_org_detail_page.dart';
 
 class AdminApprovalWaitList extends StatefulWidget {
   const AdminApprovalWaitList({Key? key}) : super(key: key);
