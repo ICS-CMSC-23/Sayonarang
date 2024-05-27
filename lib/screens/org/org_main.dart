@@ -3,6 +3,11 @@ import "package:donation_app/screens/org/org_home.dart";
 import "package:donation_app/screens/org/org_drives.dart";
 import "package:donation_app/screens/org/org_profile.dart";
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/auth/login_page.dart';
+
 class OrgMainPage extends StatefulWidget {
   const OrgMainPage({super.key});
 

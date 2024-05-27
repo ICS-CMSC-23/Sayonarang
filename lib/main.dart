@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -62,14 +63,61 @@ class MyApp extends StatelessWidget {
         colorScheme: colorScheme,
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      // initialRoute: '/org',
       routes: {
         // set the routes of the pages
-        '/': (context) => const LoginPage(),
+        '/login': (context) => const LoginPage(),
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
         '/donor': (context) => const DonorView(),
+      },
+      home: AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // print('>>> Snapshot: $snapshot');
+        if (snapshot.connectionState == ConnectionState.active) {
+          User? user = snapshot.data;
+          if (user == null) {
+            return LoginPage();
+          } else {
+            return FutureBuilder<String>(
+              future: MyAuthProvider().getUserRole(user.uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // return CircularProgressIndicator();  # ugly in ui
+                  return Scaffold();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  String role = snapshot.data!;
+                  switch (role) {
+                    case 'admin':
+                      return AdminView();
+                    case 'org':
+                      return OrgMainPage();
+                    case 'donor':
+                      return DonorView();
+                    default:
+                      return LoginPage();
+                  }
+                }
+              },
+            );
+          }
+        } else {
+          return CircularProgressIndicator();
+        }
       },
     );
   }

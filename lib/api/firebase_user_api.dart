@@ -146,4 +146,11 @@ class FirebaseAuthAPI {
 
     return userDoc.data()!;
   }
+
+  Future<String> getUserRole(String uid) async {
+    final DocumentSnapshot<Map<String, dynamic>> userDoc =
+        await db.collection('users').doc(uid).get();
+
+    return userDoc.data()!['role'];
+  }
 }

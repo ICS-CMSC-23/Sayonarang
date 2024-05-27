@@ -61,12 +61,6 @@ class AdminView extends StatelessWidget {
                 // Handle Log out tap
                 // Implement log out logic here
                 context.read<MyAuthProvider>().signOut(); // Log-out
-                // Go to Log-in
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(),
-                  ),
-                );
               },
             ),
           ],
