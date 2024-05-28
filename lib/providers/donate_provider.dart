@@ -1,62 +1,72 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/donate_data.dart';
 import '../api/firebase_api.dart';
 
-class DonateDatacart with ChangeNotifier {
-  late FirebaseSlamAPI firebaseService;
+class DonateDataProvider with ChangeNotifier {
+  final FirebaseSlamAPI firebaseService = FirebaseSlamAPI();
   late Stream<QuerySnapshot> _dataStream;
   final List<DonateData> _dataList = [];
-  
-  int _friendsCount = 0;
-  List<DonateData> get friends => _dataList;
 
-  DonateDatacart () {
-    firebaseService = FirebaseSlamAPI();
+  int get donationsCount => _dataList.length;
+  List<DonateData> get donations => _dataList;
+
+  DonateDataProvider() {
     fetchData();
   }
 
   Stream<QuerySnapshot> get dataStream => _dataStream;
 
   void fetchData() {
-    _dataStream = firebaseService.getAllFriends();
-    notifyListeners();
-  }
-
-  void addData(DonateData d) async {
-    String message = await firebaseService.addDataApi(d);
-    print(message);
-    _friendsCount++;
-    notifyListeners();
-  } 
-
-  void updateData(DonateData d) async {
-    String message = await firebaseService.editData(d);
-    print(message);
-    notifyListeners();
-  }
-
-  void delete(String nameAndNickname) async {
-    String message = await firebaseService.deleteFriend(nameAndNickname);
-    print(message);
-  notifyListeners();
-}
-
-  void removeAll() {
-    _dataList.clear();
-    _friendsCount = 0;
-    notifyListeners();
-  }
-
-  void removeData(String name) {
-    for (int i = 0; i < _dataList.length; i++) {
-      if (_dataList[i].data["Name"] == name) {
-        _friendsCount--;
-        _dataList.remove(_dataList[i]);
-        break;
+    _dataStream = firebaseService.getAllDonations();
+    _dataStream.listen((snapshot) {
+      _dataList.clear();
+      for (var doc in snapshot.docs) {
+        _dataList.add(DonateData.fromMap(doc.data() as Map<String, dynamic>, id: doc.id));
       }
+      notifyListeners();
+    }, onError: (error) {
+      print('Error fetching donations: $error');
+    });
+  }
+  
+
+  Future<void> addDonation(DonateData donation) async {
+    try {
+      String message = await firebaseService.addDataApi(donation);
+      print(message);
+      _dataList.add(donation);
+      notifyListeners();
+    } catch (e) {
+      print('Error adding donation: $e');
+      rethrow;
     }
-    notifyListeners();
+  }
+
+  Future<void> updateDonation(DonateData donation) async {
+    try {
+      String message = await firebaseService.editData(donation);
+      print(message);
+      int index = _dataList.indexWhere((d) => d.id == donation.id);
+      if (index != -1) {
+        _dataList[index] = donation;
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error updating donation: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteDonation(String id) async {
+    try {
+      String message = await firebaseService.deleteDonation(id);
+      print(message);
+      _dataList.removeWhere((item) => item.id == id);
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting donation: $e');
+      rethrow;
+    }
   }
 }
-

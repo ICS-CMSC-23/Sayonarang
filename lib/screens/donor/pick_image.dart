@@ -1,11 +1,12 @@
-//GOODS NA SKSKS
-
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class PickImage extends StatefulWidget {
-  const PickImage({super.key});
+  final Function(String) onImagePicked;
+
+  const PickImage({Key? key, required this.onImagePicked}) : super(key: key);
 
   @override
   State<PickImage> createState() => _PickImageState();
@@ -13,6 +14,8 @@ class PickImage extends StatefulWidget {
 
 class _PickImageState extends State<PickImage> {
   File? _selectedImage;
+  String? _imageUrl;
+  bool _uploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +27,8 @@ class _PickImageState extends State<PickImage> {
                 height: 200,
                 width: 200,
                 decoration: BoxDecoration(
-                  color: Colors.black12, // Add a color here
-                  borderRadius: BorderRadius.circular(10), // Change the border radius here
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(10),
                   image: DecorationImage(
                     image: FileImage(_selectedImage!),
                     fit: BoxFit.cover,
@@ -36,13 +39,13 @@ class _PickImageState extends State<PickImage> {
                 height: 200,
                 width: 200,
                 decoration: BoxDecoration(
-                  color: Colors.black12, // Add a color here
-                  shape: BoxShape.rectangle, // Use BoxShape.rectangle to make it not circular
-                  image: DecorationImage(
-                    image: NetworkImage(
-                        "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"),
-                    fit: BoxFit.cover,
-                  ),
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.image,
+                  size: 100,
+                  color: Colors.grey,
                 ),
               ),
         const SizedBox(height: 20),
@@ -50,38 +53,67 @@ class _PickImageState extends State<PickImage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-              onPressed: () {
-                _pickImageFromGallery();
-              },
+              onPressed: _pickImageFromGallery,
               child: const Text("Gallery"),
             ),
             ElevatedButton(
-              onPressed: () {
-                _pickImageFromCamera();
-              },
+              onPressed: _pickImageFromCamera,
               child: const Text("Camera"),
             ),
           ],
         ),
+        if (_uploading) CircularProgressIndicator(),
       ],
     );
   }
 
-  Future _pickImageFromGallery() async {
-    final returnImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (returnImage == null) return;
+  Future<void> _pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) return;
+
     setState(() {
-      _selectedImage = File(returnImage.path);
+      _selectedImage = File(pickedFile.path);
+      _uploading = true;
     });
+
+    await _uploadImageToFirebaseStorage(_selectedImage!);
   }
 
-  Future _pickImageFromCamera() async {
-    final returnImage =
-        await ImagePicker().pickImage(source: ImageSource.camera);
-    if (returnImage == null) return;
+  Future<void> _pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile == null) return;
+
     setState(() {
-      _selectedImage = File(returnImage.path);
+      _selectedImage = File(pickedFile.path);
+      _uploading = true;
     });
+
+    await _uploadImageToFirebaseStorage(_selectedImage!);
+  }
+
+  Future<void> _uploadImageToFirebaseStorage(File imageFile) async {
+    try {
+      String fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child(fileName);
+
+      await ref.putFile(imageFile);
+
+      setState(() {
+        _uploading = false;
+      });
+
+      widget.onImagePicked(fileName);
+    } catch (e) {
+      setState(() {
+        _uploading = false;
+      });
+      print('Error uploading image to Firebase Storage: $e');
+    }
   }
 }

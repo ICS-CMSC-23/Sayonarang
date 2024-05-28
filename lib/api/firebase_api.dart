@@ -1,40 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 import '../models/donate_data.dart';
 
 class FirebaseSlamAPI {
-  static final FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String> addDataApi(DonateData data) async {
+
+  Stream<QuerySnapshot> getAllDonations() {
+    return _firestore.collection('donations').snapshots();
+  }
+
+  Future<String> addDataApi(DonateData donation) async {
     try {
-      await db.collection("Friends").add(data.data);
-      return "Successfully added data!";
-    } on FirebaseException catch (e) {
-      return "Failed with error '${e.code}: ${e.message}";
+      await _firestore.collection('donations').add(donation.toMap());
+      return 'Donation added successfully';
+    } catch (e) {
+      print('Error adding donation: $e');
+      throw e;
     }
   }
 
-   Future<String> editData(DonateData data) async {
+  Future<String> editData(DonateData donation) async {
     try {
-      await db.collection("Friends").doc(data.id).update(data.data);
-      return "Successfully updated data!";
-    } on FirebaseException catch (e) {
-      return "Failed with error '${e.code}: ${e.message}";
+      await _firestore.collection('donations').doc(donation.id).update(donation.toMap());
+      return 'Donation updated successfully';
+    } catch (e) {
+      print('Error updating donation: $e');
+      throw e;
     }
   }
 
-  Stream<QuerySnapshot> getAllFriends() {
-    return db.collection("Friends").snapshots();
+  Future<String> deleteDonation(String id) async {
+    try {
+      await _firestore.collection('donations').doc(id).delete();
+      return 'Donation deleted successfully';
+    } catch (e) {
+      print('Error deleting donation: $e');
+      throw e;
+    }
   }
-
-  Future<String> deleteFriend(String? id) async {
-  try {
-    await db.collection("Friends").doc(id).delete();
-
-    return "Successfully deleted!";
-  } on FirebaseException catch (e) {
-    return "Failed with error '${e.code}: ${e.message}";
-  }
-}
-
 }

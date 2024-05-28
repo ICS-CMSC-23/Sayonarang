@@ -11,7 +11,6 @@ class DonorView extends StatelessWidget {
 
   static const List<String> _pageTitles = [
     'Organizations',
-    'Donate Now',
     'Profile'
   ];
 
@@ -27,11 +26,7 @@ class DonorView extends StatelessWidget {
             label: 'Organizations',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.handshake),
-            label: 'Donate Now',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.rectangle_stack_person_crop_fill),
+            icon: Icon(Icons.account_circle_outlined),
             label: 'Profile',
           ),
         ],
@@ -55,7 +50,6 @@ class DonorView extends StatelessWidget {
 
   static List<Widget> _DonorPages = <Widget>[
     ViewOrganizations(),
-    DonorDonatePage(),
     DonorProfileWidget(),
   ];
 }

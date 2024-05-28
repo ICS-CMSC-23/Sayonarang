@@ -13,6 +13,7 @@ import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
 import 'package:donation_app/screens/donor/donor_home.dart';
 import 'package:donation_app/providers/donor_provider.dart';
+import 'package:donation_app/providers/donate_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ void main() async {
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
         ChangeNotifierProvider(create: ((context) => DonorProvider())),
+        ChangeNotifierProvider(create: ((context) => DonateDataProvider())),
       ],
       child: MyApp(),
     ),
