@@ -23,13 +23,15 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
     if (_currentUser != null) {
-      _userDocFuture = Provider.of<DonorProvider>(context, listen: false).getUserById(_currentUser!.uid);
+      _userDocFuture = Provider.of<DonorProvider>(context, listen: false)
+          .getUserById(_currentUser!.uid);
     }
   }
 
   void _fetchDonations() async {
     if (_currentUser != null) {
-      await Provider.of<DonorProvider>(context, listen: false).fetchDonationsByDonor(_currentUser!.uid);
+      await Provider.of<DonorProvider>(context, listen: false)
+          .fetchDonationsByDonor(_currentUser!.uid);
       setState(() {
         _showDonations = true;
       });
@@ -52,7 +54,8 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                   } else if (!snapshot.hasData || !snapshot.data!.exists) {
                     return Center(child: Text('User not found'));
                   } else {
-                    final userData = snapshot.data!.data() as Map<String, dynamic>;
+                    final userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
                     final donorProfile = DonorProfileModel.fromMap(userData);
 
                     return SingleChildScrollView(
@@ -75,7 +78,8 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                           SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: _fetchDonations,
-                            child: Text(_showDonations ? 'Refresh' : 'Show Donations'),
+                            child: Text(
+                                _showDonations ? 'Refresh' : 'Show Donations'),
                           ),
                           SizedBox(height: 20),
                           if (_showDonations) _buildDonationsList(context),
@@ -112,7 +116,8 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
             itemCount: donations.length,
             itemBuilder: (context, index) {
               final donation = donations[index];
-              final orgName = orgNames[donation.orgId] ?? 'Unknown Organization';
+              final orgName =
+                  orgNames[donation.orgId] ?? 'Unknown Organization';
 
               if (donation.status != 'Completed') {
                 return Padding(
@@ -123,7 +128,8 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                       children: [
                         ListTile(
                           title: Text('${orgName.toUpperCase()}',
-                              style: TextStyle(fontSize: 18, color: Colors.red)),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.red)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -141,8 +147,12 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                             width: 100,
                             child: ElevatedButton(
                               onPressed: () async {
-                                await Provider.of<DonorProvider>(context, listen: false)
-                                    .deleteDonation(donation.id!);
+                                // await Provider.of<DonorProvider>(context,
+                                //         listen: false)
+                                //     .deleteDonation(donation.id!);
+                                await Provider.of<DonorProvider>(context,
+                                        listen: false)
+                                    .cancelDonation(donation.id!, 'cancelled');
                               },
                               child: Text('Cancel'),
                             ),
@@ -167,7 +177,8 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                       children: [
                         ListTile(
                           title: Text('${orgName.toUpperCase()}',
-                              style: TextStyle(fontSize: 18, color: Colors.green)),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.green)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
