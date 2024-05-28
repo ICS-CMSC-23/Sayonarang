@@ -86,5 +86,17 @@ class DonorProvider with ChangeNotifier {
       print('Error deleting donation: $e');
     }
   }
+
+
+  //Instead of deleting update the status to cancelled
+  Future<void> cancelDonation(String donationId, String status) async {
+    try {
+      await firebaseService.cancelDonation(donationId, status);
+      // _donationsList.removeWhere((donation) => donation.id == donationId);
+      notifyListeners();
+    } catch (e) {
+      print('Error cancelling donation: $e');
+    }
+  }
 }
 
