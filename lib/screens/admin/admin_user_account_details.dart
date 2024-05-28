@@ -8,17 +8,6 @@ class UserAccountDetails extends StatelessWidget {
 
   const UserAccountDetails({Key? key, required this.user}) : super(key: key);
 
-  Color getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.black;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final adminProvider = Provider.of<AdminProvider>(context, listen: false);
@@ -76,11 +65,11 @@ class UserAccountDetails extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
                   const Text(
                     'Contact Number:',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -100,7 +89,7 @@ class UserAccountDetails extends StatelessWidget {
                   const Text(
                     'Addresses:',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
