@@ -1,7 +1,62 @@
-import 'dart:convert';
-
 class DonateData {
-  String? id;
-  Map<String,dynamic> data = {};
-  DonateData({required this.data, this.id});
+  final String? id;
+  final String? orgId;
+  final String? donorId;
+  final List<String> categories;
+  final String mode;
+  final List<String> addresses;
+  final String contactNum;
+  final String weight;
+  final String photo;
+  final String date;
+  final String time;
+  String status;
+
+  DonateData({
+    this.id,
+    required this.orgId,
+    required this.donorId,
+    required this.categories,
+    required this.mode,
+    required this.addresses,
+    required this.contactNum,
+    required this.weight,
+    required this.photo,
+    required this.date,
+    required this.time,
+    this.status = 'pending',
+  });
+
+  factory DonateData.fromMap(Map<String, dynamic> data, {String? id}) {
+    return DonateData(
+      id: id,
+      orgId: data['orgId'] ?? '',
+      donorId: data['donorId'] ?? '',
+      categories: List<String>.from(data['categories'] ?? []),
+      mode: data['mode'] ?? '',
+      addresses: List<String>.from(data['addresses'] ?? []),
+      contactNum: data['contactNum'] ?? '',
+      weight: data['weight'] ?? '',
+      photo: data['photo'] ?? '',
+      date: data['date'] ?? '',
+      time: data['time'] ?? '',
+      status: data['status'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'orgId': orgId,
+      'donorId': donorId,
+      'categories': categories,
+      'mode': mode,
+      'addresses': addresses,
+      'contactNum': contactNum,
+      'weight': weight,
+      'photo': photo,
+      'date': date,
+      'time': time,
+      'status': status,
+    };
+  }
 }
