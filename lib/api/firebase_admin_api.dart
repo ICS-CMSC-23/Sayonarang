@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseAdminAPI {
   // A class that provides methods to interact with Firebase Firestore for friend-related operations.
@@ -18,7 +19,7 @@ class FirebaseAdminAPI {
         .snapshots();
   }
 
-// Retrieves a stream of all approved orgs from the Firestore collection.
+  // Retrieves a stream of all approved orgs from the Firestore collection.
   Stream<QuerySnapshot> getAllPending() {
     return db
         .collection("users")
@@ -27,25 +28,14 @@ class FirebaseAdminAPI {
         .snapshots();
   }
 
-  // Adds a friend to the Firestore collection.
-  // Future<String> addFriend(Map<String, dynamic> friend) async {
-  //   try {
-  //     await db.collection("friends").add(friend);
-  //     return "Successfully added friend!";
-  //   } on FirebaseException catch (e) {
-  //     return "Failed with error '${e.code}: ${e.message}";
-  //   }
-  // }
-
-  // Deletes a friend from the Firestore collection by their ID.
-  // Future<String> deleteFriend(String? id) async {
-  //   try {
-  //     await db.collection("friends").doc(id).delete();
-  //     return "Successfully deleted friend!";
-  //   } on FirebaseException catch (e) {
-  //     return "Failed with error '${e.code}: ${e.message}";
-  //   }
-  // }
+  // Retrieves a stream of all rejected orgs from the Firestore collection.
+  Stream<QuerySnapshot> getAllRejected() {
+    return db
+        .collection("users")
+        .where("role", isEqualTo: "org")
+        .where("status", isEqualTo: "rejected")
+        .snapshots();
+  }
 
   // Edits a friend's information in the Firestore collection.
   Future<String> editFriend(
@@ -81,6 +71,42 @@ class FirebaseAdminAPI {
       return "Successfully edited friend!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  Future<String> updateOrganizationStatus(String orgId, String status) async {
+    try {
+      await db.collection('users').doc(orgId).update({
+        'status': status,
+      });
+
+      return "Successfully updated organization status to $status!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  // Retrieve specific org by id
+  Future<DocumentSnapshot<Map<String, dynamic>>> getOrganizationById(
+      String orgId) async {
+    return db.collection('users').doc(orgId).get();
+  }
+
+  // Retrieve specific donor by id
+  Future<DocumentSnapshot<Map<String, dynamic>>> getDonorById(
+      String donorId) async {
+    return db.collection('users').doc(donorId).get();
+  }
+
+  // Retrieve image proof of org
+  Future<String?> getProofImageUrl(String filename) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child("proof/$filename");
+      return await imageRef.getDownloadURL();
+    } catch (e) {
+      print("Failed to retrieve image: $e");
+      return null;
     }
   }
 }

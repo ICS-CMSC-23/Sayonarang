@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
+import 'package:provider/provider.dart';
+import 'package:donation_app/providers/user_provider.dart';
 
 class OrgProfilePage extends StatefulWidget {
   const OrgProfilePage({super.key});
@@ -13,7 +14,12 @@ class _OrgProfilePageState extends State<OrgProfilePage> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      child: Text("Org Profile"),
-    );
+        // child: Text("Org Profile"),
+        child: Center(
+            child: ElevatedButton(
+                onPressed: () {
+                  context.read<MyAuthProvider>().signOut();
+                },
+                child: const Text("Logout"))));
   }
 }

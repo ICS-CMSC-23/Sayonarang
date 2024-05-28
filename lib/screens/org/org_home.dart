@@ -1,228 +1,220 @@
 import 'package:flutter/material.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/org/org_donation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:donation_app/screens/org/org_navbar.dart';
-
-class Donation {
-  final String donorId;
-  final String donorName;
-  final List<String> categories;
-  final String mode;
-  final double weight;
-  final String photoUrl;
-  final String date;
-  final String time;
-  final String address;
-  final String contactNumber;
-  final String status;
-
-  Donation({
-    required this.donorId,
-    required this.donorName,
-    required this.categories,
-    required this.mode,
-    required this.weight,
-    required this.photoUrl,
-    required this.date,
-    required this.time,
-    required this.address,
-    required this.contactNumber,
-    required this.status,
-  });
-}
+import 'package:donation_app/providers/donation_provider.dart';
+import 'package:donation_app/models/donation_model.dart';
 
 class OrgHomePage extends StatefulWidget {
   const OrgHomePage({super.key});
+
   @override
   _OrgHomePageState createState() => _OrgHomePageState();
 }
 
 class _OrgHomePageState extends State<OrgHomePage> {
+  late User? _currentUser;
+  Map<String, dynamic>? _userDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Remove, move implementation to org profile page
+    // fetch user details
+    _currentUser = FirebaseAuth.instance.currentUser;
+    if (_currentUser != null) {
+      fetchUserDetails(); // TODO: Remove, move implementation to org profile page
+      // execute initialization of the stream after the layout is completed
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
+      });
+    }
+  }
+
+  // TODO: Remove, move implementation to org profile page
+  Future<void> fetchUserDetails() async {
+    final details =
+        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
+    setState(() {
+      _userDetails = details;
+    });
+  }
+
+  Future<String> _fetchDonorName(String donorId) async {
+    final _userDetails =
+        await context.read<MyAuthProvider>().getUserDetails(donorId);
+    return _userDetails['name'] as String? ?? 'Unknown Donor';
+  }
+
   @override
   Widget build(BuildContext context) {
+    // access donations in the provider
+    Stream<QuerySnapshot> donationsStream =
+        context.watch<DonationProvider>().donationsToOrg;
+
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    // TODO: Fetch donations from database
-    final List<Donation> donations = [
-      Donation(
-        donorId: '1',
-        donorName: 'John Doe',
-        categories: ['Food', 'Necessities'],
-        mode: "pickup",
-        weight: 0.5,
-        photoUrl:
-            'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg',
-        date: '2022-05-23',
-        time: '10:00 AM',
-        address: '123 Main St, City',
-        contactNumber: '123-456-7890',
-        status: "pending",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-      Donation(
-        donorId: '2',
-        donorName: 'Jane Smith',
-        categories: ['Clothing', 'Books', 'Books', 'Books', 'Books'],
-        mode: "drop-off",
-        weight: 1.0,
-        photoUrl: 'https://example.com/photo2.jpg',
-        date: '2022-05-24',
-        time: '11:00 AM',
-        address: '456 Elm St, Town',
-        contactNumber: '987-654-3210',
-        status: "confirmed",
-      ),
-    ];
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Donations",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.primary,
+            ),
+          ),
+          bottom: const TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(text: "Pending"),
+              Tab(text: "Confirmed"),
+              Tab(text: "Scheduled"),
+              Tab(text: "Completed"),
+              Tab(text: "Cancelled"),
+            ],
+          ),
+        ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: donationsStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("Error encountered! ${snapshot.error}"),
+              );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No donations yet!',
+                  style: TextStyle(fontSize: 18),
+                ),
+              );
+            }
 
-    IconData getIconForStatus(String status) {
-      switch (status.toLowerCase()) {
-        case 'pending':
-          return Icons.remove_circle_outline;
-        case 'confirmed':
-        case 'scheduled for pickup':
-          return Icons.check_circle_outline;
-        case 'completed':
-          return Icons.check_circle;
-        case 'cancelled':
-          return Icons.cancel;
-        default:
-          return Icons.error;
-      }
-    }
+            // convert data from donations stream to a list
+            List<Donation> donations = snapshot.data!.docs.map((doc) {
+              Donation donation =
+                  Donation.fromJson(doc.data() as Map<String, dynamic>);
+              donation.id = doc.id;
+              return donation;
+            }).toList();
 
-    Color getColorForStatus(String status) {
-      switch (status.toLowerCase()) {
-        case 'pending':
-          return Color(0xFFEE9D13);
-        case 'confirmed':
-        case 'scheduled for pickup':
-          return Color(0xFF0760B8);
-        case 'completed':
-          return Color(0xFF8EA72E);
-        case 'cancelled':
-          return Color(0xFFE0554B);
-        default:
-          return Colors.black;
-      }
+            return TabBarView(
+              children: [
+                _buildDonationList(donations, 'pending'),
+                _buildDonationList(donations, 'confirmed'),
+                _buildDonationList(donations, 'scheduled for pickup'),
+                _buildDonationList(donations, 'completed'),
+                _buildDonationList(donations, 'cancelled'),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDonationList(List<Donation> donations, String status) {
+    List<Donation> filteredDonations = donations.where((donation) {
+      return donation.status.toLowerCase() == status.toLowerCase();
+    }).toList();
+
+    if (filteredDonations.isEmpty) {
+      return Center(
+        child: Text(
+          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
     }
 
     return ListView.builder(
-      itemCount: donations.length,
+      itemCount: filteredDonations.length,
       itemBuilder: (context, index) {
-        final donation = donations[index];
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: InkWell(
-            onTap: () {
-              // Navigate to the donation details page
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DonationDetailsPage(donation: donation),
-              //   ),
-              // );
-            },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      donation.donorName,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1, // Limit name to one line
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Donated on ${DateFormat('MMMM dd, yyyy').format(DateTime.parse(donation.date))}',
-                      style:
-                          TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                    ),
-                    SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: donation.categories
-                          // Limit the categories to at most 3 sinceall categories will be displayed in the donation details
-                          .take(3)
-                          .map((category) {
-                        return Chip(
-                          label: Text(
-                            category,
-                          ),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          side: BorderSide.none,
-                          labelStyle: TextStyle(color: Colors.white),
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 8),
-                    // TODO: Display mode only in the donation details page
-                    // Row(
-                    //   children: [
-                    //     Icon(Icons.directions_car),
-                    //     SizedBox(width: 4),
-                    //     Text(
-                    //       '{donation.mode.toLowerCase()}',
-                    //       style: TextStyle(fontSize: 16),
-                    //     ),
-                    //   ],
-                    // ),
-                    SizedBox(width: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          getIconForStatus(donation.status),
-                          color: getColorForStatus(donation.status),
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          donation.status.substring(0, 1).toUpperCase() +
-                              donation.status.substring(1).toLowerCase(),
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: getColorForStatus(donation.status),
-                              fontStyle: FontStyle.italic),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
+        Donation donation = filteredDonations[index];
+        return FutureBuilder<String>(
+          future: _fetchDonorName(donation.donorId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return LinearProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error encountered! ${snapshot.error}');
+            }
+            String donorName = snapshot.data ?? 'Donor';
+            return _buildDonationCard(donation, donorName);
+          },
         );
       },
+    );
+  }
+
+  Widget _buildDonationCard(Donation donation, String donorName) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: InkWell(
+        onTap: () {
+          // change selected donation
+          context.read<DonationProvider>().changeSelectedDonation(donation);
+
+          // navigate to the donation details page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DonationDetailsPage(),
+            ),
+          );
+        },
+        child: Card(
+          surfaceTintColor: Colors.transparent,
+          child: ListTile(
+            title: Text(
+              donorName, // display the fetched donor name
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1, // limit name to one line
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  // limit categories to be displayed to 3
+                  children: donation.categories.take(3).map((category) {
+                    return Chip(
+                      label: Text(category),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      side: BorderSide.none,
+                      labelStyle: const TextStyle(color: Colors.white),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+          ),
+        ),
+      ),
     );
   }
 }

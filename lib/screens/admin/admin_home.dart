@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
+import '../../providers/user_provider.dart';
+import '../auth/login_page.dart';
 import 'admin_donors.dart';
 import 'admin_organizations.dart';
+import 'admin_profile.dart';
 import 'admin_waitlist.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -15,13 +18,28 @@ class AdminView extends StatelessWidget {
     'Donors'
   ];
 
+  static List<Widget> _AdminPages = <Widget>[
+    AdminApprovalWaitList(),
+    ViewOrganizations(),
+    ViewDonors(),
+  ];
+
+  static const Color customRed = Color(0xFFF54741);
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pageTitles[provider.selectedIndex]),
+        title: Text(
+          _pageTitles[provider.selectedIndex],
+          style: const TextStyle(
+            color: customRed,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: _AdminPages.elementAt(provider.selectedIndex),
       drawer: Drawer(
@@ -30,7 +48,7 @@ class AdminView extends StatelessWidget {
           children: <Widget>[
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: customRed,
               ),
               child: Text(
                 'Admin',
@@ -41,19 +59,21 @@ class AdminView extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
               onTap: () {
-                // Handle Profile tap
-                // Navigator.pushNamed(context, '/profile');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Log out'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Log out'),
               onTap: () {
-                // Handle Log out tap
-                // Implement log out logic here
+                context.read<MyAuthProvider>().signOut(); // Log-out
               },
             ),
           ],
@@ -75,15 +95,9 @@ class AdminView extends StatelessWidget {
           ),
         ],
         currentIndex: provider.selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: customRed, // Set the selected item color to Red
         onTap: (index) => provider.updateIndex(index),
       ),
     );
   }
-
-  static List<Widget> _AdminPages = <Widget>[
-    AdminApprovalWaitList(),
-    ViewOrganizations(),
-    ViewDonors(),
-  ];
 }

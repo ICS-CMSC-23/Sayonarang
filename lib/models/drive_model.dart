@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Drive {
   String? id;
@@ -7,6 +8,7 @@ class Drive {
   String description;
   List<String>
       donationIds; // list of donation ids for when the org links donations to donation drives
+  DateTime endDate;
 
   Drive({
     this.id,
@@ -14,6 +16,7 @@ class Drive {
     required this.title,
     required this.description,
     required this.donationIds,
+    required this.endDate,
   });
 
   // Factory constructor to instantiate object from json format
@@ -23,7 +26,8 @@ class Drive {
       orgId: json['orgId'],
       title: json['title'],
       description: json['description'],
-      donationIds: json['donationIds'],
+      donationIds: (json['donationIds'] as List).cast<String>(),
+      endDate: (json['endDate'] as Timestamp).toDate(),
     );
   }
 
@@ -32,12 +36,14 @@ class Drive {
     return data.map<Drive>((dynamic d) => Drive.fromJson(d)).toList();
   }
 
-  Map<String, dynamic> toJson(Drive donationDrive) {
+  Map<String, dynamic> toJson() {
     return {
-      'orgId': donationDrive.orgId,
-      'title': donationDrive.title,
-      'description': donationDrive.description,
-      'donationIds': donationDrive.donationIds,
+      'id': id,
+      'orgId': orgId,
+      'title': title,
+      'description': description,
+      'donationIds': donationIds,
+      'endDate': endDate,
     };
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:donation_app/providers/user_provider.dart';
+import 'dart:io';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -26,9 +27,14 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   bool _passwordValid = true;
   bool _addressValid = true;
   bool _contactNumValid = true;
+  bool _proofValid = true;
   bool _obscureText = true;
 
   List<Widget> addressFields = [];
+
+  File? selectedProof; // full path of the selected file
+  String proofFilename = ""; // for displaying filename in the text field
+  String? finalFilename; // filename of proof saved in the firebase
 
   RegExp get _emailRegex =>
       RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)$');
@@ -118,6 +124,9 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     _passwordController.text.length >= 6;
                 _addressValid = _addressController.text.isNotEmpty;
                 _contactNumValid = _contactNumController.text.isNotEmpty;
+                _proofValid =
+                    (proofFilename.isNotEmpty && tabController.index == 1) ||
+                        (tabController.index == 0);
               });
 
               // validate text fields
@@ -126,7 +135,8 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                   _emailValid &&
                   _passwordValid &&
                   _addressValid &&
-                  _contactNumValid) {
+                  _contactNumValid &&
+                  _proofValid) {
                 // get the addresses from the text controllers
                 List<String> addresses = [_addressController.text];
                 for (TextEditingController controller
@@ -136,15 +146,40 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                   }
                 }
 
-                await context.read<MyAuthProvider>().signUp(
+                final myAuthProvider = context.read<MyAuthProvider>();
+
+                if (selectedProof != null) {
+                  // upload file to firebase storage
+                  finalFilename =
+                      await myAuthProvider.uploadFile(selectedProof!);
+                }
+
+                await myAuthProvider.signUp(
                     _nameController.text,
                     _usernameController.text,
                     _emailController.text,
                     _passwordController.text,
                     _contactNumController.text,
                     addresses,
-                    '', // TODO: proof of legitimacy link
+                    finalFilename ?? '',
                     tabController.index == 0 ? 'donor' : 'org');
+
+                // check if sign up is successful
+                if (myAuthProvider.signupStatus['success']) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Successfully signed up!'),
+                    ),
+                  );
+                  if (context.mounted) Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Error: ${myAuthProvider.signupStatus['response']}'),
+                    ),
+                  );
+                }
               }
             },
             child: const Text('Sign Up', style: TextStyle(color: Colors.white)),
@@ -254,7 +289,11 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                 _contactNumValid, 'Please enter your contact number'),
             textField('Address', _addressController, false, _addressValid,
                 'Please enter your address'),
+
+            // additional address fields
             ...addressFields,
+
+            // button for adding additional address
             TextButton(
               onPressed: () {
                 // new text controller for the new address field
@@ -298,34 +337,43 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
               ),
             ),
 
+            // proof of legitimacy
             Container(
-              margin: const EdgeInsets.only(left: 16, right: 16, top: 16),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Proof of Legitimacy',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+              child: TextField(
+                controller: TextEditingController(text: proofFilename),
+                readOnly: true,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.only(bottom: 5),
+                  labelText: 'Proof of Legitimacy',
+                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  errorText: _proofValid ? null : 'Please upload an image',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.file_upload,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onPressed: () async {
+                      // select an image from the gallery
+                      selectedProof = await context
+                          .read<MyAuthProvider>()
+                          .getImageFromGallery(context);
+
+                      // check if there's a selected image
+                      if (selectedProof != null) {
+                        // print(selectedProof.path.split("/").last);
+                        setState(() {
+                          proofFilename = selectedProof!.path.split("/").last;
+                          _proofValid = true;
+                        });
+                      }
+                    },
+                  ),
+                ),
               ),
             ),
 
-            // upload a file for proof of legitimacy
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              width: MediaQuery.of(context).size.width,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border:
-                    Border.all(color: Theme.of(context).colorScheme.primary),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  // TODO: display filename
-                },
-                child: const Text('Upload a File'),
-              ),
-            ),
-
+            // button for signing up
             signupButton(),
           ],
         ));

@@ -39,10 +39,20 @@ class FirebaseDonationAPI {
     }
   }
 
+  Stream<QuerySnapshot> getDonationsByDrive(String driveId) {
+    try {
+      return db
+          .collection("donations")
+          .where("driveId", isEqualTo: driveId)
+          .snapshots();
+    } catch (e) {
+      throw "Failed to get donations by drive: $e";
+    }
+  }
+
   // TODO: add api for getting donations given categories as a filter
 
-  // the donation can be edited only to update its status
-  Future<String> editDonation(
+  Future<String> editDonationStatus(
     String? id,
     String status,
   ) async {
@@ -52,7 +62,23 @@ class FirebaseDonationAPI {
         "status": status,
       });
 
-      return "Successfully edited donation!";
+      return "Successfully edited donation status to $status!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  Future<String> editLinkedDrive(
+    String? id,
+    String driveId,
+  ) async {
+    try {
+      print("driveId: $driveId");
+      await db.collection("donations").doc(id).update({
+        "driveId": driveId,
+      });
+
+      return "Successfully linked donation to donation drive with id $driveId!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
     }

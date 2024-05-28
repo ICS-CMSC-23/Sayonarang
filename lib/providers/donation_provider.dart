@@ -8,16 +8,28 @@ class DonationProvider with ChangeNotifier {
   late Stream<QuerySnapshot> _donationsStream;
   late Stream<QuerySnapshot> _donationsByDonorStream;
   late Stream<QuerySnapshot> _donationsToOrgStream;
+  late Stream<QuerySnapshot> _donationsByDriveStream;
+  Donation? _selectedDonation;
 
   DonationProvider() {
     firebaseService = FirebaseDonationAPI();
-    // fetchDonations();
+    fetchDonations();
+    _donationsByDonorStream = const Stream
+        .empty(); // initialize with an empty stream to prevent LateInitializationError
+    _donationsToOrgStream = const Stream
+        .empty(); // initialize with an empty stream to prevent LateInitializationError
   }
 
   // getter
   Stream<QuerySnapshot> get donations => _donationsStream;
   Stream<QuerySnapshot> get donationsByDonor => _donationsByDonorStream;
   Stream<QuerySnapshot> get donationsToOrg => _donationsToOrgStream;
+  Stream<QuerySnapshot> get donationsByDrive => _donationsByDriveStream;
+  Donation get selected => _selectedDonation!;
+
+  changeSelectedDonation(Donation donation) {
+    _selectedDonation = donation;
+  }
 
   void fetchDonations() {
     _donationsStream = firebaseService.getAllDonations();
@@ -34,6 +46,11 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void fetchDonationsByDrive(String driveId) {
+    _donationsByDriveStream = firebaseService.getDonationsByDrive(driveId);
+    notifyListeners();
+  }
+
   void addDonation(Donation donation) async {
     String message =
         await firebaseService.addDonation(donation.toJson(donation));
@@ -41,14 +58,23 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void editDonation(String id, String status) async {
-    String message = await firebaseService.editDonation(id, status);
+  void editDonationStatus(String status) async {
+    String message =
+        await firebaseService.editDonationStatus(_selectedDonation!.id, status);
     print(message);
     notifyListeners();
   }
 
-  void deleteDonation(String id) async {
-    String message = await firebaseService.deleteDonation(id);
+  void editLinkedDrive(String driveId) async {
+    String message =
+        await firebaseService.editLinkedDrive(_selectedDonation!.id, driveId);
+    print(message);
+    notifyListeners();
+  }
+
+  void deleteDonation() async {
+    String message =
+        await firebaseService.deleteDonation(_selectedDonation!.id);
     print(message);
     notifyListeners();
   }
