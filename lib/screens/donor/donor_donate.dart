@@ -32,12 +32,16 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     'Photo': "",
     'Date': "",
     'Time': "",
-};
-
+  };
 
   List<String> _modeOptions = ["Pick-up", "Drop-off"];
-  List<String> _donateOptions = ['Food', 'Clothes', 'Cash', 'Necessities', 'Others'];
-  
+  List<String> _donateOptions = [
+    'Food',
+    'Clothes',
+    'Cash',
+    'Necessities',
+    'Others'
+  ];
 
   String _mode = "Pick-up";
   String photo = " ";
@@ -61,13 +65,14 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     addressControllers[0].addListener(() {
       if (addressControllers[0].text.isNotEmpty) {
         setState(() {
-          formValues["Address"] = addressControllers.map((c) => c.text).toList();
+          formValues["Address"] =
+              addressControllers.map((c) => c.text).toList();
         });
       }
     });
 
     formValues["Address"] = [];
-}
+  }
 
   Future<void> _initializeCurrentDonorId() async {
     Auth.User? user = Auth.FirebaseAuth.instance.currentUser;
@@ -81,34 +86,32 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime.now(),
-    firstDate: DateTime(2020),
-    lastDate: DateTime(2101),
-  );
-  if (picked != null && picked != DateTime.now()) {
-    setState(() {
-      _dateController.text = "${picked.toLocal()}".split(' ')[0];
-      formValues['Date'] = _dateController.text;
-    });
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _dateController.text = "${picked.toLocal()}".split(' ')[0];
+        formValues['Date'] = _dateController.text;
+      });
+    }
   }
-}
 
-
-Future<void> _selectTime(BuildContext context) async {
-  final TimeOfDay? picked = await showTimePicker(
-    context: context,
-    initialTime: TimeOfDay.now(),
-  );
-  if (picked != null && picked != TimeOfDay.now()) {
-    setState(() {
-      _timeController.text = picked.format(context);
-      formValues['Time'] = _timeController.text;
-    });
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null && picked != TimeOfDay.now()) {
+      setState(() {
+        _timeController.text = picked.format(context);
+        formValues['Time'] = _timeController.text;
+      });
+    }
   }
-}
-
 
   @override
   void dispose() {
@@ -124,7 +127,6 @@ Future<void> _selectTime(BuildContext context) async {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Donate to ${widget.organization.name}'),
@@ -317,11 +319,7 @@ Future<void> _selectTime(BuildContext context) async {
                     },
                   ),
                 ),
-
-              Visibility(
-                visible: _showUploadButton,
-                child: Column()
-              ),
+              Visibility(visible: _showUploadButton, child: Column()),
               Padding(
                 padding: EdgeInsets.all(20),
                 child: Row(
@@ -370,129 +368,133 @@ Future<void> _selectTime(BuildContext context) async {
                   ],
                 ),
               ),
-
               Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  Text(
-                    "Select Donation Date and Time:",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic),
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "Select Donation Date and Time:",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: _dateController,
+                  decoration: InputDecoration(
+                    labelText: "Date",
+                    hintText: "Select Date",
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.calendar_today),
+                      onPressed: () {
+                        _selectDate(context);
+                      },
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a date';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextFormField(
+                  controller: _timeController,
+                  decoration: InputDecoration(
+                    labelText: "Time",
+                    hintText: "Select Time",
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.access_time),
+                      onPressed: () {
+                        _selectTime(context);
+                      },
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a time';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: SwitchListTile(
+                        title: const Text("Show Upload Options"),
+                        value: _showUploadButton,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _showUploadButton = value!;
+                          });
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: TextFormField(
-                controller: _dateController,
-                decoration: InputDecoration(
-                  labelText: "Date",
-                  hintText: "Select Date",
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a date';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: TextFormField(
-                controller: _timeController,
-                decoration: InputDecoration(
-                  labelText: "Time",
-                  hintText: "Select Time",
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.access_time),
-                    onPressed: () {
-                      _selectTime(context);
-                    },
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a time';
-                  }
-                  return null;
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(5),
-                   child: SwitchListTile(
-                    title: const Text("Show Upload Options"),
-                    value: _showUploadButton,
-                     onChanged: (bool? value) {
-                         setState(() {
-                           _showUploadButton = value!;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Visibility(
-                    visible: _showUploadButton,
-                    child: Column(
-                      children: [
-                        PickImage(
-                          onImagePicked: (String imageName) {
-                            setState(() {
-                              formValues["Photo"] = imageName;
-                            });
-                          },
-                        ), 
-                      ],
+              Visibility(
+                visible: _showUploadButton,
+                child: Column(
+                  children: [
+                    PickImage(
+                      onImagePicked: (String imageName) {
+                        setState(() {
+                          formValues["Photo"] = imageName;
+                        });
+                      },
                     ),
-                  ),
+                  ],
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      if (_showUploadButton) {
-                      }
-                      List<String> categories = List<String>.from(formValues["Donation"]);
-                      List<String> addresses = List<String>.from(formValues["Address"]);
+                      if (_showUploadButton) {}
+                      List<String> categories =
+                          List<String>.from(formValues["Donation"]);
+                      List<String> addresses =
+                          List<String>.from(formValues["Address"]);
 
                       double weight = double.parse(formValues["Weight"]);
                       if (formValues["WeightUnit"] == "lbs") {
-                        weight = weight * 0.453592; 
+                        weight = weight * 0.453592;
                       }
 
                       DonateData donation = DonateData(
-                        orgId: widget.organization.id ?? '', 
+                        orgId: widget.organization.id ?? '',
                         donorId: currentDonorId,
+                        //TODO: add drive id if available
+                        driveId: '',
                         categories: categories,
                         mode: formValues["Mode of Transaction"],
                         addresses: addresses,
                         contactNum: formValues["Contact Number"],
-                        weight: weight.toStringAsFixed(2), 
+                        weight: weight.toStringAsFixed(2),
                         photo: formValues["Photo"],
                         date: formValues["Date"],
                         time: formValues["Time"],
                       );
 
-                      await context.read<DonateDataProvider>().addDonation(donation);
+                      await context
+                          .read<DonateDataProvider>()
+                          .addDonation(donation);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Form validated! Donation submitted.'),

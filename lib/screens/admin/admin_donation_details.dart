@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 
 import '../../models/donation_model.dart';
 
@@ -17,6 +17,11 @@ class DonationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Convert the donation.date string to a DateTime object
+    DateTime donationDate = DateTime.parse(donation.date);
+    // Format the DateTime object to the desired format
+    String formattedDate = DateFormat('MMMM dd, yyyy').format(donationDate);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -135,7 +140,7 @@ class DonationDetailScreen extends StatelessWidget {
                     children: [
                       const SizedBox(width: 25),
                       Text(
-                        '${donation.weight}',
+                        donation.weight,
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF666666),
@@ -175,7 +180,7 @@ class DonationDetailScreen extends StatelessWidget {
                     children: [
                       const SizedBox(width: 25),
                       Text(
-                        DateFormat('MMMM dd, yyyy').format(donation.date),
+                        formattedDate,
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF666666),

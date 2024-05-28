@@ -15,7 +15,7 @@ class DonorProvider with ChangeNotifier {
   int get selectedIndex => _selectedIndex;
   List<DonateData> get donationsList => _donationsList;
   Map<String, String> get orgNames => _orgNames;
-  
+
   DonorProvider() {
     fetchDonors();
     fetchOrgs();
@@ -25,7 +25,7 @@ class DonorProvider with ChangeNotifier {
     _selectedIndex = index;
     notifyListeners();
   }
-  
+
   Stream<QuerySnapshot> get donorList => _donorStream;
   Stream<QuerySnapshot> get orgList => _orgStream;
 
@@ -66,10 +66,12 @@ class DonorProvider with ChangeNotifier {
 
   Future<void> fetchDonationsByDonor(String donorId) async {
     try {
-      await fetchOrgNames();  // Fetch organization names first
-      QuerySnapshot snapshot = await firebaseService.getDonationsByDonor(donorId);
+      await fetchOrgNames(); // Fetch organization names first
+      QuerySnapshot snapshot =
+          await firebaseService.getDonationsByDonor(donorId);
       _donationsList = snapshot.docs
-          .map((doc) => DonateData.fromMap(doc.data() as Map<String, dynamic>, id: doc.id))
+          .map((doc) => DonateData.fromMap(doc.data() as Map<String, dynamic>,
+              id: doc.id))
           .toList();
       notifyListeners();
     } catch (e) {
@@ -86,5 +88,15 @@ class DonorProvider with ChangeNotifier {
       print('Error deleting donation: $e');
     }
   }
-}
 
+  // Instead of deleting update the status to cancelled
+  Future<void> cancelDonation(String donationId, String status) async {
+    try {
+      await firebaseService.cancelDonation(donationId, status);
+      // _donationsList.removeWhere((donation) => donation.id == donationId);
+      notifyListeners();
+    } catch (e) {
+      print('Error cancelling donation: $e');
+    }
+  }
+}

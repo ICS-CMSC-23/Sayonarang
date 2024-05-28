@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/donate_data.dart'; 
+import '../models/donate_data.dart';
 
 class FirebaseDonorAPI {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -35,7 +35,10 @@ class FirebaseDonorAPI {
 
   Future<QuerySnapshot> getDonationsByDonor(String donorId) async {
     try {
-      return await db.collection('donations').where('donorId', isEqualTo: donorId).get();
+      return await db
+          .collection('donations')
+          .where('donorId', isEqualTo: donorId)
+          .get();
     } on FirebaseException catch (e) {
       throw Exception("Failed to fetch donations: ${e.message}");
     }
@@ -46,6 +49,19 @@ class FirebaseDonorAPI {
       await db.collection('donations').doc(donationId).delete();
     } on FirebaseException catch (e) {
       throw Exception("Failed to delete donation: ${e.message}");
+    }
+  }
+
+  // Instead of deleting update the status to cancelled
+  Future<String> cancelDonation(String orgId, String status) async {
+    try {
+      await db.collection('donations').doc(orgId).update({
+        'status': status,
+      });
+
+      return "Successfully updated donation status to $status!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
     }
   }
 
