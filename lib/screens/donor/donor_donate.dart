@@ -1,13 +1,11 @@
 import 'package:donation_app/models/donation_model.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:donation_app/models/donate_data.dart';
 import 'package:donation_app/models/user_model.dart' as AppUser;
 import 'package:donation_app/providers/donate_provider.dart';
 import 'package:provider/provider.dart';
 import 'pick_image.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'dart:io';
 
 class DonorDonatePage extends StatefulWidget {
@@ -27,10 +25,10 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     'Mode of Transaction': "Pick-up",
     'Address': <String>[],
     'Contact Number': "",
-    'Weight': "",
+    'Weight': 0.0,
     'WeightUnit': "kg",
     'Photo': "",
-    'Date': "",
+    'Date': null,
     'Time': "",
   };
 
@@ -50,7 +48,6 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
   List<TextEditingController> addressControllers = [TextEditingController()];
-  //final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _showUploadButton = false;
   late String currentDonorId;
@@ -92,10 +89,10 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
         _dateController.text = "${picked.toLocal()}".split(' ')[0];
-        formValues['Date'] = _dateController.text;
+        formValues['Date'] = picked; // Save as DateTime
       });
     }
   }
@@ -105,7 +102,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null && picked != TimeOfDay.now()) {
+    if (picked != null) {
       setState(() {
         _timeController.text = picked.format(context);
         formValues['Time'] = _timeController.text;
@@ -330,10 +327,15 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter weight';
                           }
+                          try {
+                            double.parse(value);
+                          } catch (e) {
+                            return 'Please enter a valid number';
+                          }
                           return null;
                         },
                         onChanged: (String value) {
-                          formValues["Weight"] = value;
+                          formValues["Weight"] = double.tryParse(value) ?? 0.0;
                         },
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -472,7 +474,10 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                       List<String> addresses =
                           List<String>.from(formValues["Address"]);
 
-                      double weight = double.parse(formValues["Weight"]);
+                      DateTime timestamp = DateTime.now();
+
+
+                      double weight = formValues["Weight"];
                       if (formValues["WeightUnit"] == "lbs") {
                         weight = weight * 0.453592;
                       }
@@ -486,10 +491,12 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                         mode: formValues["Mode of Transaction"],
                         addresses: addresses,
                         contactNum: formValues["Contact Number"],
-                        weight: weight.toStringAsFixed(2),
+                        weight: weight,
                         photo: formValues["Photo"],
                         date: formValues["Date"],
                         time: formValues["Time"],
+                        status: '',
+                        timestamp: timestamp,
                       );
 
                       await context

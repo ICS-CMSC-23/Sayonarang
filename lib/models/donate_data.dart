@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class DonateData {
   final String? id;
   final String? orgId;
@@ -7,11 +9,12 @@ class DonateData {
   final String mode;
   final List<String> addresses;
   final String contactNum;
-  final String weight;
+  double weight;
   final String photo;
-  final String date;
+  DateTime date;
   final String time;
   String status;
+  DateTime timestamp;
 
   DonateData({
     this.id,
@@ -27,6 +30,7 @@ class DonateData {
     required this.date,
     required this.time,
     this.status = 'pending',
+    required this.timestamp,
   });
 
   factory DonateData.fromMap(Map<String, dynamic> data, {String? id}) {
@@ -39,11 +43,12 @@ class DonateData {
       mode: data['mode'] ?? '',
       addresses: List<String>.from(data['addresses'] ?? []),
       contactNum: data['contactNum'] ?? '',
-      weight: data['weight'] ?? '',
+      weight: (data['weight'] ?? 0.0).toDouble(),
       photo: data['photo'] ?? '',
-      date: data['date'] ?? '',
+      date: (data['date'] as Timestamp).toDate(),
       time: data['time'] ?? '',
-      status: data['status'] ?? '',
+      status: data['status'] ?? 'pending',
+      timestamp: (data['timestamp'] as Timestamp).toDate(),
     );
   }
 
@@ -58,9 +63,10 @@ class DonateData {
       'contactNum': contactNum,
       'weight': weight,
       'photo': photo,
-      'date': date,
+      'date': Timestamp.fromDate(date),
       'time': time,
       'status': status,
+      'timestamp': Timestamp.fromDate(timestamp),
     };
   }
 }
