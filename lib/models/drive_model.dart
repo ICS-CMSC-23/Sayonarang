@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Drive {
   String? id;
@@ -26,7 +27,7 @@ class Drive {
       title: json['title'],
       description: json['description'],
       donationIds: (json['donationIds'] as List).cast<String>(),
-      endDate: json['endDate'].toDate(),
+      endDate: (json['endDate'] as Timestamp).toDate(),
     );
   }
 
@@ -35,13 +36,14 @@ class Drive {
     return data.map<Drive>((dynamic d) => Drive.fromJson(d)).toList();
   }
 
-  Map<String, dynamic> toJson(Drive donationDrive) {
+  Map<String, dynamic> toJson() {
     return {
-      'orgId': donationDrive.orgId,
-      'title': donationDrive.title,
-      'description': donationDrive.description,
-      'donationIds': donationDrive.donationIds,
-      'endDate': donationDrive.endDate,
+      'id': id,
+      'orgId': orgId,
+      'title': title,
+      'description': description,
+      'donationIds': donationIds,
+      'endDate': endDate,
     };
   }
 }

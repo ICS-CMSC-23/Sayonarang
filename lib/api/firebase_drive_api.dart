@@ -5,10 +5,10 @@ class FirebaseDriveAPI {
 
   Future<String> addDrive(Map<String, dynamic> drive) async {
     try {
-      // Explicitly set the document ID to the drive ID
-      await db.collection("drives").doc(drive['id']).set(drive);
-
-      return "Successfully added donation drive!";
+      DocumentReference docRef = await db.collection("drives").add(drive);
+      // Update the document with the generated ID
+      await docRef.update({'id': docRef.id});
+      return "Successfully added donation drive with ID: ${docRef.id}";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
     }
@@ -29,19 +29,15 @@ class FirebaseDriveAPI {
     }
   }
 
-  // the donation drive can be edited to update its description and list of donations linked
   Future<String> editDrive(String? id, String title, String description,
       List<String> donationIds, DateTime endDate) async {
     try {
-      print("Description: $description");
-      print("Donation IDs: $donationIds");
       await db.collection("drives").doc(id).update({
         "title": title,
         "description": description,
         "donationIds": donationIds,
         "endDate": endDate
       });
-
       return "Successfully edited donation drive!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
@@ -51,7 +47,6 @@ class FirebaseDriveAPI {
   Future<String> deleteDrive(String? id) async {
     try {
       await db.collection("drives").doc(id).delete();
-
       return "Successfully deleted donation drive!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";

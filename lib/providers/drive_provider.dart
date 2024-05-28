@@ -37,7 +37,7 @@ class DriveProvider with ChangeNotifier {
   }
 
   void addDrive(Drive drive) async {
-    String message = await firebaseService.addDrive(drive.toJson(drive));
+    String message = await firebaseService.addDrive(drive.toJson());
     print(message);
     notifyListeners();
   }
