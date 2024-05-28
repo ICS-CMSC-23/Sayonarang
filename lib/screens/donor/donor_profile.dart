@@ -66,7 +66,16 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                             donorName: donorProfile.name ?? "Name",
                             username: donorProfile.username ?? "username",
                           ),
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: _fetchDonations,
+                            child: Text(
+                                _showDonations ? 'Refresh' : 'Show Donations'),
+                          ),
                           SizedBox(height: 20),
+                          if (_showDonations) _buildDonationsList(context),
+
+                          SizedBox(height: 10),
                           Center(
                             child: ElevatedButton(
                               onPressed: () {
@@ -75,14 +84,6 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                               child: Text('Logout'),
                             ),
                           ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: _fetchDonations,
-                            child: Text(
-                                _showDonations ? 'Refresh' : 'Show Donations'),
-                          ),
-                          SizedBox(height: 20),
-                          if (_showDonations) _buildDonationsList(context),
                         ],
                       ),
                     );
