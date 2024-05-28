@@ -1,11 +1,9 @@
-// //donor_organizations.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../models/user_model.dart';
 import '../../providers/donor_provider.dart';
+import 'donor_donate.dart';
 
 class ViewOrganizations extends StatefulWidget {
   const ViewOrganizations({Key? key}) : super(key: key);
@@ -41,11 +39,10 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Display a message if there are no orgs
                 Text(
                   'No organizations yet!',
                   style: TextStyle(
-                    fontSize: 20, // Increased font size for no org message
+                    fontSize: 20, 
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -67,17 +64,22 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                 margin: EdgeInsets.all(8.0),
                 child: InkWell(
                   onTap: () {
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DonorDonatePage(organization: org),
+                      ),
+                    );
                   },
                   child: ListTile(
                     leading: Icon(
-                      Icons.verified_user_rounded,
+                      Icons.supervised_user_circle_sharp,
                       size: 40,
                     ), 
                     title: Text(
                       org.name.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 22, // Adjusted font size for donor name
+                        fontSize: 22, 
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -88,9 +90,6 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                         color: Colors.blue,
                       ),
                     ),
-                    onTap: () {
-
-                    },
                   ),
                 ),
               );
@@ -101,3 +100,5 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
     );
   }
 }
+
+
