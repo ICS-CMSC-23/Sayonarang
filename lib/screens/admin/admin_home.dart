@@ -24,8 +24,7 @@ class AdminView extends StatelessWidget {
     ViewDonors(),
   ];
 
-  static const Color customRed =
-      Color(0xFFF54741); // Define the custom color here
+  static const Color customRed = Color(0xFFF54741);
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +59,8 @@ class AdminView extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -71,8 +70,8 @@ class AdminView extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Log out'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Log out'),
               onTap: () {
                 context.read<MyAuthProvider>().signOut(); // Log-out
                 // Go to Log-in
@@ -102,8 +101,7 @@ class AdminView extends StatelessWidget {
           ),
         ],
         currentIndex: provider.selectedIndex,
-        selectedItemColor:
-            customRed, // Set the selected item color to customRed
+        selectedItemColor: customRed, // Set the selected item color to Red
         onTap: (index) => provider.updateIndex(index),
       ),
     );

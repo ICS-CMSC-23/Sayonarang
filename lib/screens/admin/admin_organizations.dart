@@ -52,8 +52,16 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 elevation: 4,
                 child: ListTile(
-                  leading: const Icon(Icons.verified_user_rounded,
-                      size: 40, color: Color(0xFF4CAF50)),
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF4CAF50),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.business,
+                        size: 40, color: Color.fromARGB(255, 254, 238, 237)),
+                  ),
                   title: Text(
                     org.name,
                     style: const TextStyle(
