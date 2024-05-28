@@ -320,16 +320,7 @@ Future<void> _selectTime(BuildContext context) async {
 
               Visibility(
                 visible: _showUploadButton,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        print("Upload Button Clicked");
-                      },
-                      child: Text("Upload Photos"),
-                    ),
-                  ],
-                ),
+                child: Column()
               ),
               Padding(
                 padding: EdgeInsets.all(20),
