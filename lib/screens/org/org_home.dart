@@ -189,7 +189,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
               children: [
                 const SizedBox(height: 8),
                 Text(
-                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                  // 'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                  'Donated on ${donation.date}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,

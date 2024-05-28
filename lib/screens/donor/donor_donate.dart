@@ -28,7 +28,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     'Weight': 0.0,
     'WeightUnit': "kg",
     'Photo': "",
-    'Date': null, // Change here to DateTime
+    'Date': null,
     'Time': "",
   };
 

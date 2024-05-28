@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Donation {
   String? id;
@@ -12,28 +11,30 @@ class Donation {
       categories; // food, clothes, cash, necessities, others (can add as necessary)
   List<String> addresses;
   String mode; // pickup or drop-off
-  double weight; // weight in kg
+  String weight; // weight in kg
   String contactNum;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
-  DateTime date;
+  // DateTime date;
+  String date;
   String time;
-  DateTime timestamp; // date of when the donor made the donation
+  // DateTime timestamp; // date of when the donor made the donation
 
-  Donation(
-      {this.id,
-      required this.donorId,
-      required this.orgId,
-      required this.driveId,
-      required this.categories,
-      required this.addresses,
-      required this.mode,
-      required this.weight,
-      required this.contactNum,
-      required this.status,
-      required this.date,
-      required this.time,
-      required this.timestamp});
+  Donation({
+    this.id,
+    required this.donorId,
+    required this.orgId,
+    required this.driveId,
+    required this.categories,
+    required this.addresses,
+    required this.mode,
+    required this.weight,
+    required this.contactNum,
+    required this.status,
+    required this.date,
+    required this.time,
+    // required this.timestamp
+  });
 
   // Factory constructor to instantiate object from json format
   factory Donation.fromJson(Map<String, dynamic> json) {
@@ -49,9 +50,10 @@ class Donation {
       weight: json['weight'],
       contactNum: json['contactNum'],
       status: json['status'],
-      date: json['date'].toDate(), // convert Timestamp to DateTime
+      // date: json['date'].toDate(), // convert Timestamp to DateTime
+      date: json['date'],
       time: json['time'],
-      timestamp: json['timestamp'].toDate(),
+      // timestamp: json['timestamp'].toDate(),
     );
   }
 
@@ -73,7 +75,7 @@ class Donation {
       'status': donation.status,
       'date': donation.date,
       'time': donation.time,
-      'timestamp': donation.timestamp,
+      // 'timestamp': donation.timestamp,
     };
   }
 }
