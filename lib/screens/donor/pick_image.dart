@@ -14,7 +14,7 @@ class PickImage extends StatefulWidget {
 
 class _PickImageState extends State<PickImage> {
   File? _selectedImage;
-  String? _imageUrl;
+  //String? _imageUrl;
   bool _uploading = false;
 
   @override
