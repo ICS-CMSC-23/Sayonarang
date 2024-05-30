@@ -15,6 +15,7 @@ class DonateData {
   final String time;
   String status;
   DateTime timestamp;
+  String weightUnit;
 
   DonateData({
     this.id,
@@ -31,6 +32,7 @@ class DonateData {
     required this.time,
     this.status = 'pending',
     required this.timestamp,
+    required this.weightUnit,
   });
 
   factory DonateData.fromMap(Map<String, dynamic> data, {String? id}) {
@@ -49,6 +51,7 @@ class DonateData {
       time: data['time'] ?? '',
       status: data['status'] ?? 'pending',
       timestamp: (data['timestamp'] as Timestamp).toDate(),
+      weightUnit: data['weightUnit'] ?? '',
     );
   }
 
@@ -67,6 +70,7 @@ class DonateData {
       'time': time,
       'status': status,
       'timestamp': Timestamp.fromDate(timestamp),
+      'weightUnit': weightUnit,
     };
   }
 }

@@ -8,15 +8,15 @@ import "package:provider/provider.dart";
 // TODO: Add image upload for when add or edit mode (edit mode should have the image already displayed)
 // TODO: Show image from firebase storage when in view mode
 
-class OrgDriveFormPage extends StatefulWidget {
+class DonorDonationFormPage extends StatefulWidget {
   final String mode; // add, edit, view
-  const OrgDriveFormPage({super.key, required this.mode});
+  const DonorDonationFormPage({super.key, required this.mode});
 
   @override
-  State<OrgDriveFormPage> createState() => OrgDriveFormPageState();
+  State<DonorDonationFormPage> createState() => DonorDonationFormPageState();
 }
 
-class OrgDriveFormPageState extends State<OrgDriveFormPage> {
+class DonorDonationFormPageState extends State<DonorDonationFormPage> {
   late User? _currentUser;
 
   late TextEditingController _titleController;
@@ -331,7 +331,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const OrgDriveFormPage(mode: "edit"),
+                                      const DonorDonationFormPage(mode: "edit"),
                                 ),
                               );
                             },

@@ -114,4 +114,6 @@ class MyAuthProvider with ChangeNotifier {
       throw Exception("Failed to retrieve role of user: ${e.toString()}");
     }
   }
+
+  // TODO: Add edit user function to update if org wants to accept donations
 }
