@@ -3,14 +3,14 @@ import "package:donation_app/providers/donation_provider.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 
-class DonationDetailsPage extends StatefulWidget {
-  const DonationDetailsPage({super.key});
+class OrgDonationDetailsPage extends StatefulWidget {
+  const OrgDonationDetailsPage({super.key});
 
   @override
-  State<DonationDetailsPage> createState() => _DonationDetailsPageState();
+  State<OrgDonationDetailsPage> createState() => _OrgDonationDetailsPageState();
 }
 
-class _DonationDetailsPageState extends State<DonationDetailsPage> {
+class _OrgDonationDetailsPageState extends State<OrgDonationDetailsPage> {
   @override
   Widget build(BuildContext context) {
     Donation selectedDonation = context.read<DonationProvider>().selected;

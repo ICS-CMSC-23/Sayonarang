@@ -38,6 +38,7 @@ class FirebaseAuthAPI {
         'proof': proof,
         'role': role,
         'status': role == 'org' ? 'pending' : '',
+        'isOpen': false,
       });
 
       // print('Successfully signed up!');
