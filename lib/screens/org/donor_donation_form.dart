@@ -1,12 +1,9 @@
-import "package:donation_app/models/drive_model.dart";
-import "package:donation_app/providers/drive_provider.dart";
+import "package:donation_app/models/donation_model.dart";
+import "package:donation_app/providers/donation_provider.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:provider/provider.dart";
-
-// TODO: Add image upload for when add or edit mode (edit mode should have the image already displayed)
-// TODO: Show image from firebase storage when in view mode
 
 class DonorDonationFormPage extends StatefulWidget {
   final String mode; // add, edit, view
@@ -19,11 +16,9 @@ class DonorDonationFormPage extends StatefulWidget {
 class DonorDonationFormPageState extends State<DonorDonationFormPage> {
   late User? _currentUser;
 
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _endDateController;
-  late List<String> _donationIds;
-  Drive? _selectedDrive;
+  late TextEditingController _contacNumController;
+  late TextEditingController _dateController;
+  Donation? _selectedDonation;
   bool get isViewMode => widget.mode == "view";
   final _formKey = GlobalKey<FormState>();
 
@@ -35,27 +30,22 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
     _currentUser = FirebaseAuth.instance.currentUser;
 
     if (widget.mode == "edit" || widget.mode == "view") {
-      _selectedDrive = context.read<DriveProvider>().selected;
+      _selectedDonation = context.read<DonationProvider>().selected;
 
-      _titleController = TextEditingController(text: _selectedDrive?.title);
-      _descriptionController =
-          TextEditingController(text: _selectedDrive?.description);
-      _endDateController = TextEditingController(
-          text: DateFormat('yyyy-MM-dd').format(_selectedDrive!.endDate));
-      _donationIds = _selectedDrive!.donationIds;
+      _contacNumController =
+          TextEditingController(text: _selectedDonation?.contactNum);
+      _dateController = TextEditingController(
+          text: DateFormat('yyyy-MM-dd').format(_selectedDonation!.date));
     } else {
-      _titleController = TextEditingController();
-      _descriptionController = TextEditingController();
-      _endDateController = TextEditingController();
-      _donationIds = [];
+      _contacNumController = TextEditingController();
+      _dateController = TextEditingController();
     }
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _endDateController.dispose();
+    _contacNumController.dispose();
+    _dateController.dispose();
     super.dispose();
   }
 
@@ -215,7 +205,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
       child: Scaffold(
         appBar: AppBar(
             title: Text(
-          "${widget.mode == "add" ? "Add" : widget.mode == "edit" ? "Edit" : "View"} Donation Drive ${widget.mode == "view" ? "Details" : ""}",
+          "${widget.mode == "add" ? "Add" : widget.mode == "edit" ? "Edit" : "View"} Donation ${widget.mode == "view" ? "Details" : ""}",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: colorScheme.primary,
@@ -230,7 +220,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                   context: context,
                   type: 'text',
                   label: 'Title',
-                  controller: _titleController,
+                  controller: _contacNumController,
                   enabled: !isViewMode,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -240,25 +230,10 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                   },
                 ),
                 _buildFormField(
-                  context: context,
-                  type: 'text',
-                  label: 'Description',
-                  controller: _descriptionController,
-                  enabled: !isViewMode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a description';
-                    }
-                    return null;
-                  },
-                  minLines: 5,
-                  maxLines: null,
-                ),
-                _buildFormField(
                     context: context,
                     type: 'date',
                     label: 'End Date',
-                    controller: _endDateController,
+                    controller: _dateController,
                     enabled: !isViewMode,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -278,29 +253,16 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            Drive drive = Drive(
-                                orgId: _currentUser!.uid,
-                                title: _titleController.text,
-                                description: _descriptionController.text,
-                                endDate: DateFormat('yyyy-MM-dd')
-                                    .parse(_endDateController.text),
-                                donationIds: _donationIds);
-
+                            // create Donation object
                             // call function based on mode
                             if (widget.mode == "add") {
-                              context.read<DriveProvider>().addDrive(drive);
+                              // context.read<DonationProvider>().addDonation(donation);
                               Navigator.pop(context);
                             } else if (widget.mode == "edit") {
-                              drive.id = _selectedDrive?.id;
-                              context.read<DriveProvider>().editDrive(
-                                    _titleController.text,
-                                    _descriptionController.text,
-                                    _donationIds,
-                                    DateFormat('yyyy-MM-dd')
-                                        .parse(_endDateController.text),
-                                  );
+                              // context.read<DonationProvider>().editDonation(
+                              //     );
                               // TODO: find fix for when going to back to view details page from edit, the details page is updated
-                              // current solution is to pop twice to go back to the donation drives page
+                              // current solution is to pop twice to go back to the donations page
                               // https: //stackoverflow.com/a/74316628
                               Navigator.of(context)
                                 ..pop()
@@ -351,7 +313,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () {
-                              context.read<DriveProvider>().deleteDrive();
+                              context.read<DonationProvider>().deleteDonation();
                               Navigator.pop(context);
                             },
                             style: OutlinedButton.styleFrom(

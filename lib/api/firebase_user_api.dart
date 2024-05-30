@@ -154,4 +154,33 @@ class FirebaseAuthAPI {
 
     return userDoc.data()!['role'];
   }
+
+  // TODO: Add edit user function to update when org wants to accept donations, etc.
+  // for org use to update their status
+  Future<String> editOrgStatus(
+    String? orgId,
+    bool isOpen,
+  ) async {
+    try {
+      print("Is org open for donations: $isOpen");
+      await db.collection("users").doc(orgId).update({
+        "isOpen": isOpen,
+      });
+
+      return "Successfully edited org status to $isOpen!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
+  Stream<QuerySnapshot> getOpenOrgs(String orgId) {
+    try {
+      return db
+          .collection("users")
+          .where("isOpen", isEqualTo: true)
+          .snapshots();
+    } catch (e) {
+      throw "Failed to get open orgs: $e";
+    }
+  }
 }
