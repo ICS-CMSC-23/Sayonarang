@@ -1,4 +1,3 @@
-import 'package:donation_app/models/donation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/models/donate_data.dart';
 import 'package:donation_app/models/user_model.dart' as AppUser;
@@ -6,7 +5,6 @@ import 'package:donation_app/providers/donate_provider.dart';
 import 'package:provider/provider.dart';
 import 'pick_image.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
-import 'dart:io';
 
 class DonorDonatePage extends StatefulWidget {
   final AppUser.User organization;
