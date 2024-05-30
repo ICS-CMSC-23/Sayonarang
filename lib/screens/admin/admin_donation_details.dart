@@ -17,13 +17,10 @@ class DonationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     // Convert the donation.date string to a DateTime object
     // Format the DateTime object to the desired format
     String formattedDate = DateFormat('MMMM dd, yyyy').format(donation.date);
 
-=======
->>>>>>> main
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -142,11 +139,7 @@ class DonationDetailScreen extends StatelessWidget {
                     children: [
                       const SizedBox(width: 25),
                       Text(
-<<<<<<< HEAD
                         donation.weight.toString(),
-=======
-                        '${donation.weight}',
->>>>>>> main
                         style: const TextStyle(
                           fontSize: 16,
                           color: Color(0xFF666666),
