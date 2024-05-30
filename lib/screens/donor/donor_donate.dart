@@ -474,28 +474,27 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
 
                       DateTime timestamp = DateTime.now();
 
-
                       double weight = formValues["Weight"];
                       if (formValues["WeightUnit"] == "lbs") {
                         weight = weight * 0.453592;
                       }
 
                       DonateData donation = DonateData(
-                        orgId: widget.organization.id ?? '',
-                        donorId: currentDonorId,
-                        //TODO: add drive id if available
-                        driveId: '',
-                        categories: categories,
-                        mode: formValues["Mode of Transaction"],
-                        addresses: addresses,
-                        contactNum: formValues["Contact Number"],
-                        weight: weight,
-                        photo: formValues["Photo"],
-                        date: formValues["Date"],
-                        time: formValues["Time"],
-                        status: "Pending",
-                        timestamp: timestamp,
-                      );
+                          orgId: widget.organization.id ?? '',
+                          donorId: currentDonorId,
+                          //TODO: add drive id if available
+                          driveId: '',
+                          categories: categories,
+                          mode: formValues["Mode of Transaction"],
+                          addresses: addresses,
+                          contactNum: formValues["Contact Number"],
+                          weight: weight,
+                          photo: formValues["Photo"],
+                          date: formValues["Date"],
+                          time: formValues["Time"],
+                          status: '',
+                          timestamp: timestamp,
+                          weightUnit: "kg");
 
                       await context
                           .read<DonateDataProvider>()

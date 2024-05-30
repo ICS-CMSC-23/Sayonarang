@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Drive {
   String? id;
-  final String? orgId; // id of org who created the donation drive
+  final String orgId; // id of org who created the donation drive
   String title;
   String description;
   List<String>

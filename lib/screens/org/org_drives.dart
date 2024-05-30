@@ -94,7 +94,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriveFormPage(mode: "add"),
+                builder: (context) => OrgDriveFormPage(mode: "add"),
               ),
             );
           },
@@ -144,7 +144,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DriveFormPage(mode: "view"),
+              builder: (context) => OrgDriveFormPage(mode: "view"),
             ),
           );
         },
@@ -163,7 +163,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   '${isEnded ? 'Ended' : 'Ends'} on ${DateFormat('MMMM dd, yyyy').format(drive.endDate)}',
                   style: TextStyle(
@@ -171,7 +171,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
                   drive.description,
                   style: const TextStyle(fontSize: 16),

@@ -11,8 +11,6 @@ class OrgProfilePage extends StatefulWidget {
 class _OrgProfilePageState extends State<OrgProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return Container(
         // child: Text("Org Profile"),
         child: Center(

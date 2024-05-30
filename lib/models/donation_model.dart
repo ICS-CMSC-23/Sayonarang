@@ -3,8 +3,9 @@ import 'dart:convert';
 
 class Donation {
   String? id;
-  final String donorId; // id of user who made the donation
-  final String orgId; // id of user whom the donation will be given to
+  final String donorId; // id of user who made the donation, will not change
+  final String
+      orgId; // id of user whom the donation will be given to, will not change (assigned when donation is made)
   final String
       driveId; // id of donation drive where the org linked the donation to
   List<String>
@@ -12,30 +13,32 @@ class Donation {
   List<String> addresses;
   String mode; // pickup or drop-off
   double weight; // weight in kg
-  // String weight;
+  String weightUnit; // kg, lbs
   String contactNum;
   String
       status; // pending, confirmed, scheduled for pick-up, completed, cancelled
   DateTime date;
-  // String date;
   String time;
   DateTime timestamp; // date of when the donor made the donation
-  // DateTime timestamp; // date of when the donor made the donation
+  String photo;
 
-  Donation(
-      {this.id,
-      required this.donorId,
-      required this.orgId,
-      required this.driveId,
-      required this.categories,
-      required this.addresses,
-      required this.mode,
-      required this.weight,
-      required this.contactNum,
-      required this.status,
-      required this.date,
-      required this.time,
-      required this.timestamp});
+  Donation({
+    this.id,
+    required this.donorId,
+    required this.orgId,
+    required this.driveId,
+    required this.categories,
+    required this.addresses,
+    required this.mode,
+    required this.weight,
+    required this.weightUnit,
+    required this.contactNum,
+    required this.status,
+    required this.date,
+    required this.time,
+    required this.timestamp,
+    required this.photo,
+  });
 
   // Factory constructor to instantiate object from json format
   factory Donation.fromJson(Map<String, dynamic> json) {
@@ -49,11 +52,13 @@ class Donation {
       addresses: (json['addresses'] as List).cast<String>(),
       mode: json['mode'],
       weight: json['weight'].toDouble(),
+      weightUnit: json['weightUnit'],
       contactNum: json['contactNum'],
       status: json['status'],
-      date: json['date'].toDate(), // convert Timestamp to DateTime
+      date: json['date'].toDate(), // convert Firebase Timestamp to DateTime
       time: json['time'],
       timestamp: json['timestamp'].toDate(),
+      photo: json['photo'],
     );
   }
 
@@ -71,11 +76,13 @@ class Donation {
       'addresses': donation.addresses,
       'mode': donation.mode,
       'weight': donation.weight,
+      'weightUnit': donation.weightUnit,
       'contactNum': donation.contactNum,
       'status': donation.status,
       'date': donation.date,
       'time': donation.time,
       'timestamp': donation.timestamp,
+      'photo': donation.photo,
     };
   }
 }
