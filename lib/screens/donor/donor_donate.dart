@@ -1,4 +1,3 @@
-import 'package:donation_app/models/donation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/models/donate_data.dart';
 import 'package:donation_app/models/user_model.dart' as AppUser;
@@ -6,7 +5,6 @@ import 'package:donation_app/providers/donate_provider.dart';
 import 'package:provider/provider.dart';
 import 'pick_image.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
-import 'dart:io';
 
 class DonorDonatePage extends StatefulWidget {
   final AppUser.User organization;
@@ -476,28 +474,27 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
 
                       DateTime timestamp = DateTime.now();
 
-
                       double weight = formValues["Weight"];
                       if (formValues["WeightUnit"] == "lbs") {
                         weight = weight * 0.453592;
                       }
 
                       DonateData donation = DonateData(
-                        orgId: widget.organization.id ?? '',
-                        donorId: currentDonorId,
-                        //TODO: add drive id if available
-                        driveId: '',
-                        categories: categories,
-                        mode: formValues["Mode of Transaction"],
-                        addresses: addresses,
-                        contactNum: formValues["Contact Number"],
-                        weight: weight,
-                        photo: formValues["Photo"],
-                        date: formValues["Date"],
-                        time: formValues["Time"],
-                        status: '',
-                        timestamp: timestamp,
-                      );
+                          orgId: widget.organization.id ?? '',
+                          donorId: currentDonorId,
+                          //TODO: add drive id if available
+                          driveId: '',
+                          categories: categories,
+                          mode: formValues["Mode of Transaction"],
+                          addresses: addresses,
+                          contactNum: formValues["Contact Number"],
+                          weight: weight,
+                          photo: formValues["Photo"],
+                          date: formValues["Date"],
+                          time: formValues["Time"],
+                          status: '',
+                          timestamp: timestamp,
+                          weightUnit: "kg");
 
                       await context
                           .read<DonateDataProvider>()
