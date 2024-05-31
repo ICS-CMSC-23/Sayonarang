@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+//import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
-import '../../providers/donor_provider.dart';
+//import '../../providers/donor_provider.dart';
 import 'donor_donate.dart';
 
 class ViewOrgDetails extends StatelessWidget {
@@ -12,7 +12,7 @@ class ViewOrgDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final donorProvider = Provider.of<DonorProvider>(context, listen: false);
+    //final donorProvider = Provider.of<DonorProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
