@@ -63,7 +63,7 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                         size: 40, color: Color.fromARGB(255, 254, 238, 237)),
                   ),
                   title: Text(
-                    org.name,
+                    org.name.toUpperCase(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
