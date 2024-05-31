@@ -492,17 +492,20 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                           photo: formValues["Photo"],
                           date: formValues["Date"],
                           time: formValues["Time"],
-                          status: '',
+                          status: 'pending',
                           timestamp: timestamp,
                           weightUnit: "kg");
 
                       await context
                           .read<DonateDataProvider>()
                           .addDonation(donation);
+                      
+                      Navigator.of(context).pop();
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Form validated! Donation submitted.'),
-                          duration: Duration(seconds: 2),
+                          duration: Duration(seconds: 1),
                         ),
                       );
                     } else {
