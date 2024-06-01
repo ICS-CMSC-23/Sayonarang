@@ -19,7 +19,7 @@ class _ShowDonationsState extends State<ShowDonations> with SingleTickerProvider
   void initState() {
     super.initState();
     _currentUser = FirebaseAuth.instance.currentUser;
-    _tabController = TabController(length: 5, vsync: this); // Adjust the length based on the number of statuses
+    _tabController = TabController(length: 5, vsync: this);
     if (_currentUser != null) {
       _donationsFuture = Provider.of<DonorProvider>(context, listen: false)
           .fetchDonationsByDonor(_currentUser!.uid);

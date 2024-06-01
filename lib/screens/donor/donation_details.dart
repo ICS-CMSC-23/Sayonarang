@@ -20,6 +20,8 @@ class DonationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final donorProvider = Provider.of<DonorProvider>(context, listen: false);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -84,7 +86,7 @@ class DonationDetailScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 8),
                           const Text(
                             'Addresses:',
                             style: TextStyle(
@@ -109,7 +111,7 @@ class DonationDetailScreen extends StatelessWidget {
                               );
                             }).toList(),
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 8),
                           const Text(
                             'Contact Number:',
                             style: TextStyle(
@@ -131,7 +133,7 @@ class DonationDetailScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
                     const Text(
                       'Mode:',
                       style: TextStyle(
@@ -151,7 +153,7 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
                     const Text(
                       'Weight:',
                       style: TextStyle(
@@ -171,7 +173,7 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
                     const Text(
                       'Date:',
                       style: TextStyle(
@@ -191,7 +193,7 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
                     const Text(
                       'Time:',
                       style: TextStyle(
@@ -211,7 +213,37 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 15),
+                    // const SizedBox(height: 8),
+                    //   const Text(
+                    //     'Image:',
+                    //     style: TextStyle(
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //   ),
+                    //   FutureBuilder<String?>(
+                    //     future: donorProvider.getImageUrl(donation.photo),
+                    //     builder: (context, snapshot) {
+                    //       if (snapshot.connectionState ==
+                    //           ConnectionState.waiting) {
+                    //         return const CircularProgressIndicator();
+                    //       } else if (snapshot.hasError) {
+                    //         return Text('Error: ${snapshot.error}');
+                    //       } else {
+                    //         final imageUrl = snapshot.data;
+                    //         if (imageUrl != null) {
+                    //           return Image.network(
+                    //             imageUrl,
+                    //             width: 250,
+                    //             height: 250,
+                    //             fit: BoxFit.cover,
+                    //           );
+                    //         } else {
+                    //           return const Text('Image not found');
+                    //         }
+                    //       }
+                    //     },
+                    //   ),
                     if (donation.mode == "Drop-off")
                       Center(
                         child: ElevatedButton(
@@ -235,9 +267,8 @@ class DonationDetailScreen extends StatelessWidget {
       ),
       floatingActionButton: donation.status != 'cancelled' && donation.status != 'completed'
           ? FloatingActionButton.extended(
-              onPressed: () async {
-                await Provider.of<DonorProvider>(context, listen: false)
-                    .cancelDonation(donation.id!, 'cancelled');
+              onPressed: () {
+                donorProvider.cancelDonation(donation.id!, 'cancelled');
                 Navigator.of(context).pop();
 
                 ScaffoldMessenger.of(context).showSnackBar(
