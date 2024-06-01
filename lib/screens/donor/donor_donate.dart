@@ -4,6 +4,7 @@ import 'package:donation_app/models/user_model.dart' as AppUser;
 import 'package:donation_app/providers/donate_provider.dart';
 import 'package:provider/provider.dart';
 import 'pick_image.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart' as Auth;
 
 class DonorDonatePage extends StatefulWidget {
@@ -16,57 +17,59 @@ class DonorDonatePage extends StatefulWidget {
 }
 
 class _DonorDonatePageState extends State<DonorDonatePage> {
-  String? currentDonationId;
   final _formKey = GlobalKey<FormState>();
-  Map<String, dynamic> formValues = {
-    'Donation': <String>[],
-    'Mode of Transaction': "Pick-up",
-    'Address': <String>[],
-    'Contact Number': "",
-    'Weight': 0.0,
-    'WeightUnit': "kg",
-    'Photo': "",
-    'Date': null,
-    'Time': "",
+  final Map<String, dynamic> formValues = {
+    'categories': <String>[],
+    'mode': "Pick-up",
+    'addresses': <String>[],
+    'contactNum': "",
+    'weight': 0.0,
+    'weightUnit': "kg",
+    'photo': "",
+    'date': DateTime.now(),
+    'time': "",
+    'driveId': "",
+    'status': "pending",
+    'timestamp': DateTime.now(),
   };
 
-  List<String> _modeOptions = ["Pick-up", "Drop-off"];
-  List<String> _donateOptions = [
-    'Food',
-    'Clothes',
-    'Cash',
-    'Necessities',
-    'Others'
-  ];
-
+  final List<String> _modeOptions = ["Pick-up", "Drop-off"];
+  final List<String> _donateOptions = ['Food', 'Clothes', 'Cash', 'Necessities', 'Others'];
+  
   String _mode = "Pick-up";
-  String photo = " ";
-  final TextEditingController _textFieldController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
-  final TextEditingController _numberController = TextEditingController();
-  List<TextEditingController> addressControllers = [TextEditingController()];
-
   bool _showUploadButton = false;
   late String currentDonorId;
+
+  final TextEditingController _numberController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+  final List<TextEditingController> addressControllers = [TextEditingController()];
+  late TextEditingController _textEditingController;
 
   @override
   void initState() {
     super.initState();
     _initializeCurrentDonorId();
-    _textFieldController.addListener(() {
-      print("Latest Value: ${_textFieldController.text}");
+    _initializeListeners();
+    _textEditingController = TextEditingController();
+  }
+
+  void _initializeListeners() {
+    _numberController.addListener(() {
+      setState(() {
+        formValues["contactNum"] = _numberController.text;
+      });
     });
+
     addressControllers[0].addListener(() {
       if (addressControllers[0].text.isNotEmpty) {
         setState(() {
-          formValues["Address"] =
-              addressControllers.map((c) => c.text).toList();
+          formValues["addresses"] = addressControllers.map((c) => c.text).toList();
         });
       }
     });
 
-    formValues["Address"] = [];
+    formValues["addresses"] = [];
   }
 
   Future<void> _initializeCurrentDonorId() async {
@@ -90,7 +93,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     if (picked != null) {
       setState(() {
         _dateController.text = "${picked.toLocal()}".split(' ')[0];
-        formValues['Date'] = picked; // Save as DateTime
+        formValues['date'] = picked;
       });
     }
   }
@@ -103,17 +106,17 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     if (picked != null) {
       setState(() {
         _timeController.text = picked.format(context);
-        formValues['Time'] = _timeController.text;
+        formValues['time'] = _timeController.text;
       });
     }
   }
 
   @override
   void dispose() {
-    _textFieldController.dispose();
+    _numberController.dispose();
     _dateController.dispose();
     _timeController.dispose();
-    _numberController.dispose();
+    _textEditingController.dispose();
     for (var controller in addressControllers) {
       controller.dispose();
     }
@@ -127,444 +130,449 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
         title: Text('Donate to ${widget.organization.name}'),
       ),
       backgroundColor: Colors.white,
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  Text(
-                    "Fill up the following to donate:",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [Text("Items to Donate")],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 255, 230, 230),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Color.fromARGB(255, 255, 230, 230), width: 5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                ),
+              ], 
+            ),
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ..._donateOptions
-                        .map((option) => CheckboxListTile(
-                              title: Text(option),
-                              value: formValues["Donation"].contains(option),
-                              onChanged: (value) {
+                    _buildSectionTitle("Fill up the following to donate:"),
+                    _buildSectionTitle("Items to Donate"),
+                    _buildCategorySelection(),
+                    _buildSectionTitle("Modes of Transportation:"),
+                    _buildSubTitle("Which mode do you prefer?"),
+                    _buildModeSelection(),
+                    if (_mode == "Pick-up") _buildPickupFields(),
+                    _buildSectionTitle("Enter Weight of Donation:"),
+                    _buildWeightField(),
+                    _buildWeightUnitDropdown(),
+                    _buildSectionTitle("Upload a photo (optional)"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: SwitchListTile(
+                              title: const Text("Show Upload Options"),
+                              value: _showUploadButton,
+                              onChanged: (bool? value) {
                                 setState(() {
-                                  if (value!) {
-                                    formValues["Donation"].add(option);
-                                  } else {
-                                    formValues["Donation"].remove(option);
-                                  }
+                                  _showUploadButton = value!;
                                 });
                               },
-                            ))
-                        .toList(),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            String newOption = '';
-                            return AlertDialog(
-                              title: Text('Add new option'),
-                              content: TextField(
-                                onChanged: (value) {
-                                  newOption = value;
-                                },
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _donateOptions.add(newOption);
-                                      formValues["Donation"].add(newOption);
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('Add'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Text('Add'),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text(
-                      "Modes of Transportation:",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
-                    )
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [Text("Which mode do you prefer?")],
-              ),
-              FormField(
-                builder: (value) => Column(
-                  children: <Widget>[
-                    RadioListTile<String>(
-                      title: Text(_modeOptions[0]),
-                      value: _modeOptions[0],
-                      groupValue: _mode,
-                      onChanged: (String? value) {
-                        setState(() {
-                          _mode = value!;
-                          formValues["Mode of Transaction"] = _mode;
-                        });
-                      },
-                    ),
-                    RadioListTile<String>(
-                      title: Text(_modeOptions[1]),
-                      value: _modeOptions[1],
-                      groupValue: _mode,
-                      onChanged: (String? value) {
-                        setState(() {
-                          _mode = value!;
-                          formValues["Mode of Transaction"] = _mode;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              if (_mode == "Pick-up")
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Enter address(es):",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic),
-                      )
-                    ],
-                  ),
-                ),
-              if (_mode == "Pick-up") _buildAddressFields(),
-              if (_mode == "Pick-up")
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text(
-                        "Enter a Contact Number:",
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic),
-                      )
-                    ],
-                  ),
-                ),
-              if (_mode == "Pick-up")
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: TextFormField(
-                    controller: _numberController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: "Contact Number",
-                      labelText: "Contact Number",
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your contact number';
-                      }
-                      return null;
-                    },
-                    onChanged: (String value) {
-                      formValues["Contact Number"] = value;
-                    },
-                  ),
-                ),
-              Visibility(visible: _showUploadButton, child: Column()),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter weight';
-                          }
-                          try {
-                            double.parse(value);
-                          } catch (e) {
-                            return 'Please enter a valid number';
-                          }
-                          return null;
-                        },
-                        onChanged: (String value) {
-                          formValues["Weight"] = double.tryParse(value) ?? 0.0;
-                        },
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: "Weight",
-                          labelText: "Weight",
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: formValues["WeightUnit"] ?? "kg",
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            formValues["WeightUnit"] = value!;
-                          });
-                        },
-                        items: [
-                          DropdownMenuItem(
-                            child: Text("kg"),
-                            value: "kg",
+                            ),
                           ),
-                          DropdownMenuItem(
-                            child: Text("lbs"),
-                            value: "lbs",
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: _showUploadButton,
+                      child: Column(
+                        children: [
+                          PickImage(
+                            onImagePicked: (String imageName) {
+                              setState(() {
+                                formValues["photo"] = imageName;
+                              });
+                            },
                           ),
                         ],
                       ),
                     ),
+                    _buildSectionTitle("Pick-up Date and Time"),
+                    _buildDateTimeFields(),
+                    _buildSubmitButton(),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Text(
-                      "Select Donation Date and Time:",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: TextFormField(
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                    labelText: "Date",
-                    hintText: "Select Date",
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.calendar_today),
-                      onPressed: () {
-                        _selectDate(context);
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a date';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: TextFormField(
-                  controller: _timeController,
-                  decoration: InputDecoration(
-                    labelText: "Time",
-                    hintText: "Select Time",
-                    suffixIcon: IconButton(
-                      icon: Icon(Icons.access_time),
-                      onPressed: () {
-                        _selectTime(context);
-                      },
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a time';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: SwitchListTile(
-                        title: const Text("Show Upload Options"),
-                        value: _showUploadButton,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _showUploadButton = value!;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Visibility(
-                visible: _showUploadButton,
-                child: Column(
-                  children: [
-                    PickImage(
-                      onImagePicked: (String imageName) {
-                        setState(() {
-                          formValues["Photo"] = imageName;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      if (_showUploadButton) {}
-                      List<String> categories =
-                          List<String>.from(formValues["Donation"]);
-                      List<String> addresses =
-                          List<String>.from(formValues["Address"]);
-
-                      DateTime timestamp = DateTime.now();
-
-                      double weight = formValues["Weight"];
-                      if (formValues["WeightUnit"] == "lbs") {
-                        weight = weight * 0.453592;
-                      }
-
-                      DonateData donation = DonateData(
-                          orgId: widget.organization.id ?? '',
-                          donorId: currentDonorId,
-                          //TODO: add drive id if available
-                          driveId: '',
-                          categories: categories,
-                          mode: formValues["Mode of Transaction"],
-                          addresses: addresses,
-                          contactNum: formValues["Contact Number"],
-                          weight: weight,
-                          photo: formValues["Photo"],
-                          date: formValues["Date"],
-                          time: formValues["Time"],
-                          status: 'pending',
-                          timestamp: timestamp,
-                          weightUnit: "kg");
-
-                      await context
-                          .read<DonateDataProvider>()
-                          .addDonation(donation);
-                      
-                      Navigator.of(context).pop();
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Form validated! Donation submitted.'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    } else {
-                      print("Not Validated");
-                    }
-                  },
-                  child: const Text("Submit"),
-                ),
-              ),
-              const SizedBox(height: 80),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildAddressFields() {
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategorySelection() {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          ...addressControllers.map((controller) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: TextFormField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Enter Address",
-                  labelText: "Enter Address",
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an address';
-                  }
-                  return null;
-                },
-                onChanged: (String value) {
-                  setState(() {
-                    formValues["Address"] = addressControllers
-                        .map((controller) => controller.text)
-                        .toList();
-                  });
-                },
-              ),
-            );
-          }).toList(),
-          ElevatedButton(
-            onPressed: () {
+          ..._donateOptions.map((option) => CheckboxListTile(
+            title: Text(option),
+            value: formValues["categories"].contains(option),
+            onChanged: (value) {
               setState(() {
-                TextEditingController newController = TextEditingController();
-                addressControllers.add(newController);
+                if (value!) {
+                  formValues["categories"].add(option);
+                } else {
+                  formValues["categories"].remove(option);
+                }
               });
             },
-            child: const Text("Add Address"),
+          )).toList(),
+          ElevatedButton(
+            onPressed: () => _addNewCategory(context),
+            child: Text('Add'),
           ),
         ],
       ),
     );
   }
+
+  Future<void> _addNewCategory(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add new option'),
+          content: TextFormField(
+            controller: _textEditingController,
+            decoration: InputDecoration(
+              hintText: 'Enter new option',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a category name';
+              }
+              return null;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_textEditingController.text.isNotEmpty) {
+                  setState(() {
+                    String enteredText = _textEditingController.text;
+                    _donateOptions.add(enteredText);
+                    formValues["categories"].add(enteredText);
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text('Please enter a category name.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildModeSelection() {
+    return FormField(
+      builder: (value) => Column(
+        children: _modeOptions.map((mode) => RadioListTile<String>(
+          title: Text(mode),
+          value: mode,
+          groupValue: _mode,
+          onChanged: (String? value) {
+            setState(() {
+              _mode = value!;
+              formValues["mode"] = _mode;
+            });
+          },
+        )).toList(),
+      ),
+    );
+  }
+
+  Widget _buildPickupFields() {
+    return Column(
+      children: [
+        _buildSectionTitle("Enter address(es):"),
+        _buildAddressFields(),
+        _buildSectionTitle("Enter a Contact Number:"),
+        _buildContactNumberField(),
+      ],
+    );
+  }
+
+  Widget _buildAddressFields() {
+    return Column(
+      children: [
+        ...List.generate(
+          addressControllers.length,
+          (index) => Padding(
+            padding: const EdgeInsets.all(10),
+            child: TextFormField(
+              controller: addressControllers[index],
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                labelText: 'Address ${index + 1}',
+                suffixIcon: addressControllers.length > 1
+                    ? IconButton(
+                        icon: Icon(Icons.remove_circle),
+                        onPressed: () {
+                          setState(() {
+                            addressControllers.removeAt(index);
+                          });
+                        },
+                      )
+                    : null,
+              ),
+              onChanged: (String value) {
+                formValues["addresses"][index] = value;
+              },
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              addressControllers.add(TextEditingController());
+            });
+          },
+          child: const Text('Add Address'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactNumberField() {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: TextFormField(
+        controller: _numberController,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: "Contact Number",
+          labelText: "Contact Number",
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your contact number';
+          }
+          return null;
+        },
+        onChanged: (value) {
+          formValues["contactNum"] = value;
+        },
+      ),
+    );
+  }
+
+  Widget _buildWeightField() {
+  return Padding(
+    padding: const EdgeInsets.all(10),
+    child: TextFormField(
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        hintText: "Enter weight",
+        labelText: "Weight",
+      ),
+      keyboardType: TextInputType.number,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+      ],
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter the weight';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          formValues["weight"] = double.parse(value);
+        });
+      },
+    ),
+  );
+}
+
+  Widget _buildWeightUnitDropdown() {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: DropdownButtonFormField<String>(
+        value: formValues["weightUnit"],
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Weight Unit',
+        ),
+        items: <String>['kg', 'lbs']
+            .map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? value) {
+          setState(() {
+            formValues["weightUnit"] = value!;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildPhotoUpload() {
+    return Column(
+      children: [
+        if (_showUploadButton) PickImage(
+          onImagePicked: (String imageName) {
+            setState(() {
+              formValues["Photo"] = imageName;
+            });
+          },
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _showUploadButton = true;
+            });
+          },
+          child: const Text('Upload Image'),
+        ),
+        if (formValues['photo'] != null) Text(formValues['photo']),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeFields() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: TextFormField(
+            controller: _dateController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Date',
+            ),
+            onTap: () {
+              _selectDate(context);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: TextFormField(
+            controller: _timeController,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Time',
+            ),
+            onTap: () {
+              _selectTime(context);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+Widget _buildSubmitButton() {
+  return Padding(
+    padding: const EdgeInsets.all(10), 
+    child: SizedBox(
+      width: double.infinity, 
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red, 
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8), 
+          ),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
+
+            formValues["addresses"] = addressControllers.map((controller) => controller.text).toList();
+
+            Provider.of<DonateDataProvider>(context, listen: false).addDonation(
+              DonateData(
+                id: null,
+                orgId: widget.organization.id,
+                donorId: currentDonorId,
+                driveId: formValues["driveId"],
+                categories: formValues["categories"],
+                mode: formValues["mode"],
+                addresses: formValues["addresses"],
+                contactNum: formValues["contactNum"],
+                weight: formValues["weight"],
+                photo: formValues["photo"],
+                date: formValues["date"],
+                time: formValues["time"],
+                status: formValues["status"],
+                timestamp: formValues["timestamp"],
+                weightUnit: formValues["weightUnit"],
+              ),
+            );
+
+            Navigator.of(context).pop();
+          }
+        },
+        child: const Text('Submit'),
+      ),
+    ),
+  );
+}
 }
