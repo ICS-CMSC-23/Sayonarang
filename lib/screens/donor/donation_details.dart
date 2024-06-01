@@ -213,37 +213,6 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // const SizedBox(height: 8),
-                    //   const Text(
-                    //     'Image:',
-                    //     style: TextStyle(
-                    //       fontSize: 16,
-                    //       fontWeight: FontWeight.bold,
-                    //     ),
-                    //   ),
-                    //   FutureBuilder<String?>(
-                    //     future: donorProvider.getImageUrl(donation.photo),
-                    //     builder: (context, snapshot) {
-                    //       if (snapshot.connectionState ==
-                    //           ConnectionState.waiting) {
-                    //         return const CircularProgressIndicator();
-                    //       } else if (snapshot.hasError) {
-                    //         return Text('Error: ${snapshot.error}');
-                    //       } else {
-                    //         final imageUrl = snapshot.data;
-                    //         if (imageUrl != null) {
-                    //           return Image.network(
-                    //             imageUrl,
-                    //             width: 250,
-                    //             height: 250,
-                    //             fit: BoxFit.cover,
-                    //           );
-                    //         } else {
-                    //           return const Text('Image not found');
-                    //         }
-                    //       }
-                    //     },
-                    //   ),
                     if (donation.mode == "Drop-off")
                       Center(
                         child: ElevatedButton(
