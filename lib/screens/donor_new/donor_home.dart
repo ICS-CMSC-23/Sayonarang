@@ -9,14 +9,14 @@ import 'package:intl/intl.dart';
 import 'package:donation_app/providers/donation_provider.dart';
 import 'package:donation_app/models/donation_model.dart';
 
-class OrgHomePage extends StatefulWidget {
-  const OrgHomePage({super.key});
+class DonorHomePage extends StatefulWidget {
+  const DonorHomePage({super.key});
 
   @override
-  _OrgHomePageState createState() => _OrgHomePageState();
+  _DonorHomePageState createState() => _DonorHomePageState();
 }
 
-class _OrgHomePageState extends State<OrgHomePage> {
+class _DonorHomePageState extends State<DonorHomePage> {
   late User? _currentUser;
   Map<String, dynamic>? _userDetails;
 
