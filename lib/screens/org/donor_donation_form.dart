@@ -16,8 +16,12 @@ class DonorDonationFormPage extends StatefulWidget {
 class DonorDonationFormPageState extends State<DonorDonationFormPage> {
   late User? _currentUser;
 
+  late List<String> _categories;
   late TextEditingController _contacNumController;
   late TextEditingController _dateController;
+  late TextEditingController _weightController;
+  late String _weightUnit;
+
   Donation? _selectedDonation;
   bool get isViewMode => widget.mode == "view";
   final _formKey = GlobalKey<FormState>();
@@ -32,13 +36,20 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
     if (widget.mode == "edit" || widget.mode == "view") {
       _selectedDonation = context.read<DonationProvider>().selected;
 
+      _categories = _selectedDonation!.categories;
       _contacNumController =
-          TextEditingController(text: _selectedDonation?.contactNum);
+          TextEditingController(text: _selectedDonation!.contactNum);
       _dateController = TextEditingController(
           text: DateFormat('yyyy-MM-dd').format(_selectedDonation!.date));
+      _weightController =
+          TextEditingController(text: _selectedDonation!.weight.toString());
+      _weightUnit = _selectedDonation!.weightUnit;
     } else {
+      _categories = [];
       _contacNumController = TextEditingController();
       _dateController = TextEditingController();
+      _weightController = TextEditingController();
+      _weightUnit = 'kg';
     }
   }
 
@@ -216,15 +227,35 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
             key: _formKey,
             child: Column(
               children: [
+                // TODO: Add categories (checkboxes: Food, Cash, Necessities), then additional categories in an other but text field and should be separated with comma
+                ...['Food', 'Cash', 'Necessities'].map((option) {
+                  return CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(option),
+                    value: _categories.contains(option),
+                    onChanged: (newValue) {
+                      setState(() {
+                        if (newValue!) {
+                          _categories.add(option);
+                        } else {
+                          _categories.remove(option);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+
+                // loop through addresses and display them using the _buildFormField function
+
                 _buildFormField(
                   context: context,
                   type: 'text',
-                  label: 'Title',
+                  label: 'Contact Number',
                   controller: _contacNumController,
                   enabled: !isViewMode,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a title';
+                      return 'Please enter a contact number';
                     }
                     return null;
                   },
@@ -232,17 +263,56 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                 _buildFormField(
                     context: context,
                     type: 'date',
-                    label: 'End Date',
+                    label: 'Date of Pickup/Drop-off',
                     controller: _dateController,
                     enabled: !isViewMode,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter an end date';
+                        return 'Please enter date of pickup/drop-off';
                       }
                       return null;
                     },
                     minLines: 1,
                     suffixIcon: const Icon(Icons.calendar_today)),
+                // TODO: Display date (above) and time field in the same row
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: _buildFormField(
+                        context: context,
+                        type: 'number',
+                        label: 'Weight',
+                        controller: _weightController,
+                        enabled: !isViewMode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter weight';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 2,
+                      child: DropdownButtonFormField<String>(
+                        value: _weightUnit,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _weightUnit = newValue!;
+                          });
+                        },
+                        items: <String>['kg', 'lbs'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 if (!isViewMode)
                   Padding(
