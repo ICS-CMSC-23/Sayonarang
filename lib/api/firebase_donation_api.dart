@@ -50,7 +50,39 @@ class FirebaseDonationAPI {
     }
   }
 
-  // TODO: add api for getting donations given categories as a filter
+  // for donor, can edit all fields except the status
+  Future<String> editDonationDetails(
+      String? id,
+      List<String> categories,
+      List<String> addresses,
+      String mode,
+      double weight,
+      String weightUnit,
+      String contactNu,
+      String status,
+      DateTime date,
+      String time,
+      String photo) async {
+    try {
+      print("Status: $status");
+      await db.collection("donations").doc(id).update({
+        categories: 'categories',
+        addresses: 'addresses',
+        mode: 'mode',
+        weight: 'weight',
+        weightUnit: 'weightUnit',
+        contactNu: 'contactNu',
+        status: 'status',
+        date: 'date',
+        time: 'time',
+        photo: 'photo',
+      });
+
+      return "Successfully edited donation details!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
 
   Future<String> editDonationStatus(
     String? id,
@@ -63,22 +95,6 @@ class FirebaseDonationAPI {
       });
 
       return "Successfully edited donation status to $status!";
-    } on FirebaseException catch (e) {
-      return "Failed with error '${e.code}: ${e.message}";
-    }
-  }
-
-  Future<String> editLinkedDrive(
-    String? id,
-    String driveId,
-  ) async {
-    try {
-      print("driveId: $driveId");
-      await db.collection("donations").doc(id).update({
-        "driveId": driveId,
-      });
-
-      return "Successfully linked donation to donation drive with id $driveId!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
     }

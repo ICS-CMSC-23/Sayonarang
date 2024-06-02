@@ -1,12 +1,16 @@
 import "package:donation_app/models/drive_model.dart";
 import "package:donation_app/providers/drive_provider.dart";
+import "package:donation_app/screens/org/image_slider.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:provider/provider.dart";
 
-// TODO: Add image upload for when add or edit mode (edit mode should have the image already displayed)
-// TODO: Show image from firebase storage when in view mode
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
+// TODO: Add loading state for saving and loading images
+// TODO: Add snackbar to show successfully edited or successfully saved
 
 class OrgDriveFormPage extends StatefulWidget {
   final String mode; // add, edit, view
@@ -23,6 +27,14 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
   late TextEditingController _descriptionController;
   late TextEditingController _endDateController;
   late List<String> _donationIds;
+  late List<String> _photos;
+  late List<String> _photosDownloadURLs;
+  late List<String>
+      _deletedPhotos; // tto keep track of the deleted photos deleted by the user when editing
+
+  List<File> _selectedFiles = [];
+  final _picker = ImagePicker();
+
   Drive? _selectedDrive;
   bool get isViewMode => widget.mode == "view";
   final _formKey = GlobalKey<FormState>();
@@ -37,17 +49,26 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     if (widget.mode == "edit" || widget.mode == "view") {
       _selectedDrive = context.read<DriveProvider>().selected;
 
-      _titleController = TextEditingController(text: _selectedDrive?.title);
+      _titleController = TextEditingController(text: _selectedDrive!.title);
       _descriptionController =
           TextEditingController(text: _selectedDrive?.description);
       _endDateController = TextEditingController(
           text: DateFormat('yyyy-MM-dd').format(_selectedDrive!.endDate));
       _donationIds = _selectedDrive!.donationIds;
+      _photos = _selectedDrive!
+          .photos; // filenames of the images from firebase storage
+      _deletedPhotos = [];
+      _photosDownloadURLs = [];
+      // fetch download URLs for images
+      _loadDownloadURLs();
     } else {
       _titleController = TextEditingController();
       _descriptionController = TextEditingController();
       _endDateController = TextEditingController();
       _donationIds = [];
+      _photos = [];
+      _deletedPhotos = [];
+      _photosDownloadURLs = [];
     }
   }
 
@@ -57,6 +78,17 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     _descriptionController.dispose();
     _endDateController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadDownloadURLs() async {
+    if (widget.mode == "edit" || widget.mode == "view") {
+      List<String> downloadURLs = await context
+          .read<DriveProvider>()
+          .fetchDownloadURLsForImages(_photos);
+      setState(() {
+        _photosDownloadURLs = downloadURLs;
+      });
+    }
   }
 
   Widget _buildFormField({
@@ -197,6 +229,114 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     );
   }
 
+  Future getImages() async {
+    final pickedFile = await _picker.pickMultiImage(
+        imageQuality: 100, maxHeight: 1000, maxWidth: 1000);
+    List<XFile> xfilePick = pickedFile;
+
+    setState(
+      () {
+        if (xfilePick.isNotEmpty) {
+          for (var i = 0; i < xfilePick.length; i++) {
+            _selectedFiles.add(File(xfilePick[i].path));
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Nothing is selected')));
+        }
+      },
+    );
+  }
+
+  Widget _buildImageGrid() {
+    List<dynamic> images = [..._photosDownloadURLs, ..._selectedFiles];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: SizedBox(
+        height: 200,
+        child: images.isEmpty
+            ? Center(
+                child: Text(
+                  'No images selected',
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                  ),
+                ),
+              )
+            : GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
+                ),
+                itemCount: images.length,
+                itemBuilder: (context, index) {
+                  final image = images[index];
+                  return Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SliderShowFullmages(
+                                listImagesModel: images,
+                                current: index,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            image: DecorationImage(
+                              image: image is File
+                                  ? FileImage(image)
+                                  : NetworkImage(image) as ImageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (!isViewMode)
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (image is File) {
+                                  _selectedFiles.remove(image);
+                                } else if (image is String) {
+                                  int deleteIndex =
+                                      _photosDownloadURLs.indexOf(image);
+                                  _photos.removeAt(deleteIndex);
+                                  _deletedPhotos
+                                      .add(_photosDownloadURLs[deleteIndex]);
+                                  _photosDownloadURLs.removeAt(deleteIndex);
+                                }
+                              });
+                            },
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -269,42 +409,117 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                     minLines: 1,
                     suffixIcon: const Icon(Icons.calendar_today)),
                 const SizedBox(height: 8),
-                if (!isViewMode)
+                if (!isViewMode) ...[
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              getImages();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2.0,
+                              ),
+                            ),
+                            icon: const Icon(Icons.image_search),
+                            label: const Text('Select Images From Gallery'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildImageGrid(),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            Drive drive = Drive(
-                                orgId: _currentUser!.uid,
-                                title: _titleController.text,
-                                description: _descriptionController.text,
-                                endDate: DateFormat('yyyy-MM-dd')
-                                    .parse(_endDateController.text),
-                                donationIds: _donationIds);
-
-                            // call function based on mode
                             if (widget.mode == "add") {
-                              context.read<DriveProvider>().addDrive(drive);
-                              Navigator.pop(context);
+                              if (_selectedFiles.isNotEmpty) {
+                                List<String> fileNames = await context
+                                    .read<DriveProvider>()
+                                    .uploadFiles(_selectedFiles);
+
+                                Drive drive = Drive(
+                                  orgId: _currentUser!.uid,
+                                  title: _titleController.text,
+                                  description: _descriptionController.text,
+                                  endDate: DateFormat('yyyy-MM-dd')
+                                      .parse(_endDateController.text),
+                                  donationIds: _donationIds,
+                                  photos:
+                                      fileNames, // convert File objects to paths
+                                );
+
+                                if (!context.mounted) return; // mounted check
+                                context.read<DriveProvider>().addDrive(drive);
+                                Navigator.pop(context);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Please select at least one image'),
+                                  ),
+                                );
+                              }
                             } else if (widget.mode == "edit") {
-                              drive.id = _selectedDrive?.id;
-                              context.read<DriveProvider>().editDrive(
-                                    _titleController.text,
-                                    _descriptionController.text,
-                                    _donationIds,
-                                    DateFormat('yyyy-MM-dd')
-                                        .parse(_endDateController.text),
-                                  );
-                              // TODO: find fix for when going to back to view details page from edit, the details page is updated
-                              // current solution is to pop twice to go back to the donation drives page
-                              // https: //stackoverflow.com/a/74316628
-                              Navigator.of(context)
-                                ..pop()
-                                ..pop(); // kanta ni nayeon hahahaha
+                              if (_selectedFiles.isNotEmpty ||
+                                  _photos.isNotEmpty) {
+                                List<String> fileNames = [];
+                                if (_selectedFiles.isNotEmpty) {
+                                  fileNames = await context
+                                      .read<DriveProvider>()
+                                      .uploadFiles(_selectedFiles);
+                                }
+
+                                // delete files only if there are photos to delete
+                                if (_deletedPhotos.isNotEmpty) {
+                                  if (!context.mounted) return; // mounted check
+
+                                  context
+                                      .read<DriveProvider>()
+                                      .deleteFiles(_deletedPhotos);
+                                }
+
+                                // merge existing photos and newly uploaded files
+                                List<String> updatedPhotos =
+                                    _photos + fileNames;
+
+                                if (!context.mounted) return; // mounted check
+                                context.read<DriveProvider>().editDrive(
+                                      _titleController.text,
+                                      _descriptionController.text,
+                                      _donationIds,
+                                      DateFormat('yyyy-MM-dd')
+                                          .parse(_endDateController.text),
+                                      updatedPhotos,
+                                    );
+
+                                // TODO: find fix for when going back to the view details page from edit, the details page is updated
+                                // current solution is to pop twice to go back to the donation drives page
+                                // https://stackoverflow.com/a/74316628
+                                Navigator.of(context)
+                                  ..pop()
+                                  ..pop(); // kanta ni nayeon hahahaha
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please select at least one image',
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           }
                         },
@@ -318,7 +533,9 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                       ),
                     ),
                   ),
-                if (isViewMode)
+                ],
+                if (isViewMode) ...[
+                  _buildImageGrid(),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -369,6 +586,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                       ],
                     ),
                   ),
+                ]
               ],
             ),
           ),

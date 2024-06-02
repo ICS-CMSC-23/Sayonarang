@@ -9,6 +9,7 @@ class Drive {
   List<String>
       donationIds; // list of donation ids for when the org links donations to donation drives
   DateTime endDate;
+  List<String> photos;
 
   Drive({
     this.id,
@@ -17,6 +18,7 @@ class Drive {
     required this.description,
     required this.donationIds,
     required this.endDate,
+    required this.photos,
   });
 
   // Factory constructor to instantiate object from json format
@@ -28,6 +30,7 @@ class Drive {
       description: json['description'],
       donationIds: (json['donationIds'] as List).cast<String>(),
       endDate: (json['endDate'] as Timestamp).toDate(),
+      photos: (json['photos'] as List).cast<String>(),
     );
   }
 
@@ -44,6 +47,7 @@ class Drive {
       'description': description,
       'donationIds': donationIds,
       'endDate': endDate,
+      'photos': photos,
     };
   }
 }

@@ -58,16 +58,37 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void editDonationStatus(String status) async {
-    String message =
-        await firebaseService.editDonationStatus(_selectedDonation!.id, status);
+  void editDonationDetails(
+      List<String> categories,
+      List<String> addresses,
+      String mode,
+      double weight,
+      String weightUnit,
+      String contactNu,
+      String status,
+      DateTime date,
+      String time,
+      String photo) async {
+    String message = await firebaseService.editDonationDetails(
+      _selectedDonation!.id,
+      categories,
+      addresses,
+      mode,
+      weight,
+      weightUnit,
+      contactNu,
+      status,
+      date,
+      time,
+      photo,
+    );
     print(message);
     notifyListeners();
   }
 
-  void editLinkedDrive(String driveId) async {
+  void editDonationStatus(String status) async {
     String message =
-        await firebaseService.editLinkedDrive(_selectedDonation!.id, driveId);
+        await firebaseService.editDonationStatus(_selectedDonation!.id, status);
     print(message);
     notifyListeners();
   }

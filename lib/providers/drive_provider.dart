@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:donation_app/api/firebase_drive_api.dart';
 import 'package:donation_app/models/drive_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class DriveProvider with ChangeNotifier {
   late FirebaseDriveAPI firebaseService;
@@ -43,9 +46,9 @@ class DriveProvider with ChangeNotifier {
   }
 
   void editDrive(String title, String description, List<String> donationIds,
-      DateTime endDate) async {
+      DateTime endDate, List<String> photos) async {
     String message = await firebaseService.editDrive(
-        _selectedDrive!.id, title, description, donationIds, endDate);
+        _selectedDrive!.id, title, description, donationIds, endDate, photos);
     print(message);
     notifyListeners();
   }
@@ -54,5 +57,82 @@ class DriveProvider with ChangeNotifier {
     String message = await firebaseService.deleteDrive(_selectedDrive!.id);
     print(message);
     notifyListeners();
+  }
+
+  Future<String> uploadFile(File file) async {
+    try {
+      // get reference to firebase storage
+      final storageRef = FirebaseStorage.instance.ref();
+
+      // get filename of the image
+      final fileName = file.path.split("/").last;
+      final timestamp = DateTime.now().microsecondsSinceEpoch;
+
+      // define the path in the storage
+      final uploadRef = storageRef.child("drive/$timestamp-$fileName");
+      await uploadRef.putFile(file);
+      print('Successfully uploaded file');
+      return '$timestamp-$fileName';
+    } catch (e) {
+      print(e);
+      return 'error';
+    }
+  }
+
+  Future<List<String>> uploadFiles(List<File> files) async {
+    List<String> uploadedPaths = [];
+
+    try {
+      // Get reference to Firebase Storage
+      final storageRef = FirebaseStorage.instance.ref();
+
+      // Upload each file in the list
+      for (File file in files) {
+        // Get filename of the image
+        final fileName = file.path.split("/").last;
+        final timestamp = DateTime.now().microsecondsSinceEpoch;
+
+        // Define the path in the storage
+        final uploadRef = storageRef.child("drives/$timestamp-$fileName");
+
+        // Upload file to Firebase Storage
+        await uploadRef.putFile(file);
+
+        // Add uploaded file path to the list
+        uploadedPaths.add('$timestamp-$fileName');
+        print('Successfully uploaded file: $fileName');
+      }
+
+      return uploadedPaths;
+    } catch (e) {
+      print(e);
+      return ['error'];
+    }
+  }
+
+  Future<void> deleteFiles(List<String> fileUrls) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      for (String fileUrl in fileUrls) {
+        final fileRef = storageRef.storage.refFromURL(fileUrl);
+        await fileRef.delete();
+        print('Successfully deleted file: $fileUrl');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<List<String>> fetchDownloadURLsForImages(
+      List<String> filenames) async {
+    List<String> downloadURLs = [];
+    for (String filename in filenames) {
+      String downloadURL = await FirebaseStorage.instance
+          .ref()
+          .child('drives/${filename}')
+          .getDownloadURL();
+      downloadURLs.add(downloadURL);
+    }
+    return downloadURLs;
   }
 }
