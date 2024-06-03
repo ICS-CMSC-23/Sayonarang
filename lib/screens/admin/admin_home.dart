@@ -13,20 +13,12 @@ class AdminView extends StatelessWidget {
   const AdminView({super.key});
 
   static const List<String> _pageTitles = [
-    // 'Approval Wait list',
-    // 'Organizations',
-    // 'Donors'
     'Organizations',
     'Donors',
     'Profile'
   ];
 
   static List<Widget> _AdminPages = <Widget>[
-    // AdminApprovalWaitList(),
-    // ViewOrganizations(),
-    // ViewDonors(),
-
-    // ViewOrganizations(),
     AdminApprovalWaitList(),
     ViewDonors(),
     ProfilePage()
@@ -50,49 +42,6 @@ class AdminView extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: _AdminPages.elementAt(provider.selectedIndex),
-      // drawer: Drawer(
-      //   child: ListView(
-      //     padding: EdgeInsets.zero,
-      //     children: <Widget>[
-      //       const DrawerHeader(
-      //         decoration: BoxDecoration(
-      //           color: customRed,
-      //         ),
-      //         child: Text(
-      //           'Admin',
-      //           style: TextStyle(
-      //             color: Colors.white,
-      //             fontSize: 24,
-      //           ),
-      //         ),
-      //       ),
-      //       ListTile(
-      //         leading: const Icon(Icons.person),
-      //         title: const Text('Profile'),
-      //         onTap: () {
-      //           Navigator.of(context).push(
-      //             MaterialPageRoute(
-      //               builder: (context) => const ProfilePage(),
-      //             ),
-      //           );
-      //         },
-      //       ),
-      //       ListTile(
-      //         leading: const Icon(Icons.logout),
-      //         title: const Text('Log out'),
-      //         onTap: () {
-      //           context.read<MyAuthProvider>().signOut(); // Log-out
-      //           // Go to Log-in
-      //           Navigator.of(context).pushReplacement(
-      //             MaterialPageRoute(
-      //               builder: (context) => LoginPage(),
-      //             ),
-      //           );
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
