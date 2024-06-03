@@ -12,6 +12,8 @@ class PendingOrgDetailPage extends StatelessWidget {
     switch (status) {
       case 'pending':
         return Colors.orange;
+      case 'approved':
+        return Colors.green;
       case 'rejected':
         return Colors.red;
       default:
@@ -42,116 +44,118 @@ class PendingOrgDetailPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
+                surfaceTintColor: Colors.transparent,
                 elevation: 4,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Center(
-                        child: Text(
-                          'ACCOUNT DETAILS',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      const Icon(
+                        Icons.business,
+                        size: 60,
+                      ),
+                      Text(
+                        org.name,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF333333),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.business,
-                          size: 40,
-                        ),
-                        title: Text(
-                          org.name,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333),
-                          ),
-                        ),
-                        subtitle: Text(
-                          org.username,
-                          style: const TextStyle(
+                      Text(
+                        org.username,
+                        style: const TextStyle(
                             fontSize: 16,
                             color: Color(0xFF666666),
+                            fontStyle: FontStyle.italic),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: getStatusColor(org.status),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        child: Text(
+                          'Status: ${org.status}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Status:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      const SizedBox(height: 12),
                       Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          Text(
-                            org.status,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: getStatusColor(org.status),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Contact Number:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          Text(
-                            org.contactNum,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF666666),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Addresses:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: org.addresses.map((address) {
-                          return Row(
+                        children: [
+                          const Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(width: 15),
                               Text(
-                                address,
+                                'Contact Number:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Addresses:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          )),
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                org.contactNum,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF666666),
                                 ),
                               ),
+                              const SizedBox(height: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: org.addresses.map((address) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Text(
+                                      address,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF666666),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ],
-                          );
-                        }).toList(),
+                          ))
+                        ],
+                      ),
+                      // const SizedBox(height: 8),
+                      const Row(
+                        children: [
+                          Text(
+                            'Proof:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Proof:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                       FutureBuilder<String?>(
                         future: adminProvider.getProofImageUrl(org.proof),
                         builder: (context, snapshot) {
@@ -179,35 +183,36 @@ class PendingOrgDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      adminProvider.updateOrgStatus(org.id!, 'approved');
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color(0xFF4CAF50),
+              const SizedBox(height: 10),
+              // show only buttons if org is pending
+              if (org.status == 'pending')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        adminProvider.updateOrgStatus(org.id!, 'approved');
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF4CAF50),
+                      ),
+                      child: const Text('Approve'),
                     ),
-                    child: const Text('Approve'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      adminProvider.updateOrgStatus(org.id!, 'rejected');
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color(0xFFE53935),
+                    ElevatedButton(
+                      onPressed: () {
+                        adminProvider.updateOrgStatus(org.id!, 'rejected');
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFFE53935),
+                      ),
+                      child: const Text('Disapprove'),
                     ),
-                    child: const Text('Disapprove'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 50),
+                  ],
+                ),
             ],
           ),
         ],
