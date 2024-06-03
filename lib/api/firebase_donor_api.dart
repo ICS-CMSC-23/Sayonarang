@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/donate_data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseDonorAPI {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -70,6 +71,17 @@ class FirebaseDonorAPI {
       return await db.collection('users').doc(orgId).get();
     } on FirebaseException catch (e) {
       throw Exception("Failed to retrieve organization: ${e.message}");
+    }
+  }
+
+  Future<String?> getImageUrl(String filename) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final imageRef = storageRef.child("images/$filename");
+      return await imageRef.getDownloadURL();
+    } catch (e) {
+      print("Failed to retrieve image: $e");
+      return null;
     }
   }
 }

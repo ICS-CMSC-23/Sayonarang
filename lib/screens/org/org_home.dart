@@ -123,6 +123,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
                   ),
+                  maxLines: 1, // limit date to one line
                 ),
                 const SizedBox(height: 4),
                 Wrap(
@@ -130,16 +131,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                   runSpacing: 6,
                   // limit categories to be displayed to 3
                   children: donation.categories.take(3).map((category) {
-                    return Chip(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      label: Text(category),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      side: BorderSide.none,
-                      labelStyle: const TextStyle(color: Colors.white),
-                    );
+                    return _buildTruncatedChip(category);
                   }).toList(),
                 ),
               ],
@@ -148,6 +140,23 @@ class _OrgHomePageState extends State<OrgHomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTruncatedChip(String text) {
+    final maxLength = 20;
+    final truncatedText =
+        text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+
+    return Chip(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      label: Text(truncatedText),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      side: BorderSide.none,
+      labelStyle: const TextStyle(color: Colors.white),
     );
   }
 

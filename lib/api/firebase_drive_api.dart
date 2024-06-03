@@ -30,13 +30,14 @@ class FirebaseDriveAPI {
   }
 
   Future<String> editDrive(String? id, String title, String description,
-      List<String> donationIds, DateTime endDate) async {
+      List<String> donationIds, DateTime endDate, List<String> photos) async {
     try {
       await db.collection("drives").doc(id).update({
         "title": title,
         "description": description,
         "donationIds": donationIds,
-        "endDate": endDate
+        "endDate": endDate,
+        "photos": photos,
       });
       return "Successfully edited donation drive!";
     } on FirebaseException catch (e) {

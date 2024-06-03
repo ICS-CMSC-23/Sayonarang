@@ -4,20 +4,25 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:donation_app/api/firebase_user_api.dart';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyAuthProvider with ChangeNotifier {
   late FirebaseAuthAPI authService;
   late Stream<User?> uStream;
   User? userObj;
   String? role;
+  late Stream<QuerySnapshot> _openOrgsStream;
 
   Map<String, dynamic> signupStatus = {};
   Map<String, dynamic> userDetails =
       {}; // {success: true/false, response: map/string}
+  Stream<QuerySnapshot> get openOrgs => _openOrgsStream;
 
   MyAuthProvider() {
     authService = FirebaseAuthAPI();
     fetchAuthentication();
+    _openOrgsStream = const Stream
+        .empty(); // initialize with an empty stream to prevent LateInitializationError
   }
 
   Stream<User?> get userStream => uStream;
@@ -115,5 +120,17 @@ class MyAuthProvider with ChangeNotifier {
     }
   }
 
-  // TODO: Add edit user function to update if org wants to accept donations
+  void editOrgStatus(
+    String userId,
+    bool isOpen,
+  ) async {
+    String message = await authService.editOrgStatus(userId, isOpen);
+    print(message);
+    notifyListeners();
+  }
+
+  void fetchOpenOrgs(String driveId) {
+    _openOrgsStream = authService.getOpenOrgs(driveId);
+    notifyListeners();
+  }
 }
