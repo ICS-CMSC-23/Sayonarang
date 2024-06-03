@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
+import 'dart:typed_data';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class QrCodeScreen extends StatelessWidget {
   final String donationId;
+  final ScreenshotController screenshotController = ScreenshotController();
+  QrCodeScreen({Key? key, required this.donationId}) : super(key: key);
 
-  const QrCodeScreen({Key? key, required this.donationId}) : super(key: key);
+  Future<void> saveImage() async {
+    final Uint8List? uint8list = await screenshotController.capture();
+    if (uint8list != null) {
+      final PermissionStatus status;
+      if (await Permission.manageExternalStorage.request().isGranted) {
+        status = PermissionStatus.granted;
+      } else {
+        status = await Permission.storage.request();
+      }
+
+      if (status.isGranted) {
+        final result = await ImageGallerySaver.saveImage(uint8list);
+        if (result['isSuccess']) {
+          print('Image Saved to Gallery');
+        } else {
+          print('Failed to save image: ${result['error']}');
+        }
+      } else {
+        print('Permission to access storage denied');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,26 +48,31 @@ class QrCodeScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Color(0xFFF54741)),
       ),
       body: Center(
-        child: Theme(
-          data: ThemeData( // Custom theme data
-            // Define the theme for the QR code
-            colorScheme: ColorScheme.light(
-              primary: Colors.black, // Color of the QR code
-              onPrimary: Colors.white, // Color of the text in the QR code
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Screenshot(
+              controller: screenshotController,
+              child: QrImageView(
+                data: donationId,
+                version: QrVersions.auto,
+                gapless: false,
+                size: 320,
+                backgroundColor: Colors.white,
+              ),
             ),
-            // Apply the custom text theme
-            textTheme: TextTheme(
-              bodyText2: TextStyle(color: Colors.black), // Text color
+            const SizedBox(height: 20.0),
+            const Text('Scan QR code'),
+            ElevatedButton(
+              onPressed: () async {
+                await saveImage();
+              },
+              child: const Text('Save as Image'),
             ),
-          ),
-          child: QrImageView(
-            data: donationId,
-            version: QrVersions.auto,
-            size: 200.0,
-          ),
+          ],
         ),
       ),
     );
   }
 }
-
