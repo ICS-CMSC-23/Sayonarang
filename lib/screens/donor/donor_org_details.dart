@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 //import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
@@ -80,11 +79,13 @@ class ViewOrgDetails extends StatelessWidget {
                   Row(
                     children: [
                       const SizedBox(width: 15),
-                      Text(
-                        user.contactNum,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
+                      Flexible(
+                        child: Text(
+                          user.contactNum,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF666666),
+                          ),
                         ),
                       ),
                     ],
@@ -100,17 +101,22 @@ class ViewOrgDetails extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: user.addresses.map((address) {
-                      return Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          Text(
-                            address,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF666666),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 15),
+                            Flexible(
+                              child: Text(
+                                address,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     }).toList(),
                   ),
