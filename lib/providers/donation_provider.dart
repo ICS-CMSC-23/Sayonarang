@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:donation_app/api/firebase_donation_api.dart';
 import 'package:donation_app/models/donation_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class DonationProvider with ChangeNotifier {
   late FirebaseDonationAPI firebaseService;
@@ -64,8 +66,7 @@ class DonationProvider with ChangeNotifier {
       String mode,
       double weight,
       String weightUnit,
-      String contactNu,
-      String status,
+      String contactNum,
       DateTime date,
       String time,
       String photo) async {
@@ -76,8 +77,7 @@ class DonationProvider with ChangeNotifier {
       mode,
       weight,
       weightUnit,
-      contactNu,
-      status,
+      contactNum,
       date,
       time,
       photo,
@@ -98,5 +98,44 @@ class DonationProvider with ChangeNotifier {
         await firebaseService.deleteDonation(_selectedDonation!.id);
     print(message);
     notifyListeners();
+  }
+
+  Future<String> uploadFile(File file) async {
+    try {
+      // get reference to firebase storage
+      final storageRef = FirebaseStorage.instance.ref();
+
+      // get filename of the image
+      final fileName = file.path.split("/").last;
+      final timestamp = DateTime.now().microsecondsSinceEpoch;
+
+      // define the path in the storage
+      final uploadRef = storageRef.child("images/$timestamp-$fileName");
+      await uploadRef.putFile(file);
+      print('Successfully uploaded file');
+      return '$timestamp-$fileName';
+    } catch (e) {
+      print(e);
+      return 'error';
+    }
+  }
+
+  Future<void> deleteFile(String fileUrl) async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref();
+      final fileRef = storageRef.storage.refFromURL(fileUrl);
+      await fileRef.delete();
+      print('Successfully deleted file: $fileUrl');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<String> fetchDownloadURLForImage(String filename) async {
+    String downloadURL = await FirebaseStorage.instance
+        .ref()
+        .child('images/${filename}')
+        .getDownloadURL();
+    return downloadURL;
   }
 }

@@ -1,12 +1,19 @@
 import 'package:donation_app/models/donation_model.dart';
 import 'package:donation_app/providers/donation_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/donor_new/donor_qrcode.dart';
+import 'package:donation_app/screens/donor_new/image_viewer.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import "package:firebase_auth/firebase_auth.dart";
+import "package:donation_app/models/user_model.dart" as user_model;
 
-// TODO: Add optional image field
-// TODO: Display image and use the image_view to expand
+// TODO: Add loading state for saving and loading image
+// TODO: Add snackbar to show successfully edited or successfully saved
+
 class DonorDonationFormPage extends StatefulWidget {
   final String mode; // add, edit, view
   const DonorDonationFormPage({super.key, required this.mode});
@@ -16,23 +23,34 @@ class DonorDonationFormPage extends StatefulWidget {
 }
 
 class DonorDonationFormPageState extends State<DonorDonationFormPage> {
+  late User? _currentUser;
+
   late List<String> _categories;
   late TextEditingController _otherCategoriesController;
   late TextEditingController _weightController;
   late String _weightUnit;
-  late String? _mode;
+  late String _mode;
   late List<TextEditingController> _addressControllers;
   late TextEditingController _contactNumController;
   late TextEditingController _dateController;
   late TextEditingController _timeController;
+  late String _photo;
+  late String _photoDownloadURL;
+  late String _status;
+  late DateTime _timestamp;
+  String _deletedPhoto = '';
+  File? _selectedPhoto;
 
   Donation? _selectedDonation;
+  user_model.User? _selectedOrg;
   bool get isViewMode => widget.mode == 'view';
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    // fetch user details
+    _currentUser = FirebaseAuth.instance.currentUser;
 
     if (widget.mode == 'edit' || widget.mode == 'view') {
       _selectedDonation = context.read<DonationProvider>().selected;
@@ -51,7 +69,16 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
       _dateController = TextEditingController(
           text: DateFormat('yyyy-MM-dd').format(_selectedDonation!.date));
       _timeController = TextEditingController(text: _selectedDonation!.time);
+      _photo = _selectedDonation!.photo;
+      _photoDownloadURL = '';
+      _status = _selectedDonation!.status;
+      _timestamp = _selectedDonation!.timestamp;
+
+      _loadDownloadURLs();
     } else {
+      // only fetch selected organization when creating a new donation
+      _selectedOrg = context.read<MyAuthProvider>().selected;
+
       _categories = [];
       _otherCategoriesController = TextEditingController();
       _weightController = TextEditingController();
@@ -61,6 +88,10 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
       _contactNumController = TextEditingController();
       _dateController = TextEditingController();
       _timeController = TextEditingController();
+      _photo = '';
+      _photoDownloadURL = '';
+      _status = 'pending';
+      _timestamp = DateTime.now();
     }
   }
 
@@ -77,7 +108,42 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
     super.dispose();
   }
 
-  void _addCustomCategory(String category) {
+  Future<void> _loadDownloadURLs() async {
+    if (widget.mode == "edit" || widget.mode == "view") {
+      if (_photo != '') {
+        String downloadURL = await context
+            .read<DonationProvider>()
+            .fetchDownloadURLForImage(_photo);
+        setState(() {
+          _photoDownloadURL = downloadURL;
+        });
+      }
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) return;
+
+    setState(() {
+      _selectedPhoto = File(pickedFile.path);
+    });
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile == null) return;
+
+    setState(() {
+      _selectedPhoto = File(pickedFile.path);
+    });
+  }
+
+  void _addNewCategory(String category) {
     setState(() {
       _categories.add(category);
     });
@@ -89,30 +155,146 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Custom Category'),
+          surfaceTintColor: Colors.transparent,
+          title: const Text('Add New Category'),
           content: TextField(
             controller: _otherCategoriesController,
-            decoration: InputDecoration(hintText: 'Enter category'),
+            decoration: const InputDecoration(hintText: 'Enter category'),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             TextButton(
-              child: Text('Add'),
+              child: const Text('Add'),
               onPressed: () {
                 String category = _otherCategoriesController.text.trim();
                 if (category.isNotEmpty) {
-                  _addCustomCategory(category);
+                  _addNewCategory(category);
                 }
               },
             ),
           ],
         );
       },
+    );
+  }
+
+  void _showDatePicker(
+      BuildContext context, TextEditingController controller) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+    }
+  }
+
+  void _showTimePicker(
+      BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (!context.mounted) return; // mounted check
+    if (pickedTime != null) {
+      controller.text = pickedTime.format(context);
+    }
+  }
+
+  Widget _buildImageContainer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Image (optional)",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (_photoDownloadURL != '' || _selectedPhoto != null)
+            Stack(
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ShowFullImage(
+                          image: _photoDownloadURL != ''
+                              ? _photoDownloadURL
+                              : _selectedPhoto,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      image: DecorationImage(
+                        image: _photoDownloadURL != ''
+                            ? NetworkImage(_photoDownloadURL)
+                            : FileImage(_selectedPhoto!)
+                                as ImageProvider<Object>,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                if (!isViewMode)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _photo = '';
+                          _deletedPhoto = _photoDownloadURL;
+                          _photoDownloadURL = '';
+                          _selectedPhoto = null;
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.red,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          if (_photoDownloadURL == '' && _selectedPhoto == null)
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Colors.grey[200],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.image,
+                  color: Colors.grey[400],
+                  size: 48,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -192,31 +374,6 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
     );
   }
 
-  void _showDatePicker(
-      BuildContext context, TextEditingController controller) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-    }
-  }
-
-  void _showTimePicker(
-      BuildContext context, TextEditingController controller) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (!context.mounted) return; // mounted check
-    if (pickedTime != null) {
-      controller.text = pickedTime.format(context);
-    }
-  }
-
   Future<bool?> _showBackDialog() {
     if (isViewMode) {
       // return true immediately if in view mode
@@ -289,18 +446,18 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Categories',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
                             ),
                           ),
                           if (!isViewMode) ...[
-                            // pre-defined categories: Food, Cash, Necessities
+                            // pre-defined categories: Food, Clothes, Cash, Necessities
                             CheckboxListTile(
                               controlAffinity: ListTileControlAffinity.leading,
-                              title: Text('Food'),
+                              title: const Text('Food'),
                               value: _categories.contains('Food'),
                               onChanged: (newValue) {
                                 setState(() {
@@ -314,7 +471,21 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                             ),
                             CheckboxListTile(
                               controlAffinity: ListTileControlAffinity.leading,
-                              title: Text('Cash'),
+                              title: const Text('Clothes'),
+                              value: _categories.contains('Clothes'),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  if (newValue!) {
+                                    _categories.add('Clothes');
+                                  } else {
+                                    _categories.remove('Clothes');
+                                  }
+                                });
+                              },
+                            ),
+                            CheckboxListTile(
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: const Text('Cash'),
                               value: _categories.contains('Cash'),
                               onChanged: (newValue) {
                                 setState(() {
@@ -328,7 +499,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                             ),
                             CheckboxListTile(
                               controlAffinity: ListTileControlAffinity.leading,
-                              title: Text('Necessities'),
+                              title: const Text('Necessities'),
                               value: _categories.contains('Necessities'),
                               onChanged: (newValue) {
                                 setState(() {
@@ -344,6 +515,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                             ..._categories
                                 .where((option) => ![
                                       'Food',
+                                      'Clothes',
                                       'Necessities',
                                       'Cash'
                                     ].contains(option))
@@ -368,7 +540,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                             Center(
                               child: TextButton(
                                 onPressed: _showAddCategoryModal,
-                                child: Text('Add Category'),
+                                child: const Text('Add Category'),
                               ),
                             ),
                           ],
@@ -439,9 +611,9 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Mode of Transfer',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -492,6 +664,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                               return null;
                             },
                             minLines: 1,
+                            maxLines: null,
                           ),
                         ),
                         if (!isViewMode &&
@@ -549,38 +722,149 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                   suffixIcon: const Icon(Icons.calendar_today),
                 ),
                 const SizedBox(height: 8),
-                if (!isViewMode)
+                _buildFormField(
+                  context: context,
+                  type: 'time',
+                  label: 'Time of Pick-up/Drop-off',
+                  controller: _timeController,
+                  enabled: !isViewMode,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter time of pick-up/drop-off';
+                    }
+                    return null;
+                  },
+                  minLines: 1,
+                  suffixIcon: const Icon(Icons.access_time),
+                ),
+                const SizedBox(height: 8),
+                if (!isViewMode) ...[
+                  _buildImageContainer(),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _pickImageFromGallery();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2.0,
+                              ),
+                            ),
+                            icon: const Icon(Icons.image_search),
+                            label: const Text('Gallery'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _pickImageFromCamera();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2.0,
+                              ),
+                            ),
+                            icon: const Icon(Icons.camera_alt_outlined),
+                            label: const Text('Camera'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // Create Donation object
-                            if (widget.mode == 'add') {
-                              // final newDonation = Donation(
-                              //   contactNum: _contactNumController.text,
-                              //   date: DateTime.parse(_dateController.text),
-                              //   weight: double.parse(_weightController.text),
-                              //   weightUnit: _weightUnit,
-                              //   categories: _categories,
-                              //   addresses: _addressControllers
-                              //       .map((controller) => controller.text)
-                              //       .toList(),
-                              // );
-                              //   context
-                              //       .read<DonationProvider>()
-                              //       .addDonation(newDonation);
-                              Navigator.pop(context);
-                            } else if (widget.mode == 'edit') {
-                              // context
-                              //     .read<DonationProvider>()
-                              //     .editDonation(newDonation);
-                              Navigator.of(context)
-                                ..pop()
-                                ..pop();
+                            if (_categories.isNotEmpty) {
+                              if (widget.mode == 'add') {
+                                String fileName = '';
+                                if (_selectedPhoto != null) {
+                                  fileName = await context
+                                      .read<DonationProvider>()
+                                      .uploadFile(_selectedPhoto!);
+                                }
+                                final newDonation = Donation(
+                                  donorId: _currentUser!.uid,
+                                  orgId: _selectedOrg!.id!,
+                                  driveId: '',
+                                  categories: _categories,
+                                  addresses: _addressControllers
+                                      .map((controller) => controller.text)
+                                      .toList(),
+                                  mode: _mode,
+                                  weight: double.parse(_weightController.text),
+                                  weightUnit: _weightUnit,
+                                  contactNum: _contactNumController.text,
+                                  status: _status,
+                                  date: DateTime.parse(_dateController.text),
+                                  time: _timeController.text,
+                                  photo: fileName,
+                                  timestamp: _timestamp,
+                                );
+                                context
+                                    .read<DonationProvider>()
+                                    .addDonation(newDonation);
+                                Navigator.pop(context);
+                              } else if (widget.mode == 'edit') {
+                                String fileName = _photo;
+                                if (_selectedPhoto != null) {
+                                  fileName = await context
+                                      .read<DonationProvider>()
+                                      .uploadFile(_selectedPhoto!);
+                                }
+
+                                // delete photo only if there is one to delete
+                                if (_deletedPhoto != '') {
+                                  if (!context.mounted) return; // mounted check
+                                  context
+                                      .read<DonationProvider>()
+                                      .deleteFile(_deletedPhoto);
+                                }
+
+                                if (!context.mounted) return; // mounted check
+                                context
+                                    .read<DonationProvider>()
+                                    .editDonationDetails(
+                                      _categories,
+                                      _addressControllers
+                                          .map((controller) => controller.text)
+                                          .toList(),
+                                      _mode,
+                                      double.parse(_weightController.text),
+                                      _weightUnit,
+                                      _contactNumController.text,
+                                      DateTime.parse(_dateController.text),
+                                      _timeController.text,
+                                      fileName,
+                                    );
+                                Navigator.of(context)
+                                  ..pop()
+                                  ..pop();
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Please select at least one category',
+                                  ),
+                                ),
+                              );
                             }
                           }
                         },
@@ -594,7 +878,41 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                       ),
                     ),
                   ),
-                if (isViewMode)
+                ],
+                if (isViewMode) ...[
+                  _buildImageContainer(),
+                  if (_mode == 'Drop-off')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DonorQRCodeScreen(
+                                        donationId: _selectedDonation!.id!),
+                                  ),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              icon: const Icon(Icons.qr_code_2),
+                              label: const Text('View QR Code'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -645,6 +963,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                       ],
                     ),
                   ),
+                ]
               ],
             ),
           ),

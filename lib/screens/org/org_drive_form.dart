@@ -5,7 +5,6 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:provider/provider.dart";
-
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -29,8 +28,8 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
   late List<String> _donationIds;
   late List<String> _photos;
   late List<String> _photosDownloadURLs;
-  late List<String>
-      _deletedPhotos; // tto keep track of the deleted photos deleted by the user when editing
+  List<String> _deletedPhotos =
+      []; // to keep track of the deleted photos deleted by the user when editing
 
   List<File> _selectedFiles = [];
   final _picker = ImagePicker();
@@ -57,7 +56,6 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
       _donationIds = _selectedDrive!.donationIds;
       _photos = _selectedDrive!
           .photos; // filenames of the images from firebase storage
-      _deletedPhotos = [];
       _photosDownloadURLs = [];
       // fetch download URLs for images
       _loadDownloadURLs();
@@ -67,7 +65,6 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
       _endDateController = TextEditingController();
       _donationIds = [];
       _photos = [];
-      _deletedPhotos = [];
       _photosDownloadURLs = [];
     }
   }
@@ -229,7 +226,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     );
   }
 
-  Future getImages() async {
+  Future<void> getImages() async {
     final pickedFile = await _picker.pickMultiImage(
         imageQuality: 100, maxHeight: 1000, maxWidth: 1000);
     List<XFile> xfilePick = pickedFile;
@@ -267,16 +264,15 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: Colors.grey[200], // Set the background color to grey200
+                color: Colors.grey[200],
               ),
               height: 200,
               child: images.isEmpty
                   ? Center(
                       child: Icon(
-                        Icons.image_not_supported, // Use an icon for no images
-                        color:
-                            Colors.grey[400], // Set the icon color to grey400
-                        size: 50, // Adjust the size of the icon if needed
+                        Icons.image,
+                        color: Colors.grey[400],
+                        size: 48,
                       ),
                     )
                   : Padding(

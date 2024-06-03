@@ -6,12 +6,11 @@ class Donation {
   final String donorId; // id of user who made the donation, will not change
   final String
       orgId; // id of user whom the donation will be given to, will not change (assigned when donation is made)
-  final String
-      driveId; // id of donation drive where the org linked the donation to
+  String driveId; // id of donation drive where the org linked the donation to
   List<String>
-      categories; // food, clothes, cash, necessities, others (can add as necessary)
+      categories; // Food, Clothes, Cash, Necessities, others (can add as necessary)
   List<String> addresses;
-  String mode; // pickup or drop-off
+  String mode; // Pick-up or Drop-off
   double weight; // weight in kg
   String weightUnit; // kg, lbs
   String contactNum;

@@ -48,7 +48,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
     if (filteredDonations.isEmpty) {
       return Center(
         child: Text(
-          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          'No ${status.toLowerCase() == 'scheduled for pick-up' ? 'scheduled' : status.toLowerCase()} donations yet!',
           style: const TextStyle(fontSize: 18),
         ),
       );
@@ -109,7 +109,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  'Scheduled on ${DateFormat('MMMM dd, yyyy').format(donation.date)}',
+                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,

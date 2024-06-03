@@ -30,12 +30,17 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     'time': "",
     'driveId': "",
     'status': "pending",
-    'timestamp': DateTime.now(),
   };
 
   final List<String> _modeOptions = ["Pick-up", "Drop-off"];
-  final List<String> _donateOptions = ['Food', 'Clothes', 'Cash', 'Necessities', 'Others'];
-  
+  final List<String> _donateOptions = [
+    'Food',
+    'Clothes',
+    'Cash',
+    'Necessities',
+    'Others'
+  ];
+
   String _mode = "Pick-up";
   bool _showUploadButton = false;
   late String currentDonorId;
@@ -43,7 +48,9 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   final TextEditingController _numberController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
-  final List<TextEditingController> addressControllers = [TextEditingController()];
+  final List<TextEditingController> addressControllers = [
+    TextEditingController()
+  ];
   late TextEditingController _textEditingController;
 
   @override
@@ -64,7 +71,8 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
     addressControllers[0].addListener(() {
       if (addressControllers[0].text.isNotEmpty) {
         setState(() {
-          formValues["addresses"] = addressControllers.map((c) => c.text).toList();
+          formValues["addresses"] =
+              addressControllers.map((c) => c.text).toList();
         });
       }
     });
@@ -138,7 +146,8 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
             decoration: BoxDecoration(
               color: Color.fromARGB(255, 255, 230, 230),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Color.fromARGB(255, 255, 230, 230), width: 5),
+              border: Border.all(
+                  color: Color.fromARGB(255, 255, 230, 230), width: 5),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -146,7 +155,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                   blurRadius: 7,
                   offset: Offset(0, 3),
                 ),
-              ], 
+              ],
             ),
             constraints: BoxConstraints(maxWidth: 500),
             child: Form(
@@ -244,19 +253,21 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          ..._donateOptions.map((option) => CheckboxListTile(
-            title: Text(option),
-            value: formValues["categories"].contains(option),
-            onChanged: (value) {
-              setState(() {
-                if (value!) {
-                  formValues["categories"].add(option);
-                } else {
-                  formValues["categories"].remove(option);
-                }
-              });
-            },
-          )).toList(),
+          ..._donateOptions
+              .map((option) => CheckboxListTile(
+                    title: Text(option),
+                    value: formValues["categories"].contains(option),
+                    onChanged: (value) {
+                      setState(() {
+                        if (value!) {
+                          formValues["categories"].add(option);
+                        } else {
+                          formValues["categories"].remove(option);
+                        }
+                      });
+                    },
+                  ))
+              .toList(),
           ElevatedButton(
             onPressed: () => _addNewCategory(context),
             child: Text('Add'),
@@ -329,17 +340,19 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   Widget _buildModeSelection() {
     return FormField(
       builder: (value) => Column(
-        children: _modeOptions.map((mode) => RadioListTile<String>(
-          title: Text(mode),
-          value: mode,
-          groupValue: _mode,
-          onChanged: (String? value) {
-            setState(() {
-              _mode = value!;
-              formValues["mode"] = _mode;
-            });
-          },
-        )).toList(),
+        children: _modeOptions
+            .map((mode) => RadioListTile<String>(
+                  title: Text(mode),
+                  value: mode,
+                  groupValue: _mode,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _mode = value!;
+                      formValues["mode"] = _mode;
+                    });
+                  },
+                ))
+            .toList(),
       ),
     );
   }
@@ -420,32 +433,32 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   }
 
   Widget _buildWeightField() {
-  return Padding(
-    padding: const EdgeInsets.all(10),
-    child: TextFormField(
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: "Enter weight",
-        labelText: "Weight",
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: TextFormField(
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: "Enter weight",
+          labelText: "Weight",
+        ),
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+        ],
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter the weight';
+          }
+          return null;
+        },
+        onChanged: (value) {
+          setState(() {
+            formValues["weight"] = double.parse(value);
+          });
+        },
       ),
-      keyboardType: TextInputType.number,
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-      ],
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter the weight';
-        }
-        return null;
-      },
-      onChanged: (value) {
-        setState(() {
-          formValues["weight"] = double.parse(value);
-        });
-      },
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildWeightUnitDropdown() {
     return Padding(
@@ -456,8 +469,8 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
           border: OutlineInputBorder(),
           labelText: 'Weight Unit',
         ),
-        items: <String>['kg', 'lbs']
-            .map<DropdownMenuItem<String>>((String value) {
+        items:
+            <String>['kg', 'lbs'].map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
@@ -475,13 +488,14 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
   Widget _buildPhotoUpload() {
     return Column(
       children: [
-        if (_showUploadButton) PickImage(
-          onImagePicked: (String imageName) {
-            setState(() {
-              formValues["Photo"] = imageName;
-            });
-          },
-        ),
+        if (_showUploadButton)
+          PickImage(
+            onImagePicked: (String imageName) {
+              setState(() {
+                formValues["Photo"] = imageName;
+              });
+            },
+          ),
         ElevatedButton(
           onPressed: () {
             setState(() {
@@ -527,52 +541,55 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
       ],
     );
   }
-Widget _buildSubmitButton() {
-  return Padding(
-    padding: const EdgeInsets.all(10), 
-    child: SizedBox(
-      width: double.infinity, 
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red, 
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8), 
+
+  Widget _buildSubmitButton() {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              _formKey.currentState!.save();
+
+              formValues["addresses"] = addressControllers
+                  .map((controller) => controller.text)
+                  .toList();
+
+              Provider.of<DonateDataProvider>(context, listen: false)
+                  .addDonation(
+                DonateData(
+                  id: null,
+                  orgId: widget.organization.id,
+                  donorId: currentDonorId,
+                  driveId: formValues["driveId"],
+                  categories: formValues["categories"],
+                  mode: formValues["mode"],
+                  addresses: formValues["addresses"],
+                  contactNum: formValues["contactNum"],
+                  weight: formValues["weight"],
+                  photo: formValues["photo"],
+                  date: formValues["date"],
+                  time: formValues["time"],
+                  status: formValues["status"],
+                  weightUnit: formValues["weightUnit"],
+                ),
+              );
+
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text('Submit'),
         ),
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            _formKey.currentState!.save();
-
-            formValues["addresses"] = addressControllers.map((controller) => controller.text).toList();
-
-            Provider.of<DonateDataProvider>(context, listen: false).addDonation(
-              DonateData(
-                id: null,
-                orgId: widget.organization.id,
-                donorId: currentDonorId,
-                driveId: formValues["driveId"],
-                categories: formValues["categories"],
-                mode: formValues["mode"],
-                addresses: formValues["addresses"],
-                contactNum: formValues["contactNum"],
-                weight: formValues["weight"],
-                photo: formValues["photo"],
-                date: formValues["date"],
-                time: formValues["time"],
-                status: formValues["status"],
-                timestamp: formValues["timestamp"],
-                weightUnit: formValues["weightUnit"],
-              ),
-            );
-
-            Navigator.of(context).pop();
-          }
-        },
-        child: const Text('Submit'),
       ),
-    ),
-  );
-}
+    );
+  }
 }
