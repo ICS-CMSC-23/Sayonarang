@@ -50,6 +50,7 @@ class _ViewDonorsState extends State<ViewDonors> {
               donor.id = snapshot.data!.docs[index].id;
 
               return Card(
+                surfaceTintColor: Colors.transparent,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 elevation: 4,
                 child: ListTile(

@@ -49,18 +49,19 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
               org.id = snapshot.data!.docs[index].id;
 
               return Card(
+                surfaceTintColor: Colors.transparent,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 elevation: 4,
                 child: ListTile(
                   leading: Container(
-                    width: 40,
-                    height: 40,
+                    width: 35,
+                    height: 35,
                     decoration: BoxDecoration(
                       color: Color(0xFF4CAF50),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Icon(Icons.business,
-                        size: 40, color: Color.fromARGB(255, 254, 238, 237)),
+                        size: 30, color: Colors.white),
                   ),
                   title: Text(
                     org.name,

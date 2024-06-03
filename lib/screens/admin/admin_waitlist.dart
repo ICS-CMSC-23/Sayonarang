@@ -18,7 +18,7 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
     final provider = Provider.of<AdminProvider>(context);
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
@@ -30,6 +30,7 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
               indicatorColor: Color(0xFFF54642),
               tabs: [
                 Tab(text: 'Pending'),
+                Tab(text: 'Approved'),
                 Tab(text: 'Rejected'),
               ],
             ),
@@ -43,6 +44,13 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
               'Pending Organizations',
               Icons.access_time,
               Colors.orange,
+            ),
+            _buildOrganizationList(
+              context,
+              provider.orgList,
+              'Approved Organizations',
+              Icons.check_circle,
+              Colors.green,
             ),
             _buildOrganizationList(
               context,
@@ -106,6 +114,7 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
             org.id = snapshot.data!.docs[index].id;
 
             return Card(
+              surfaceTintColor: Colors.transparent,
               margin:
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               elevation: 4,
@@ -126,9 +135,11 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
                   org.username,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Colors.blue,
+                    color: Colors.grey,
                   ),
                 ),
+                trailing:
+                    const Icon(Icons.arrow_forward_ios, color: Colors.grey),
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
