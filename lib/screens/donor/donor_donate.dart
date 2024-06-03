@@ -198,7 +198,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                         ],
                       ),
                     ),
-                    _buildSectionTitle("Pick-up Date and Time"),
+                    _buildSectionTitle("Date and Time"),
                     _buildDateTimeFields(),
                     _buildSubmitButton(),
                   ],
