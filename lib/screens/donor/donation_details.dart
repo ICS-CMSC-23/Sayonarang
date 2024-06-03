@@ -5,7 +5,6 @@ import 'package:donation_app/providers/donor_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:donation_app/screens/donor/donor_qrcode.dart';
 
-
 class DonationDetailScreen extends StatelessWidget {
   final DonateData donation;
   final String userName;
@@ -21,7 +20,7 @@ class DonationDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final donorProvider = Provider.of<DonorProvider>(context, listen: false);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -67,12 +66,12 @@ class DonationDetailScreen extends StatelessWidget {
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: donation.categories.map((categories) {
+                      children: donation.categories.map((category) {
                         return Row(
                           children: [
                             const SizedBox(width: 25),
                             Text(
-                              categories,
+                              category,
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Color(0xFF666666),
@@ -82,7 +81,7 @@ class DonationDetailScreen extends StatelessWidget {
                         );
                       }).toList(),
                     ),
-                    if (donation.mode != "Drop-off") // Only show if mode is not "Drop-off"
+                    if (donation.mode != "Drop-off")
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -213,6 +212,15 @@ class DonationDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (donation.photo.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Image.network(
+                          donation.photo,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     if (donation.mode == "Drop-off")
                       Center(
                         child: ElevatedButton(
@@ -220,7 +228,11 @@ class DonationDetailScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => QrCodeScreen(donationId: donation.id!),
+                                builder: (context) => QrCodeScreen(
+                                  donationId: donation.id!,
+                                  status: donation.status,
+                                  timestamp: donation.timestamp,
+                                  ),
                               ),
                             );
                           },
