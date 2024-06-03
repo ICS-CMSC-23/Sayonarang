@@ -173,7 +173,7 @@ class FirebaseAuthAPI {
     }
   }
 
-  Stream<QuerySnapshot> getOpenOrgs(String orgId) {
+  Stream<QuerySnapshot> getOpenOrgs() {
     try {
       return db
           .collection("users")

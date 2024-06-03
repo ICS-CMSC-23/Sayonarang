@@ -28,7 +28,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: ((context) => DonationProvider())),
         ChangeNotifierProvider(create: ((context) => DriveProvider())),
-        // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
         ChangeNotifierProvider(create: ((context) => DonorProvider())),
@@ -112,6 +111,7 @@ class AuthWrapper extends StatelessWidget {
                     case 'org':
                       return OrgMainPage();
                     case 'donor':
+                      // return DonorView();
                       return DonorMainPage();
                     default:
                       return LoginPage();

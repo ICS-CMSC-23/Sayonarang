@@ -497,7 +497,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                         if (!isViewMode &&
                             index !=
                                 0) // ensure the first address is not removable
-                          // TODO: Fix alignment
+                          // TODO: Fix alignment of button to remove address
                           IconButton(
                             icon: const Icon(Icons.remove_circle,
                                 color: Colors.red),

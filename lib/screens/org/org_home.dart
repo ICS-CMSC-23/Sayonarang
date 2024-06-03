@@ -72,7 +72,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
           future: _fetchDonorName(donation.donorId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LinearProgressIndicator();
+              // return const LinearProgressIndicator();
+              return Container(); // TODO: Find fix for progress indicator stacking
             } else if (snapshot.hasError) {
               return Text('Error encountered! ${snapshot.error}');
             }
@@ -118,7 +119,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
+                  'Scheduled on ${DateFormat('MMMM dd, yyyy').format(donation.date)}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,

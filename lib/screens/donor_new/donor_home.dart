@@ -6,8 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:donation_app/providers/donation_provider.dart';
-import 'package:donation_app/models/donation_model.dart';
+import 'package:donation_app/models/user_model.dart' as user_model;
 
 class DonorHomePage extends StatefulWidget {
   const DonorHomePage({super.key});
@@ -23,16 +22,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
   @override
   void initState() {
     super.initState();
-    // TODO: Remove, move implementation to org profile page
-    // fetch user details
-    _currentUser = FirebaseAuth.instance.currentUser;
-    if (_currentUser != null) {
-      _fetchUserDetails(); // TODO: Remove, move implementation to org profile page
-      // execute initialization of the stream after the layout is completed
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
-      });
-    }
+    // execute initialization of the stream after the layout is completed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
+      context.read<MyAuthProvider>().fetchOpenOrgs();
+    });
   }
 
   // TODO: Remove, move implementation to org profile page
@@ -44,60 +38,38 @@ class _DonorHomePageState extends State<DonorHomePage> {
     });
   }
 
-  Future<String> _fetchDonorName(String donorId) async {
-    final _userDetails =
-        await context.read<MyAuthProvider>().getUserDetails(donorId);
-    return _userDetails['name'] as String? ?? 'Unknown Donor';
-  }
-
-  Widget _buildDonationList(List<Donation> donations, String status) {
-    List<Donation> filteredDonations = donations.where((donation) {
-      return donation.status.toLowerCase() == status.toLowerCase();
-    }).toList();
-
-    if (filteredDonations.isEmpty) {
+  Widget _buildOrgList(List<user_model.User> orgs) {
+    if (orgs.isEmpty) {
       return Center(
         child: Text(
-          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          'No open organizations yet!',
           style: const TextStyle(fontSize: 18),
         ),
       );
     }
 
     return ListView.builder(
-      itemCount: filteredDonations.length,
+      itemCount: orgs.length,
       itemBuilder: (context, index) {
-        Donation donation = filteredDonations[index];
-        return FutureBuilder<String>(
-          future: _fetchDonorName(donation.donorId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const LinearProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error encountered! ${snapshot.error}');
-            }
-            String donorName = snapshot.data ?? 'Donor';
-            return _buildDonationCard(donation, donorName);
-          },
-        );
+        user_model.User org = orgs[index];
+        return _buildOrgCard(org);
       },
     );
   }
 
-  Widget _buildDonationCard(Donation donation, String donorName) {
+  Widget _buildOrgCard(user_model.User org) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: InkWell(
         onTap: () {
-          // change selected donation
-          context.read<DonationProvider>().changeSelectedDonation(donation);
+          // change selected org
+          context.read<MyAuthProvider>().changeSelectedOrg(org);
 
-          // navigate to the donation details page
+          // navigate to the create donation form page
           Navigator.push(
             context,
             MaterialPageRoute(
-              // builder: (context) => const DonationDetailsPage(),
-              builder: (context) => const DonorDonationFormPage(mode: 'view'),
+              builder: (context) => const DonorDonationFormPage(mode: 'add'),
             ),
           );
         },
@@ -105,7 +77,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
           surfaceTintColor: Colors.transparent,
           child: ListTile(
             title: Text(
-              donorName, // display the fetched donor name
+              org.name,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -113,28 +85,31 @@ class _DonorHomePageState extends State<DonorHomePage> {
               overflow: TextOverflow.ellipsis,
               maxLines: 1, // limit name to one line
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
+            subtitle: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: "Click ",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
-                  maxLines: 1, // limit date to one line
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  // limit categories to be displayed to 3
-                  children: donation.categories.take(3).map((category) {
-                    return _buildTruncatedChip(category);
-                  }).toList(),
-                ),
-              ],
+                  WidgetSpan(
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                    ),
+                  ),
+                  TextSpan(
+                    text: " to know more",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
             ),
             trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ),
@@ -143,92 +118,53 @@ class _DonorHomePageState extends State<DonorHomePage> {
     );
   }
 
-  Widget _buildTruncatedChip(String text) {
-    final maxLength = 20;
-    final truncatedText =
-        text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-
-    return Chip(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      label: Text(truncatedText),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      side: BorderSide.none,
-      labelStyle: const TextStyle(color: Colors.white),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // access donations in the provider
-    Stream<QuerySnapshot> donationsStream =
-        context.watch<DonationProvider>().donationsToOrg;
+    Stream<QuerySnapshot> openOrgs = context.watch<MyAuthProvider>().openOrgs;
 
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return DefaultTabController(
-      length: 5,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Donations",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
-            ),
-          ),
-          bottom: const TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: "Pending"),
-              Tab(text: "Confirmed"),
-              Tab(text: "Scheduled"),
-              Tab(text: "Completed"),
-              Tab(text: "Cancelled"),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Organizations",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.primary,
           ),
         ),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: donationsStream,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text("Error encountered! ${snapshot.error}"),
-              );
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No donations yet!',
-                  style: TextStyle(fontSize: 18),
-                ),
-              );
-            }
-
-            // convert data from donations stream to a list
-            List<Donation> donations = snapshot.data!.docs.map((doc) {
-              Donation donation =
-                  Donation.fromJson(doc.data() as Map<String, dynamic>);
-              donation.id = doc.id;
-              return donation;
-            }).toList();
-
-            return TabBarView(
-              children: [
-                _buildDonationList(donations, 'pending'),
-                _buildDonationList(donations, 'confirmed'),
-                _buildDonationList(donations, 'scheduled for pickup'),
-                _buildDonationList(donations, 'completed'),
-                _buildDonationList(donations, 'cancelled'),
-              ],
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: openOrgs,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error encountered! ${snapshot.error}"),
             );
-          },
-        ),
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text(
+                'No open organizations yet!',
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
+
+          // convert data from donations stream to a list
+          List<user_model.User> orgs = snapshot.data!.docs.map((doc) {
+            user_model.User user =
+                user_model.User.fromJson(doc.data() as Map<String, dynamic>);
+            user.id = doc.id;
+            return user;
+          }).toList();
+
+          return _buildOrgList(orgs);
+        },
       ),
     );
   }

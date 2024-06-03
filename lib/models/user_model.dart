@@ -11,6 +11,7 @@ class User {
   String role; // admin, donor, org
   String status; // pending, approved, rejected (for org)
   bool isOpen;
+  String description;
 
   User({
     this.id,
@@ -22,6 +23,7 @@ class User {
     required this.role,
     required this.status, // only for org
     required this.isOpen, // only for org (if accepting donations)
+    required this.description, // only for org
   });
 
   // Factory constructor to instantiate object from json format
@@ -40,6 +42,7 @@ class User {
       role: json['role'],
       status: json['status'],
       isOpen: json['isOpen'],
+      description: json['description'],
     );
   }
 
@@ -58,6 +61,7 @@ class User {
       'role': user.role,
       'status': user.status,
       'isOpen': user.isOpen,
+      'description': user.description,
     };
   }
 }

@@ -252,89 +252,111 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     List<dynamic> images = [..._photosDownloadURLs, ..._selectedFiles];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SizedBox(
-        height: 200,
-        child: images.isEmpty
-            ? Center(
-                child: Text(
-                  'No images selected',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                  ),
-                ),
-              )
-            : GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                ),
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  final image = images[index];
-                  return Stack(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => SliderShowFullmages(
-                                listImagesModel: images,
-                                current: index,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Images",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Colors.grey[200], // Set the background color to grey200
+              ),
+              height: 200,
+              child: images.isEmpty
+                  ? Center(
+                      child: Icon(
+                        Icons.image_not_supported, // Use an icon for no images
+                        color:
+                            Colors.grey[400], // Set the icon color to grey400
+                        size: 50, // Adjust the size of the icon if needed
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 4.0,
+                        ),
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          final image = images[index];
+                          return Stack(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => SliderShowFullmages(
+                                        listImagesModel: images,
+                                        current: index,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: image is File
+                                          ? FileImage(image)
+                                          : NetworkImage(image)
+                                              as ImageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              if (!isViewMode)
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (image is File) {
+                                          _selectedFiles.remove(image);
+                                        } else if (image is String) {
+                                          int deleteIndex = _photosDownloadURLs
+                                              .indexOf(image);
+                                          _photos.removeAt(deleteIndex);
+                                          _deletedPhotos.add(
+                                              _photosDownloadURLs[deleteIndex]);
+                                          _photosDownloadURLs
+                                              .removeAt(deleteIndex);
+                                        }
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.red,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           );
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            image: DecorationImage(
-                              image: image is File
-                                  ? FileImage(image)
-                                  : NetworkImage(image) as ImageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
                       ),
-                      if (!isViewMode)
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (image is File) {
-                                  _selectedFiles.remove(image);
-                                } else if (image is String) {
-                                  int deleteIndex =
-                                      _photosDownloadURLs.indexOf(image);
-                                  _photos.removeAt(deleteIndex);
-                                  _deletedPhotos
-                                      .add(_photosDownloadURLs[deleteIndex]);
-                                  _photosDownloadURLs.removeAt(deleteIndex);
-                                }
-                              });
-                            },
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.red,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-      ),
-    );
+                    ),
+            ),
+          ],
+        ));
   }
 
   @override
@@ -410,6 +432,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                     suffixIcon: const Icon(Icons.calendar_today)),
                 const SizedBox(height: 8),
                 if (!isViewMode) ...[
+                  _buildImageGrid(),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -435,7 +458,6 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                       ],
                     ),
                   ),
-                  _buildImageGrid(),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
