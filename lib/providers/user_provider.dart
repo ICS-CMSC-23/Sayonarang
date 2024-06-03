@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:donation_app/api/firebase_user_api.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donation_app/models/user_model.dart' as user_model;
 
 class MyAuthProvider with ChangeNotifier {
   late FirebaseAuthAPI authService;
@@ -12,11 +13,17 @@ class MyAuthProvider with ChangeNotifier {
   User? userObj;
   String? role;
   late Stream<QuerySnapshot> _openOrgsStream;
+  user_model.User? _selectedOrg;
 
   Map<String, dynamic> signupStatus = {};
   Map<String, dynamic> userDetails =
       {}; // {success: true/false, response: map/string}
   Stream<QuerySnapshot> get openOrgs => _openOrgsStream;
+  user_model.User get selected => _selectedOrg!;
+
+  changeSelectedOrg(user_model.User org) {
+    _selectedOrg = org;
+  }
 
   MyAuthProvider() {
     authService = FirebaseAuthAPI();
@@ -129,8 +136,8 @@ class MyAuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchOpenOrgs(String driveId) {
-    _openOrgsStream = authService.getOpenOrgs(driveId);
+  void fetchOpenOrgs() {
+    _openOrgsStream = authService.getOpenOrgs();
     notifyListeners();
   }
 }

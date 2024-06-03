@@ -58,24 +58,21 @@ class FirebaseDonationAPI {
       String mode,
       double weight,
       String weightUnit,
-      String contactNu,
-      String status,
+      String contactNum,
       DateTime date,
       String time,
       String photo) async {
     try {
-      print("Status: $status");
       await db.collection("donations").doc(id).update({
-        categories: 'categories',
-        addresses: 'addresses',
-        mode: 'mode',
-        weight: 'weight',
-        weightUnit: 'weightUnit',
-        contactNu: 'contactNu',
-        status: 'status',
-        date: 'date',
-        time: 'time',
-        photo: 'photo',
+        'categories': categories,
+        'addresses': addresses,
+        'mode': mode,
+        'weight': weight,
+        'weightUnit': weightUnit,
+        'contactNum': contactNum,
+        'date': date,
+        'time': time,
+        'photo': photo,
       });
 
       return "Successfully edited donation details!";

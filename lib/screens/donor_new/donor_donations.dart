@@ -1,5 +1,4 @@
 import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
-import 'package:donation_app/screens/org/org_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_donation.dart';
@@ -10,45 +9,35 @@ import 'package:intl/intl.dart';
 import 'package:donation_app/providers/donation_provider.dart';
 import 'package:donation_app/models/donation_model.dart';
 
-class OrgHomePage extends StatefulWidget {
-  const OrgHomePage({super.key});
+class DonorDonationsPage extends StatefulWidget {
+  const DonorDonationsPage({super.key});
 
   @override
-  _OrgHomePageState createState() => _OrgHomePageState();
+  _DonorDonationsPageState createState() => _DonorDonationsPageState();
 }
 
-class _OrgHomePageState extends State<OrgHomePage> {
+class _DonorDonationsPageState extends State<DonorDonationsPage> {
   late User? _currentUser;
-  Map<String, dynamic>? _userDetails;
 
   @override
   void initState() {
     super.initState();
-    // TODO: Remove, move implementation to org profile page
     // fetch user details
     _currentUser = FirebaseAuth.instance.currentUser;
     if (_currentUser != null) {
-      _fetchUserDetails(); // TODO: Remove, move implementation to org profile page
       // execute initialization of the stream after the layout is completed
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
+        context
+            .read<DonationProvider>()
+            .fetchDonationsByDonor(_currentUser!.uid);
       });
     }
   }
 
-  // TODO: Remove, move implementation to org profile page
-  Future<void> _fetchUserDetails() async {
-    final details =
-        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
-    setState(() {
-      _userDetails = details;
-    });
-  }
-
-  Future<String> _fetchDonorName(String donorId) async {
+  Future<String> _fetchOrgName(String orgId) async {
     final _userDetails =
-        await context.read<MyAuthProvider>().getUserDetails(donorId);
-    return _userDetails['name'] as String? ?? 'Unknown Donor';
+        await context.read<MyAuthProvider>().getUserDetails(orgId);
+    return _userDetails['name'] as String? ?? 'Unknown Organization';
   }
 
   Widget _buildDonationList(List<Donation> donations, String status) {
@@ -59,7 +48,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
     if (filteredDonations.isEmpty) {
       return Center(
         child: Text(
-          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          'No ${status.toLowerCase() == 'scheduled for pick-up' ? 'scheduled' : status.toLowerCase()} donations yet!',
           style: const TextStyle(fontSize: 18),
         ),
       );
@@ -70,7 +59,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
       itemBuilder: (context, index) {
         Donation donation = filteredDonations[index];
         return FutureBuilder<String>(
-          future: _fetchDonorName(donation.donorId),
+          future: _fetchOrgName(donation.orgId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // return const LinearProgressIndicator();
@@ -78,15 +67,15 @@ class _OrgHomePageState extends State<OrgHomePage> {
             } else if (snapshot.hasError) {
               return Text('Error encountered! ${snapshot.error}');
             }
-            String donorName = snapshot.data ?? 'Donor';
-            return _buildDonationCard(donation, donorName);
+            String orgName = snapshot.data ?? 'Organization';
+            return _buildDonationCard(donation, orgName);
           },
         );
       },
     );
   }
 
-  Widget _buildDonationCard(Donation donation, String donorName) {
+  Widget _buildDonationCard(Donation donation, String orgName) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: InkWell(
@@ -98,7 +87,8 @@ class _OrgHomePageState extends State<OrgHomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const OrgDonationFormPage(),
+              // builder: (context) => const DonationDetailsPage(),
+              builder: (context) => const DonorDonationFormPage(mode: 'view'),
             ),
           );
         },
@@ -106,7 +96,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
           surfaceTintColor: Colors.transparent,
           child: ListTile(
             title: Text(
-              donorName, // display the fetched donor name
+              orgName, // display the fetched donor name
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -165,7 +155,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
   Widget build(BuildContext context) {
     // access donations in the provider
     Stream<QuerySnapshot> donationsStream =
-        context.watch<DonationProvider>().donationsToOrg;
+        context.watch<DonationProvider>().donationsByDonor;
 
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -223,7 +213,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               children: [
                 _buildDonationList(donations, 'pending'),
                 _buildDonationList(donations, 'confirmed'),
-                _buildDonationList(donations, 'scheduled for pick-up'),
+                _buildDonationList(donations, 'scheduled for pickup'),
                 _buildDonationList(donations, 'completed'),
                 _buildDonationList(donations, 'cancelled'),
               ],

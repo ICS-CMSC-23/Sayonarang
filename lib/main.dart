@@ -1,3 +1,4 @@
+import 'package:donation_app/screens/donor_new/donor_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'package:donation_app/screens/auth/signup_page.dart';
 import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
 import 'package:donation_app/screens/donor/donor_home.dart';
+import 'package:donation_app/screens/donor_new/donor_main.dart';
 import 'package:donation_app/providers/donor_provider.dart';
 import 'package:donation_app/providers/donate_provider.dart';
 
@@ -26,7 +28,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: ((context) => DonationProvider())),
         ChangeNotifierProvider(create: ((context) => DriveProvider())),
-        // ChangeNotifierProvider(create: ((context) => UserProvider())),
         ChangeNotifierProvider(create: ((context) => MyAuthProvider())),
         ChangeNotifierProvider(create: ((context) => AdminProvider())),
         ChangeNotifierProvider(create: ((context) => DonorProvider())),
@@ -72,7 +73,8 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupPage(),
         '/org': (context) => const OrgMainPage(),
         '/admin': (context) => const AdminView(),
-        '/donor': (context) => const DonorView(),
+        // '/donor': (context) => const DonorView(),
+        '/donor': (context) => const DonorMainPage(),
       },
       home: AuthWrapper(),
     );
@@ -109,7 +111,8 @@ class AuthWrapper extends StatelessWidget {
                     case 'org':
                       return OrgMainPage();
                     case 'donor':
-                      return DonorView();
+                      // return DonorView();
+                      return DonorMainPage();
                     default:
                       return LoginPage();
                   }
