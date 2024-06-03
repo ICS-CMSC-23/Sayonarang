@@ -567,21 +567,21 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
               Provider.of<DonateDataProvider>(context, listen: false)
                   .addDonation(
                 DonateData(
-                  id: null,
-                  orgId: widget.organization.id,
-                  donorId: currentDonorId,
-                  driveId: formValues["driveId"],
-                  categories: formValues["categories"],
-                  mode: formValues["mode"],
-                  addresses: formValues["addresses"],
-                  contactNum: formValues["contactNum"],
-                  weight: formValues["weight"],
-                  photo: formValues["photo"],
-                  date: formValues["date"],
-                  time: formValues["time"],
-                  status: formValues["status"],
-                  weightUnit: formValues["weightUnit"],
-                ),
+                    id: null,
+                    orgId: widget.organization.id,
+                    donorId: currentDonorId,
+                    driveId: formValues["driveId"],
+                    categories: formValues["categories"],
+                    mode: formValues["mode"],
+                    addresses: formValues["addresses"],
+                    contactNum: formValues["contactNum"],
+                    weight: formValues["weight"],
+                    photo: formValues["photo"],
+                    date: formValues["date"],
+                    time: formValues["time"],
+                    status: formValues["status"],
+                    weightUnit: formValues["weightUnit"],
+                    timestamp: formValues["timestamp"]),
               );
 
               Navigator.of(context).pop();

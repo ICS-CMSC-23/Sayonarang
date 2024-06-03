@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
@@ -7,8 +8,16 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 class DonorQRCodeScreen extends StatelessWidget {
   final String donationId;
+  final String status;
+  final DateTime timestamp;
   final ScreenshotController screenshotController = ScreenshotController();
-  DonorQRCodeScreen({Key? key, required this.donationId}) : super(key: key);
+
+  DonorQRCodeScreen({
+    Key? key,
+    required this.donationId,
+    required this.status,
+    required this.timestamp,
+  }) : super(key: key);
 
   Future<void> saveImage() async {
     final Uint8List? uint8list = await screenshotController.capture();
@@ -35,6 +44,14 @@ class DonorQRCodeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> qrData = {
+      'donationId': donationId,
+      'status': status,
+      'timestamp': timestamp.toString(),
+    };
+
+    final String finalQrData = jsonEncode(qrData);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -55,7 +72,7 @@ class DonorQRCodeScreen extends StatelessWidget {
             Screenshot(
               controller: screenshotController,
               child: QrImageView(
-                data: donationId,
+                data: finalQrData,
                 version: QrVersions.auto,
                 gapless: false,
                 size: 320,

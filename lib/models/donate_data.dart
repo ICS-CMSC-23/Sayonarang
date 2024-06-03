@@ -14,6 +14,7 @@ class DonateData {
   DateTime date;
   final String time;
   String status;
+  DateTime timestamp;
   String weightUnit;
 
   DonateData({
@@ -30,6 +31,7 @@ class DonateData {
     required this.date,
     required this.time,
     this.status = 'pending',
+    required this.timestamp,
     required this.weightUnit,
   });
 
@@ -48,6 +50,7 @@ class DonateData {
       date: (data['date'] as Timestamp).toDate(),
       time: data['time'] ?? '',
       status: data['status'] ?? 'pending',
+      timestamp: (data['timestamp'] as Timestamp).toDate(),
       weightUnit: data['weightUnit'] ?? '',
     );
   }
@@ -66,6 +69,7 @@ class DonateData {
       'date': Timestamp.fromDate(date),
       'time': time,
       'status': status,
+      'timestamp': Timestamp.fromDate(timestamp),
       'weightUnit': weightUnit,
     };
   }

@@ -13,6 +13,7 @@ import "package:donation_app/models/user_model.dart" as user_model;
 
 // TODO: Add loading state for saving and loading image
 // TODO: Add snackbar to show successfully edited or successfully saved
+// TODO: Show details of organization before donating
 
 class DonorDonationFormPage extends StatefulWidget {
   final String mode; // add, edit, view
@@ -894,7 +895,10 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DonorQRCodeScreen(
-                                        donationId: _selectedDonation!.id!),
+                                      donationId: _selectedDonation!.id!,
+                                      status: _selectedDonation!.status,
+                                      timestamp: _selectedDonation!.timestamp,
+                                    ),
                                   ),
                                 );
                               },

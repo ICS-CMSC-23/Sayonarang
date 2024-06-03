@@ -1,4 +1,5 @@
 import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
+import 'package:donation_app/screens/org/org_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_donation.dart';
@@ -97,8 +98,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              // builder: (context) => const DonationDetailsPage(),
-              builder: (context) => const DonorDonationFormPage(mode: 'view'),
+              builder: (context) => const OrgDonationFormPage(),
             ),
           );
         },
@@ -119,7 +119,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  'Scheduled on ${DateFormat('MMMM dd, yyyy').format(donation.date)}',
+                  'Donated on ${DateFormat('MMMM dd, yyyy').format(donation.timestamp)}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
@@ -223,7 +223,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
               children: [
                 _buildDonationList(donations, 'pending'),
                 _buildDonationList(donations, 'confirmed'),
-                _buildDonationList(donations, 'scheduled for pickup'),
+                _buildDonationList(donations, 'scheduled for pick-up'),
                 _buildDonationList(donations, 'completed'),
                 _buildDonationList(donations, 'cancelled'),
               ],
