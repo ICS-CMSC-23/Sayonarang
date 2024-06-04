@@ -87,6 +87,7 @@ class DonorDonationsList extends StatelessWidget {
               builder: (context, orgSnapshot) {
                 if (orgSnapshot.connectionState == ConnectionState.waiting) {
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -101,6 +102,7 @@ class DonorDonationsList extends StatelessWidget {
                   );
                 } else if (orgSnapshot.hasError) {
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -119,6 +121,7 @@ class DonorDonationsList extends StatelessWidget {
                   String orgName = orgData?['name'] ?? 'Unknown Organization';
 
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -126,6 +129,7 @@ class DonorDonationsList extends StatelessWidget {
                       leading: Icon(
                         leadingIcon,
                         color: statusColor,
+                        size: 30,
                       ),
                       title: Text(
                         orgName,
@@ -143,7 +147,9 @@ class DonorDonationsList extends StatelessWidget {
                             style: TextStyle(color: statusColor),
                           ),
                           const SizedBox(height: 10),
-                          Row(
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
                             children: donation.categories
                                 .take(3) // Limit to three categories
                                 .map(
