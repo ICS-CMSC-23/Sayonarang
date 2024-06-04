@@ -18,98 +18,98 @@ class UserAccountDetails extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 10),
-                  const Center(
-                    child: Text(
-                      'ACCOUNT DETAILS',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      isDonor ? Icons.person : Icons.business,
+                      size: 50,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  ListTile(
-                    leading: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        isDonor ? Icons.person : Icons.business,
-                        size: 50,
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      user.name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
-                      ),
-                    ),
-                    subtitle: Text(
-                      user.username,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF666666),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Contact Number:',
-                    style: TextStyle(
-                      fontSize: 18,
+                  Text(
+                    user.name,
+                    style: const TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
                     ),
                   ),
+                  Text(
+                    user.username,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   Row(
-                    children: [
-                      const SizedBox(width: 15),
-                      Text(
-                        user.contactNum,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Addresses:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: user.addresses.map((address) {
-                      return Row(
+                    children: [
+                      const Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(width: 15),
                           Text(
-                            address,
+                            'Contact Number:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Addresses:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )),
+                      Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.contactNum,
                             style: const TextStyle(
                               fontSize: 16,
                               color: Color(0xFF666666),
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: user.addresses.map((address) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16.0),
+                                child: Text(
+                                  address,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF666666),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ],
-                      );
-                    }).toList(),
+                      ))
+                    ],
                   ),
+
                   if (!isDonor) ...[
                     const SizedBox(height: 15),
                     const Text(
@@ -143,7 +143,7 @@ class UserAccountDetails extends StatelessWidget {
                       },
                     ),
                   ],
-                  const SizedBox(height: 15),
+                  // const SizedBox(height: 15),
                 ],
               ),
             ),
