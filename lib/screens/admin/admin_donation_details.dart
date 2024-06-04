@@ -37,6 +37,7 @@ class DonationDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(children: [
           Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -55,7 +56,7 @@ class DonationDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 15),
                   _buildStatusText(donation.status),
                   const SizedBox(height: 15),
                   const Text(

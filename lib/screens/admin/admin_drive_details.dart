@@ -79,6 +79,7 @@ class DriveDetailScreen extends StatelessWidget {
       child: ListView(
         children: [
           Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -247,6 +248,7 @@ class DriveDonationsList extends StatelessWidget {
               builder: (context, donorSnapshot) {
                 if (donorSnapshot.connectionState == ConnectionState.waiting) {
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -261,6 +263,7 @@ class DriveDonationsList extends StatelessWidget {
                   );
                 } else if (donorSnapshot.hasError) {
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -280,6 +283,7 @@ class DriveDonationsList extends StatelessWidget {
                       donorData?['name'] ?? 'Unknown Organization';
 
                   return Card(
+                    surfaceTintColor: Colors.transparent,
                     elevation: 4,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
