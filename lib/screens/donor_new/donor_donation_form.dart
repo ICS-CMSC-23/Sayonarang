@@ -2,7 +2,7 @@ import 'package:donation_app/models/donation_model.dart';
 import 'package:donation_app/providers/donation_provider.dart';
 import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/donor_new/donor_qrcode.dart';
-import 'package:donation_app/screens/donor_new/image_viewer.dart';
+import 'package:donation_app/screens/shared/image_viewer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

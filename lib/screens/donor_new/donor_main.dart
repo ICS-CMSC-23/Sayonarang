@@ -32,12 +32,12 @@ class _DonorMainPageState extends State<DonorMainPage> {
           },
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(Icons.business),
+              label: 'Organizations',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.handshake),
-              label: 'Donation Drives',
+              label: 'Donations',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

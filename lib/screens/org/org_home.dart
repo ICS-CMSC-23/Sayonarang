@@ -59,7 +59,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
     if (filteredDonations.isEmpty) {
       return Center(
         child: Text(
-          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          'No ${status.toLowerCase() == 'scheduled for pick-up' ? 'scheduled' : status.toLowerCase()} donations yet!',
           style: const TextStyle(fontSize: 18),
         ),
       );
