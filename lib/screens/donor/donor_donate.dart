@@ -144,20 +144,20 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 230, 230),
+              color: const Color.fromARGB(255, 255, 230, 230),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: Color.fromARGB(255, 255, 230, 230), width: 5),
+                  color: const Color.fromARGB(255, 255, 230, 230), width: 5),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 5,
                   blurRadius: 7,
-                  offset: Offset(0, 3),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-            constraints: BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 500),
             child: Form(
               key: _formKey,
               child: SingleChildScrollView(
@@ -227,7 +227,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
         alignment: Alignment.centerLeft,
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -270,7 +270,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
               .toList(),
           ElevatedButton(
             onPressed: () => _addNewCategory(context),
-            child: Text('Add'),
+            child: const Text('Add'),
           ),
         ],
       ),
@@ -282,10 +282,10 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add new option'),
+          title: const Text('Add new option'),
           content: TextFormField(
             controller: _textEditingController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter new option',
             ),
             validator: (value) {
@@ -298,7 +298,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -314,14 +314,14 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Error'),
-                        content: Text('Please enter a category name.'),
+                        title: const Text('Error'),
+                        content: const Text('Please enter a category name.'),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text('OK'),
+                            child: const Text('OK'),
                           ),
                         ],
                       );
@@ -329,7 +329,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                   );
                 }
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -382,7 +382,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
                 labelText: 'Address ${index + 1}',
                 suffixIcon: addressControllers.length > 1
                     ? IconButton(
-                        icon: Icon(Icons.remove_circle),
+                        icon: const Icon(Icons.remove_circle),
                         onPressed: () {
                           setState(() {
                             addressControllers.removeAt(index);
@@ -551,7 +551,7 @@ class _DonorDonatePageState extends State<DonorDonatePage> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),

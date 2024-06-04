@@ -19,9 +19,9 @@ class AdminView extends StatelessWidget {
   ];
 
   static List<Widget> _AdminPages = <Widget>[
-    AdminApprovalWaitList(),
-    ViewDonors(),
-    ProfilePage()
+    const AdminApprovalWaitList(),
+    const ViewDonors(),
+    const ProfilePage()
   ];
 
   static const Color customRed = Color(0xFFF54741);

@@ -47,7 +47,9 @@ class DonationDetailScreen extends StatelessWidget {
                     const SizedBox(height: 10),
                     Center(
                       child: Text(
-                        userRole == 'Donor' ? 'Organization: $userName' : 'Donor: $userName',
+                        userRole == 'Donor'
+                            ? 'Organization: $userName'
+                            : 'Donor: $userName',
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -232,11 +234,11 @@ class DonationDetailScreen extends StatelessWidget {
                                   donationId: donation.id!,
                                   status: donation.status,
                                   timestamp: donation.timestamp,
-                                  ),
+                                ),
                               ),
                             );
                           },
-                          child: Text('Show QR'),
+                          child: const Text('Show QR'),
                         ),
                       ),
                   ],
@@ -246,25 +248,26 @@ class DonationDetailScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: donation.status != 'cancelled' && donation.status != 'completed'
-          ? FloatingActionButton.extended(
-              onPressed: () {
-                donorProvider.cancelDonation(donation.id!, 'cancelled');
-                Navigator.of(context).pop();
+      floatingActionButton:
+          donation.status != 'cancelled' && donation.status != 'completed'
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    donorProvider.cancelDonation(donation.id!, 'cancelled');
+                    Navigator.of(context).pop();
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Donation Cancelled'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-                Provider.of<DonorProvider>(context, listen: false);
-              },
-              label: Text('Cancel Donation'),
-              icon: Icon(Icons.cancel),
-              backgroundColor: Colors.red,
-            )
-          : SizedBox.shrink(),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Donation Cancelled'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                    Provider.of<DonorProvider>(context, listen: false);
+                  },
+                  label: const Text('Cancel Donation'),
+                  icon: const Icon(Icons.cancel),
+                  backgroundColor: Colors.red,
+                )
+              : const SizedBox.shrink(),
     );
   }
 

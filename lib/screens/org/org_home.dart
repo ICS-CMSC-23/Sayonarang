@@ -1,8 +1,6 @@
-import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
 import 'package:donation_app/screens/org/org_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
-import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -145,7 +143,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
   }
 
   Widget _buildTruncatedChip(String text) {
-    final maxLength = 20;
+    const maxLength = 20;
     final truncatedText =
         text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 

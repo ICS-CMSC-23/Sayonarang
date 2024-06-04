@@ -94,7 +94,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OrgDriveFormPage(mode: "add"),
+                builder: (context) => const OrgDriveFormPage(mode: "add"),
               ),
             );
           },
@@ -116,7 +116,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
       return Center(
         child: Text(
           'No ${isOngoing ? "ongoing" : "finished"} drives yet!',
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
       );
     }
@@ -144,7 +144,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrgDriveFormPage(mode: "view"),
+              builder: (context) => const OrgDriveFormPage(mode: "view"),
             ),
           );
         },
@@ -166,7 +166,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
                 const SizedBox(height: 4),
                 Text(
                   '${isEnded ? 'Ended' : 'Ends'} on ${DateFormat('MMMM dd, yyyy').format(drive.endDate)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
                   ),
@@ -180,7 +180,7 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
                 ),
               ],
             ),
-            trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ),
         ),
       ),

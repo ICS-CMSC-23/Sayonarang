@@ -30,16 +30,16 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
     return Scaffold(
       body: SafeArea(
         child: _currentUser == null
-            ? Center(child: Text('No user is currently signed in'))
+            ? const Center(child: Text('No user is currently signed in'))
             : FutureBuilder<DocumentSnapshot>(
                 future: _userDocFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || !snapshot.data!.exists) {
-                    return Center(child: Text('User not found'));
+                    return const Center(child: Text('User not found'));
                   } else {
                     final userData =
                         snapshot.data!.data() as Map<String, dynamic>;
@@ -48,18 +48,18 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
-                          SizedBox(height: 25),
+                          const SizedBox(height: 25),
                           ProfileHeader(
                             donorName: donorProfile.name,
                             username: donorProfile.username,
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Center(
                             child: ElevatedButton(
                               onPressed: () {
                                 context.read<MyAuthProvider>().signOut();
                               },
-                              child: Text('Logout'),
+                              child: const Text('Logout'),
                             ),
                           ),
                         ],

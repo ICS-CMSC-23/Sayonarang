@@ -1,11 +1,9 @@
 import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
-import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:donation_app/models/user_model.dart' as user_model;
 
 class DonorHomePage extends StatefulWidget {
@@ -40,10 +38,10 @@ class _DonorHomePageState extends State<DonorHomePage> {
 
   Widget _buildOrgList(List<user_model.User> orgs) {
     if (orgs.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           'No open organizations yet!',
-          style: const TextStyle(fontSize: 18),
+          style: TextStyle(fontSize: 18),
         ),
       );
     }
@@ -85,12 +83,12 @@ class _DonorHomePageState extends State<DonorHomePage> {
               overflow: TextOverflow.ellipsis,
               maxLines: 1, // limit name to one line
             ),
-            subtitle: Text.rich(
+            subtitle: const Text.rich(
               TextSpan(
                 children: [
                   TextSpan(
                     text: "Click ",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
                     ),
@@ -103,7 +101,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
                   ),
                   TextSpan(
                     text: " to know more",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
                     ),

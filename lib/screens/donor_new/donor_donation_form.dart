@@ -151,6 +151,37 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
     Navigator.pop(context); // close the modal
   }
 
+  void _showDonationCancellationModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Cancel Donation'),
+          content: const Text('Are you sure you want to cancel the donation?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context
+                    .read<DonationProvider>()
+                    .editDonationStatus("cancelled");
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showAddCategoryModal() {
     showDialog(
       context: context,
@@ -818,6 +849,8 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                   photo: fileName,
                                   timestamp: _timestamp,
                                 );
+                                if (!context.mounted) return; // mounted check
+
                                 context
                                     .read<DonationProvider>()
                                     .addDonation(newDonation);
@@ -917,56 +950,93 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                         ],
                       ),
                     ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const DonorDonationFormPage(mode: 'edit'),
+                  // only allow edit and delete of donation if pending status
+                  if (_status == 'pending')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const DonorDonationFormPage(
+                                            mode: 'edit'),
+                                  ),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
                                 ),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
                               ),
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Edit'),
                             ),
-                            icon: const Icon(Icons.edit),
-                            label: const Text('Edit'),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              context.read<DonationProvider>().deleteDonation();
-                              Navigator.pop(context);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                context
+                                    .read<DonationProvider>()
+                                    .deleteDonation();
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
                               ),
+                              icon: const Icon(Icons.delete),
+                              label: const Text('Delete'),
                             ),
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Delete'),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  // only allow cancellation if status is not yet completed
+                  if (_status != 'completed' && _status != 'cancelled')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 8),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _showDonationCancellationModal,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  // only show donation drive when status is completed
+                  if (_status == 'completed') ...[
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _addressControllers.add(TextEditingController());
+                        });
+                      },
+                      child: const Text('Where is my donation ging?'),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                 ]
               ],
             ),

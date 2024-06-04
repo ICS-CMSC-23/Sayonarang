@@ -12,8 +12,6 @@ import 'package:donation_app/screens/auth/login_page.dart';
 import 'package:donation_app/screens/auth/signup_page.dart';
 import 'package:donation_app/screens/org/org_main.dart';
 import 'package:donation_app/screens/admin/admin_home.dart';
-import 'package:donation_app/screens/donor/donor_home.dart';
-import 'package:donation_app/screens/donor_new/donor_main.dart';
 import 'package:donation_app/providers/donor_provider.dart';
 import 'package:donation_app/providers/donate_provider.dart';
 
@@ -33,7 +31,7 @@ void main() async {
         ChangeNotifierProvider(create: ((context) => DonorProvider())),
         ChangeNotifierProvider(create: ((context) => DonateDataProvider())),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
     // MyApp()
   );
@@ -76,7 +74,7 @@ class MyApp extends StatelessWidget {
         // '/donor': (context) => const DonorView(),
         '/donor': (context) => const DonorMainPage(),
       },
-      home: AuthWrapper(),
+      home: const AuthWrapper(),
     );
   }
 }
@@ -93,35 +91,35 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
           if (user == null) {
-            return LoginPage();
+            return const LoginPage();
           } else {
             return FutureBuilder<String>(
               future: MyAuthProvider().getUserRole(user.uid),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // return CircularProgressIndicator();  # ugly in ui
-                  return Scaffold();
+                  return const Scaffold();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
                   String role = snapshot.data!;
                   switch (role) {
                     case 'admin':
-                      return AdminView();
+                      return const AdminView();
                     case 'org':
-                      return OrgMainPage();
+                      return const OrgMainPage();
                     case 'donor':
                       // return DonorView();
-                      return DonorMainPage();
+                      return const DonorMainPage();
                     default:
-                      return LoginPage();
+                      return const LoginPage();
                   }
                 }
               },
             );
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );

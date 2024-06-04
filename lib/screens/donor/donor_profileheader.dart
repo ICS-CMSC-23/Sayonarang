@@ -20,11 +20,12 @@ class ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(Dimensions.padding),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage('https://picsum.photos/seed/216/600'),
+              backgroundImage:
+                  NetworkImage('https://picsum.photos/seed/216/600'),
             ),
           ),
           Column(
@@ -33,27 +34,27 @@ class ProfileHeader extends StatelessWidget {
             children: [
               Text(
                 donorName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.redAccent, 
+                  color: Colors.redAccent,
                 ),
               ),
-              SizedBox(height: 22), 
-              Text(
+              const SizedBox(height: 22),
+              const Text(
                 'Username:',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey, 
+                  color: Colors.grey,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 username,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
-                  color: Colors.black, 
+                  color: Colors.black,
                 ),
               ),
             ],
