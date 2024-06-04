@@ -1,6 +1,7 @@
 import 'package:donation_app/models/donation_model.dart';
 import 'package:donation_app/providers/donation_provider.dart';
 import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/donor_new/donor_drive_form.dart';
 import 'package:donation_app/screens/donor_new/donor_qrcode.dart';
 import 'package:donation_app/screens/shared/image_viewer.dart';
 import 'package:image_picker/image_picker.dart';
@@ -156,6 +157,7 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.transparent,
           title: const Text('Cancel Donation'),
           content: const Text('Are you sure you want to cancel the donation?'),
           actions: <Widget>[
@@ -1029,11 +1031,13 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                   if (_status == 'completed') ...[
                     TextButton(
                       onPressed: () {
-                        setState(() {
-                          _addressControllers.add(TextEditingController());
-                        });
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DonorDriveFormPage(mode: 'view')),
+                        );
                       },
-                      child: const Text('Where is my donation ging?'),
+                      child: const Text('Where is my donation going?'),
                     ),
                     const SizedBox(height: 8),
                   ],

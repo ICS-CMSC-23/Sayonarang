@@ -1,7 +1,6 @@
-import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
+import 'package:donation_app/screens/donor_new/donor_org.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:donation_app/models/user_model.dart' as user_model;
@@ -14,9 +13,6 @@ class DonorHomePage extends StatefulWidget {
 }
 
 class _DonorHomePageState extends State<DonorHomePage> {
-  late User? _currentUser;
-  Map<String, dynamic>? _userDetails;
-
   @override
   void initState() {
     super.initState();
@@ -24,15 +20,6 @@ class _DonorHomePageState extends State<DonorHomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
       context.read<MyAuthProvider>().fetchOpenOrgs();
-    });
-  }
-
-  // TODO: Remove, move implementation to org profile page
-  Future<void> _fetchUserDetails() async {
-    final details =
-        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
-    setState(() {
-      _userDetails = details;
     });
   }
 
@@ -63,11 +50,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
           // change selected org
           context.read<MyAuthProvider>().changeSelectedOrg(org);
 
-          // navigate to the create donation form page
+          // navigate to the org details  page
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const DonorDonationFormPage(mode: 'add'),
+              builder: (context) => const DonorOrgPage(),
             ),
           );
         },
@@ -83,31 +70,11 @@ class _DonorHomePageState extends State<DonorHomePage> {
               overflow: TextOverflow.ellipsis,
               maxLines: 1, // limit name to one line
             ),
-            subtitle: const Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: "Click ",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  WidgetSpan(
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16,
-                    ),
-                  ),
-                  TextSpan(
-                    text: " to know more",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
+            subtitle: Text(
+              org.description,
+              style: const TextStyle(fontSize: 16),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
             ),
             trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
           ),

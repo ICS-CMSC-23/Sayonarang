@@ -210,6 +210,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.transparent,
           title: const Text('Change Donation Status'),
           content:
               Text('Are you sure you want to change the status to $newStatus?'),
@@ -626,7 +627,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
             const SizedBox(height: 8),
             _buildImageContainer(),
             const SizedBox(height: 8),
-            if (_status != 'completed')
+            if (_status != 'completed' && _status != 'cancelled')
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 child: SizedBox(

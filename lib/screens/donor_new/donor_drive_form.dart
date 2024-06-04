@@ -1,58 +1,58 @@
+import "package:donation_app/models/donation_model.dart";
 import "package:donation_app/models/drive_model.dart";
+import "package:donation_app/providers/donation_provider.dart";
 import "package:donation_app/providers/drive_provider.dart";
 import "package:donation_app/screens/shared/image_slider.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:provider/provider.dart";
+import "package:cloud_firestore/cloud_firestore.dart";
 
 // TODO: Add loading state for saving and loading images
 // TODO: Add snackbar to show successfully edited or successfully saved
 
-class OrgDriveFormPage extends StatefulWidget {
+class DonorDriveFormPage extends StatefulWidget {
   final String mode; // add, edit, view
-  const OrgDriveFormPage({super.key, required this.mode});
+  const DonorDriveFormPage({super.key, required this.mode});
 
   @override
-  State<OrgDriveFormPage> createState() => OrgDriveFormPageState();
+  State<DonorDriveFormPage> createState() => DonorDriveFormPageState();
 }
 
-class OrgDriveFormPageState extends State<OrgDriveFormPage> {
+class DonorDriveFormPageState extends State<DonorDriveFormPage> {
   late User? _currentUser;
+  late DocumentSnapshot? _driveDoc;
 
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _endDateController;
   // late List<String> _donationIds;
-  late List<String> _photos;
-  late List<String> _photosDownloadURLs;
+  late List<String> _photos = [];
+  late List<String> _photosDownloadURLs = [];
 
-  Drive? _selectedDrive;
+  Donation? _selectedDonation;
   bool get isViewMode => widget.mode == "view";
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-
-    // fetch user details
     _currentUser = FirebaseAuth.instance.currentUser;
 
-    // TODO: fetch drive of selected donation
+    _selectedDonation = context.read<DonationProvider>().selected;
 
-    _selectedDrive = context.read<DriveProvider>().selected;
-
-    _titleController = TextEditingController(text: _selectedDrive!.title);
-    _descriptionController =
-        TextEditingController(text: _selectedDrive?.description);
-    _endDateController = TextEditingController(
-        text: DateFormat('yyyy-MM-dd').format(_selectedDrive!.endDate));
-    // _donationIds = _selectedDrive!.donationIds;
-    _photos =
-        _selectedDrive!.photos; // filenames of the images from firebase storage
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _endDateController = TextEditingController();
+    // _donationIds = [];
+    _photos = [];
     _photosDownloadURLs = [];
-    // fetch download URLs for images
-    _loadDownloadURLs();
+
+    if (_currentUser != null) {
+      // fetch drive using driveId of selected donation
+      _fetchDrive(_selectedDonation!.driveId);
+    }
   }
 
   @override
@@ -61,6 +61,25 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
     _descriptionController.dispose();
     _endDateController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchDrive(String driveId) async {
+    _driveDoc = await context.read<DriveProvider>().getDriveById(driveId);
+    setState(() {
+      _initializeFormFields();
+      _loadDownloadURLs();
+    });
+  }
+
+  void _initializeFormFields() {
+    final driveData = Drive.fromJson(_driveDoc!.data() as Map<String, dynamic>);
+
+    _titleController = TextEditingController(text: driveData.title);
+    _descriptionController = TextEditingController(text: driveData.description);
+    _endDateController = TextEditingController(
+        text: DateFormat('yyyy-MM-dd').format(driveData.endDate));
+    _photos = driveData.photos;
+    _loadDownloadURLs();
   }
 
   Future<void> _loadDownloadURLs() async {
@@ -289,7 +308,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                   suffixIcon: const Icon(Icons.calendar_today)),
               const SizedBox(height: 8),
               _buildImageGrid(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
             ],
           ),
         ),

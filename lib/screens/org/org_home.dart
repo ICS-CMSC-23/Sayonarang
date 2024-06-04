@@ -17,7 +17,6 @@ class OrgHomePage extends StatefulWidget {
 
 class _OrgHomePageState extends State<OrgHomePage> {
   late User? _currentUser;
-  Map<String, dynamic>? _userDetails;
 
   @override
   void initState() {
@@ -26,7 +25,6 @@ class _OrgHomePageState extends State<OrgHomePage> {
     // fetch user details
     _currentUser = FirebaseAuth.instance.currentUser;
     if (_currentUser != null) {
-      _fetchUserDetails(); // TODO: Remove, move implementation to org profile page
       // execute initialization of the stream after the layout is completed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
@@ -34,19 +32,10 @@ class _OrgHomePageState extends State<OrgHomePage> {
     }
   }
 
-  // TODO: Remove, move implementation to org profile page
-  Future<void> _fetchUserDetails() async {
-    final details =
-        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
-    setState(() {
-      _userDetails = details;
-    });
-  }
-
   Future<String> _fetchDonorName(String donorId) async {
-    final _userDetails =
+    final userDetails =
         await context.read<MyAuthProvider>().getUserDetails(donorId);
-    return _userDetails['name'] as String? ?? 'Unknown Donor';
+    return userDetails['name'] as String? ?? 'Unknown Donor';
   }
 
   Widget _buildDonationList(List<Donation> donations, String status) {

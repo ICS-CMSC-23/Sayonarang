@@ -56,7 +56,7 @@ class _ViewOrganizationsState extends State<ViewOrganizations> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Color(0xFF4CAF50),
+                      color: const Color(0xFF4CAF50),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.business,

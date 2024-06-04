@@ -1,19 +1,16 @@
-import "package:donation_app/models/drive_model.dart";
-import "package:donation_app/providers/drive_provider.dart";
-import "package:donation_app/screens/shared/image_slider.dart";
-import "package:firebase_auth/firebase_auth.dart";
-import "package:flutter/material.dart";
-import "package:intl/intl.dart";
-import "package:provider/provider.dart";
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:donation_app/models/user_model.dart' as user_model;
 
 // TODO: Add loading state for saving and loading images
 // TODO: Add snackbar to show successfully edited or successfully saved
 
 class OrgProfilePage extends StatefulWidget {
-  final String mode; // add, edit, view
-  const OrgProfilePage({super.key, required this.mode});
+  final String mode; // edit, view
+  const OrgProfilePage({Key? key, required this.mode}) : super(key: key);
 
   @override
   State<OrgProfilePage> createState() => OrgProfilePageState();
@@ -21,20 +18,17 @@ class OrgProfilePage extends StatefulWidget {
 
 class OrgProfilePageState extends State<OrgProfilePage> {
   late User? _currentUser;
+  late Future<DocumentSnapshot> _userDocFuture;
 
-  late TextEditingController _titleController;
+  late TextEditingController _nameController;
+  late TextEditingController _usernameController;
+  late List<TextEditingController> _addressControllers;
+  late TextEditingController _contactNumController;
   late TextEditingController _descriptionController;
-  late TextEditingController _endDateController;
-  late List<String> _donationIds;
-  late List<String> _photos;
-  late List<String> _photosDownloadURLs;
-  List<String> _deletedPhotos =
-      []; // to keep track of the deleted photos deleted by the user when editing
+  late String _status;
+  late bool _isOpen;
+  bool _isLoading = true; // Add a loading state
 
-  List<File> _selectedFiles = [];
-  final _picker = ImagePicker();
-
-  Drive? _selectedDrive;
   bool get isViewMode => widget.mode == "view";
   final _formKey = GlobalKey<FormState>();
 
@@ -42,50 +36,64 @@ class OrgProfilePageState extends State<OrgProfilePage> {
   void initState() {
     super.initState();
 
-    // fetch user details
+    _nameController = TextEditingController();
+    _usernameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _addressControllers = [TextEditingController()];
+    _contactNumController = TextEditingController();
+    _status = '';
+    _isOpen = false;
+
     _currentUser = FirebaseAuth.instance.currentUser;
-
-    if (widget.mode == "edit" || widget.mode == "view") {
-      _selectedDrive = context.read<DriveProvider>().selected;
-
-      _titleController = TextEditingController(text: _selectedDrive!.title);
-      _descriptionController =
-          TextEditingController(text: _selectedDrive?.description);
-      _endDateController = TextEditingController(
-          text: DateFormat('yyyy-MM-dd').format(_selectedDrive!.endDate));
-      _donationIds = _selectedDrive!.donationIds;
-      _photos = _selectedDrive!
-          .photos; // filenames of the images from firebase storage
-      _photosDownloadURLs = [];
-      // fetch download URLs for images
-      _loadDownloadURLs();
-    } else {
-      _titleController = TextEditingController();
-      _descriptionController = TextEditingController();
-      _endDateController = TextEditingController();
-      _donationIds = [];
-      _photos = [];
-      _photosDownloadURLs = [];
+    if (_currentUser != null) {
+      _userDocFuture =
+          context.read<MyAuthProvider>().getUserById(_currentUser!.uid);
+      _getUserDetails(); // Call _getUserDetails to fetch user details
     }
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
+    _nameController.dispose();
+    _usernameController.dispose();
+    for (var controller in _addressControllers) {
+      controller.dispose();
+    }
+    _contactNumController.dispose();
     _descriptionController.dispose();
-    _endDateController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadDownloadURLs() async {
-    if (widget.mode == "edit" || widget.mode == "view") {
-      List<String> downloadURLs = await context
-          .read<DriveProvider>()
-          .fetchDownloadURLsForImages(_photos);
-      setState(() {
-        _photosDownloadURLs = downloadURLs;
-      });
+  Color getStatusColor(String status) {
+    switch (status) {
+      case 'pending':
+        return Colors.orange;
+      case 'approved':
+        return Colors.green;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return Colors.black;
     }
+  }
+
+  Future<void> _getUserDetails() async {
+    final DocumentSnapshot userSnapshot = await _userDocFuture;
+    final userData =
+        user_model.User.fromJson(userSnapshot.data() as Map<String, dynamic>);
+
+    setState(() {
+      _nameController.text = userData.name;
+      _usernameController.text = userData.username;
+      _descriptionController.text = userData.description;
+      _addressControllers = userData.addresses
+          .map((address) => TextEditingController(text: address))
+          .toList();
+      _contactNumController.text = userData.contactNum;
+      _status = userData.status;
+      _isOpen = userData.isOpen;
+      _isLoading = false; // Set loading to false after data is fetched
+    });
   }
 
   Widget _buildFormField({
@@ -119,11 +127,11 @@ class OrgProfilePageState extends State<OrgProfilePage> {
             minLines: minLines,
             maxLines: maxLines,
             onTap: () {
-              if (type == 'date') {
-                _showDatePicker(context, controller);
-              } else if (type == 'time') {
-                _showTimePicker(context, controller);
-              }
+              // if (type == 'date') {
+              //   _showDatePicker(context, controller);
+              // } else if (type == 'time') {
+              //   _showTimePicker(context, controller);
+              // }
             },
             style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
@@ -164,31 +172,6 @@ class OrgProfilePageState extends State<OrgProfilePage> {
     );
   }
 
-  void _showDatePicker(
-      BuildContext context, TextEditingController controller) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (pickedDate != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-    }
-  }
-
-  void _showTimePicker(
-      BuildContext context, TextEditingController controller) async {
-    final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (!context.mounted) return; // mounted check
-    if (pickedTime != null) {
-      controller.text = pickedTime.format(context);
-    }
-  }
-
   Future<bool?> _showBackDialog() {
     if (isViewMode) {
       // return true immediately if in view mode
@@ -226,135 +209,6 @@ class OrgProfilePageState extends State<OrgProfilePage> {
     );
   }
 
-  Future<void> getImages() async {
-    final pickedFile = await _picker.pickMultiImage(
-        imageQuality: 100, maxHeight: 1000, maxWidth: 1000);
-    List<XFile> xfilePick = pickedFile;
-
-    setState(
-      () {
-        if (xfilePick.isNotEmpty) {
-          for (var i = 0; i < xfilePick.length; i++) {
-            _selectedFiles.add(File(xfilePick[i].path));
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Nothing is selected')));
-        }
-      },
-    );
-  }
-
-  Widget _buildImageGrid() {
-    List<dynamic> images = [..._photosDownloadURLs, ..._selectedFiles];
-
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Images",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: Colors.grey[200],
-              ),
-              height: 200,
-              child: images.isEmpty
-                  ? Center(
-                      child: Icon(
-                        Icons.image,
-                        color: Colors.grey[400],
-                        size: 48,
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 4.0,
-                          mainAxisSpacing: 4.0,
-                        ),
-                        itemCount: images.length,
-                        itemBuilder: (context, index) {
-                          final image = images[index];
-                          return Stack(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => SliderShowFullmages(
-                                        listImagesModel: images,
-                                        current: index,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: image is File
-                                          ? FileImage(image)
-                                          : NetworkImage(image)
-                                              as ImageProvider,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              if (!isViewMode)
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        if (image is File) {
-                                          _selectedFiles.remove(image);
-                                        } else if (image is String) {
-                                          int deleteIndex = _photosDownloadURLs
-                                              .indexOf(image);
-                                          _photos.removeAt(deleteIndex);
-                                          _deletedPhotos.add(
-                                              _photosDownloadURLs[deleteIndex]);
-                                          _photosDownloadURLs
-                                              .removeAt(deleteIndex);
-                                        }
-                                      });
-                                    },
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.red,
-                                      ),
-                                      child: const Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-            ),
-          ],
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -373,242 +227,272 @@ class OrgProfilePageState extends State<OrgProfilePage> {
       child: Scaffold(
         appBar: AppBar(
             title: Text(
-          "${widget.mode == "add" ? "Add" : widget.mode == "edit" ? "Edit" : "View"} Donation Drive ${widget.mode == "view" ? "Details" : ""}",
+          "${widget.mode == "edit" ? "Edit" : ""} Profile",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: colorScheme.primary,
           ),
         )),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _buildFormField(
-                  context: context,
-                  type: 'text',
-                  label: 'Title',
-                  controller: _titleController,
-                  enabled: !isViewMode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a title';
-                    }
-                    return null;
-                  },
-                ),
-                _buildFormField(
-                  context: context,
-                  type: 'text',
-                  label: 'Description',
-                  controller: _descriptionController,
-                  enabled: !isViewMode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a description';
-                    }
-                    return null;
-                  },
-                  minLines: 5,
-                  maxLines: null,
-                ),
-                _buildFormField(
-                    context: context,
-                    type: 'date',
-                    label: 'End Date',
-                    controller: _endDateController,
-                    enabled: !isViewMode,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an end date';
-                      }
-                      return null;
-                    },
-                    minLines: 1,
-                    suffixIcon: const Icon(Icons.calendar_today)),
-                const SizedBox(height: 8),
-                if (!isViewMode) ...[
-                  _buildImageGrid(),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              getImages();
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
-                              ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      if (isViewMode) ...[
+                        const SizedBox(height: 8),
+                        const Icon(
+                          Icons.business,
+                          size: 72,
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: getStatusColor(_status),
+                            borderRadius: BorderRadius.circular(64.0),
+                          ),
+                          child: Text(
+                            'Status: ${_status}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
                             ),
-                            icon: const Icon(Icons.image_search),
-                            label: const Text('Select Images From Gallery'),
                           ),
                         ),
+                        const SizedBox(height: 16),
                       ],
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            if (widget.mode == "add") {
-                              if (_selectedFiles.isNotEmpty) {
-                                List<String> fileNames = await context
-                                    .read<DriveProvider>()
-                                    .uploadFiles(_selectedFiles);
-
-                                Drive drive = Drive(
-                                  orgId: _currentUser!.uid,
-                                  title: _titleController.text,
-                                  description: _descriptionController.text,
-                                  endDate: DateFormat('yyyy-MM-dd')
-                                      .parse(_endDateController.text),
-                                  donationIds: _donationIds,
-                                  photos:
-                                      fileNames, // convert File objects to paths
-                                );
-
-                                if (!context.mounted) return; // mounted check
-                                context.read<DriveProvider>().addDrive(drive);
-                                Navigator.pop(context);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Please select at least one image'),
-                                  ),
-                                );
-                              }
-                            } else if (widget.mode == "edit") {
-                              if (_selectedFiles.isNotEmpty ||
-                                  _photos.isNotEmpty) {
-                                List<String> fileNames = [];
-                                if (_selectedFiles.isNotEmpty) {
-                                  fileNames = await context
-                                      .read<DriveProvider>()
-                                      .uploadFiles(_selectedFiles);
-                                }
-
-                                // delete files only if there are photos to delete
-                                if (_deletedPhotos.isNotEmpty) {
-                                  if (!context.mounted) return; // mounted check
-
-                                  context
-                                      .read<DriveProvider>()
-                                      .deleteFiles(_deletedPhotos);
-                                }
-
-                                // merge existing photos and newly uploaded files
-                                List<String> updatedPhotos =
-                                    _photos + fileNames;
-
-                                if (!context.mounted) return; // mounted check
-                                context.read<DriveProvider>().editDrive(
-                                      _titleController.text,
-                                      _descriptionController.text,
-                                      _donationIds,
-                                      DateFormat('yyyy-MM-dd')
-                                          .parse(_endDateController.text),
-                                      updatedPhotos,
-                                    );
-
-                                // TODO: find fix for when going back to the view details page from edit, the details page is updated
-                                // current solution is to pop twice to go back to the donation drives page
-                                // https://stackoverflow.com/a/74316628
-                                Navigator.of(context)
-                                  ..pop()
-                                  ..pop(); // kanta ni nayeon hahahaha
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Please select at least one image',
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
+                      _buildFormField(
+                        context: context,
+                        type: 'text',
+                        label: 'Name',
+                        controller: _nameController,
+                        enabled: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a name';
                           }
+                          return null;
                         },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                        ),
-                        child: const Text('Save'),
                       ),
-                    ),
-                  ),
-                ],
-                if (isViewMode) ...[
-                  _buildImageGrid(),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const OrgProfilePage(mode: "edit"),
-                                ),
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
+                      _buildFormField(
+                        context: context,
+                        type: 'text',
+                        label: 'Username',
+                        controller: _usernameController,
+                        enabled: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a username';
+                          }
+                          return null;
+                        },
+                      ),
+                      // only description, addresses, contact number, and isOpen can be edited by the org
+                      _buildFormField(
+                        context: context,
+                        type: 'text',
+                        label: 'Description',
+                        controller: _descriptionController,
+                        enabled: !isViewMode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a description';
+                          }
+                          return null;
+                        },
+                        minLines: 5,
+                        maxLines: null,
+                      ),
+                      ..._addressControllers.map((controller) {
+                        final int index =
+                            _addressControllers.indexOf(controller);
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: _buildFormField(
+                                context: context,
+                                type: 'text',
+                                label: 'Address ${index + 1}',
+                                controller: controller,
+                                enabled: !isViewMode,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter an address';
+                                  }
+                                  return null;
+                                },
+                                minLines: 1,
+                                maxLines: null,
                               ),
                             ),
-                            icon: const Icon(Icons.edit),
-                            label: const Text('Edit'),
-                          ),
+                            if (!isViewMode &&
+                                index !=
+                                    0) // ensure the first address is not removable
+                              // TODO: Fix alignment of button to remove address
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle,
+                                    color: Colors.red),
+                                onPressed: () {
+                                  setState(() {
+                                    _addressControllers.removeAt(index);
+                                  });
+                                },
+                              ),
+                          ],
+                        );
+                      }).toList(),
+                      if (!isViewMode)
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _addressControllers.add(TextEditingController());
+                            });
+                          },
+                          child: const Text('Add Address'),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () async {
-                              context.read<DriveProvider>().deleteDrive();
-                              Navigator.pop(context);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 2.0,
+                      _buildFormField(
+                        context: context,
+                        type: 'text',
+                        label: 'Contact Number',
+                        controller: _contactNumController,
+                        enabled: !isViewMode,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a contact number';
+                          }
+                          return null;
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Are you accepting donations?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               ),
                             ),
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Delete'),
+                            IgnorePointer(
+                              ignoring: isViewMode,
+                              child: Row(children: [
+                                const Text("No"),
+                                const SizedBox(width: 4),
+                                Switch(
+                                    value: _isOpen,
+                                    onChanged: !isViewMode
+                                        ? (value) {
+                                            setState(() {
+                                              _isOpen = value;
+                                            });
+                                          }
+                                        : null,
+                                    activeColor:
+                                        Theme.of(context).colorScheme.primary),
+                                const SizedBox(width: 4),
+                                const Text("Yes"),
+                              ]),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (!isViewMode) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 8),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  if (!context.mounted) return; // mounted check
+                                  context.read<MyAuthProvider>().editOrgDetails(
+                                        _currentUser!.uid,
+                                        _addressControllers
+                                            .map(
+                                                (controller) => controller.text)
+                                            .toList(),
+                                        _contactNumController.text,
+                                        _isOpen,
+                                      );
+                                  Navigator.of(context)
+                                      .pop(); // TODO: Fix changes not reflecting after editing org
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                              child: const Text('Save'),
+                            ),
                           ),
                         ),
                       ],
-                    ),
+                      if (isViewMode) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 8),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OrgProfilePage(mode: "edit"),
+                                  ),
+                                );
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Edit Profile'),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 8),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  if (!context.mounted) return; // mounted check
+                                  context.read<MyAuthProvider>().signOut();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                              child: const Text('Log-out'),
+                            ),
+                          ),
+                        ),
+                      ]
+                    ],
                   ),
-                ]
-              ],
-            ),
-          ),
-        ),
+                ),
+              ),
       ),
     );
   }

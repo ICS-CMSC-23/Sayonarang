@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'donor_dimensions.dart';
+import 'package:donation_app/screens/donor_new/donor_dimensions.dart';
 
 class ProfileHeader extends StatelessWidget {
   final String donorName;
@@ -25,8 +25,7 @@ class ProfileHeader extends StatelessWidget {
             padding: EdgeInsets.all(Dimensions.padding),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage:
-                  NetworkImage('https://picsum.photos/seed/216/600'),
+              backgroundImage: AssetImage('assets/images/placeholder.jpg'),
             ),
           ),
           Column(

@@ -53,4 +53,14 @@ class FirebaseDriveAPI {
       return "Failed with error '${e.code}: ${e.message}";
     }
   }
+
+  Future<DocumentSnapshot> getDriveById(String driveId) async {
+    try {
+      DocumentSnapshot driveDoc =
+          await db.collection('drives').doc(driveId).get();
+      return driveDoc;
+    } on FirebaseException catch (e) {
+      throw Exception("Failed to retrieve user: ${e.message}");
+    }
+  }
 }

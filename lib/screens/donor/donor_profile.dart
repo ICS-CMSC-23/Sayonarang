@@ -8,6 +8,8 @@ import 'package:donation_app/screens/donor/donor_profileheader.dart';
 import 'package:donation_app/providers/user_provider.dart';
 
 class DonorProfileWidget extends StatefulWidget {
+  const DonorProfileWidget({super.key});
+
   @override
   _DonorProfileWidgetState createState() => _DonorProfileWidgetState();
 }

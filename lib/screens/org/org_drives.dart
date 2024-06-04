@@ -1,4 +1,5 @@
 import 'package:donation_app/models/drive_model.dart';
+import 'package:donation_app/providers/user_provider.dart';
 import 'package:donation_app/screens/org/org_drive_form.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,12 +16,15 @@ class OrgDrivesPage extends StatefulWidget {
 
 class _OrgDrivesPageState extends State<OrgDrivesPage> {
   late User? _currentUser;
+  late Future<Map<String, dynamic>> _userDetailsFuture;
 
   @override
   void initState() {
     super.initState();
     // fetch user details
     _currentUser = FirebaseAuth.instance.currentUser;
+    _userDetailsFuture =
+        context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
     if (_currentUser != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<DriveProvider>().fetchDrivesByOrg(_currentUser!.uid);
@@ -87,18 +91,42 @@ class _OrgDrivesPageState extends State<OrgDrivesPage> {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          tooltip: 'Create donation drive',
-          onPressed: () {
-            // navigate to the create drive details page
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const OrgDriveFormPage(mode: "add"),
-              ),
-            );
+        floatingActionButton: FutureBuilder<Map<String, dynamic>>(
+          future: _userDetailsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              // disable FAB if user is not approved
+              return const FloatingActionButton(
+                onPressed: null,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.error, color: Colors.white, size: 28),
+              );
+            } else {
+              final userDetails = snapshot.data;
+              final isApproved = userDetails?['status'] == 'approved';
+              return FloatingActionButton(
+                tooltip: 'Create donation drive',
+                onPressed: isApproved
+                    ? () {
+                        // navigate to the create drive details page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const OrgDriveFormPage(mode: "add"),
+                          ),
+                        );
+                      }
+                    : null,
+                backgroundColor: isApproved
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.grey,
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
+              );
+            }
           },
-          child: const Icon(Icons.add, color: Colors.white, size: 28),
         ),
       ),
     );

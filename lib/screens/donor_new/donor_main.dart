@@ -16,7 +16,7 @@ class _DonorMainPageState extends State<DonorMainPage> {
   List<Widget> pages = [
     const DonorHomePage(),
     const DonorDonationsPage(),
-    const DonorProfilePage()
+    const DonorProfileWidget(),
   ];
 
   @override

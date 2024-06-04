@@ -17,7 +17,7 @@ class _OrgMainPageState extends State<OrgMainPage> {
   List<Widget> pages = [
     const OrgHomePage(),
     const OrgDrivesPage(),
-    const OrgProfilePage(mode: 'view')
+    const OrgProfilePage(mode: 'view'),
   ];
 
   @override
