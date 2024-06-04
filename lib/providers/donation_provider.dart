@@ -93,6 +93,13 @@ class DonationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void linkToDrive(String driveId) async {
+    String message =
+        await firebaseService.linkToDrive(_selectedDonation!.id, driveId);
+    print(message);
+    notifyListeners();
+  }
+
   void deleteDonation() async {
     String message =
         await firebaseService.deleteDonation(_selectedDonation!.id);

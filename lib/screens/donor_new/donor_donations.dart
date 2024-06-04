@@ -1,7 +1,6 @@
 import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
-import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -35,9 +34,9 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
   }
 
   Future<String> _fetchOrgName(String orgId) async {
-    final _userDetails =
+    final userDetails =
         await context.read<MyAuthProvider>().getUserDetails(orgId);
-    return _userDetails['name'] as String? ?? 'Unknown Organization';
+    return userDetails['name'] as String? ?? 'Unknown Organization';
   }
 
   Widget _buildDonationList(List<Donation> donations, String status) {
@@ -135,9 +134,9 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
   }
 
   Widget _buildTruncatedChip(String text) {
-    final maxLength = 20;
+    const maxLength = 20;
     final truncatedText =
-        text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        text.length > maxLength ? '${text.substring(0, maxLength)}...' : text;
 
     return Chip(
       padding: const EdgeInsets.symmetric(horizontal: 4),

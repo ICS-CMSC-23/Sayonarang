@@ -97,6 +97,22 @@ class FirebaseDonationAPI {
     }
   }
 
+  Future<String> linkToDrive(
+    String? id,
+    String driveId,
+  ) async {
+    try {
+      print("Drive ID: $driveId");
+      await db.collection("donations").doc(id).update({
+        "driveId": driveId,
+      });
+
+      return "Successfully linked donation to $driveId!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
   Future<String> deleteDonation(String? id) async {
     try {
       await db.collection("donations").doc(id).delete();

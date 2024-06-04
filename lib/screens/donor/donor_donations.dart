@@ -6,11 +6,14 @@ import 'package:donation_app/providers/donor_provider.dart';
 import 'package:donation_app/screens/donor/donation_details.dart';
 
 class ShowDonations extends StatefulWidget {
+  const ShowDonations({super.key});
+
   @override
   _ShowDonationsState createState() => _ShowDonationsState();
 }
 
-class _ShowDonationsState extends State<ShowDonations> with SingleTickerProviderStateMixin {
+class _ShowDonationsState extends State<ShowDonations>
+    with SingleTickerProviderStateMixin {
   late User? _currentUser;
   late Future<void> _donationsFuture;
   late TabController _tabController;
@@ -41,7 +44,7 @@ class _ShowDonationsState extends State<ShowDonations> with SingleTickerProvider
         bottom: TabBar(
           isScrollable: true,
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Pending'),
             Tab(text: 'Confirmed'),
             Tab(text: 'Scheduled'),
@@ -54,7 +57,7 @@ class _ShowDonationsState extends State<ShowDonations> with SingleTickerProvider
         future: _donationsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -63,17 +66,37 @@ class _ShowDonationsState extends State<ShowDonations> with SingleTickerProvider
                 final donations = donorProvider.donationsList;
                 final orgNames = donorProvider.orgNames;
                 if (donations.isEmpty) {
-                  return Center(child: Text('No donations found'));
+                  return const Center(child: Text('No donations found'));
                 }
 
                 return TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildDonationList(donations.where((d) => d.status.toLowerCase() == 'pending').toList(), orgNames),
-                    _buildDonationList(donations.where((d) => d.status.toLowerCase() == 'confirmed').toList(), orgNames),
-                    _buildDonationList(donations.where((d) => d.status.toLowerCase() == 'scheduled').toList(), orgNames),
-                    _buildDonationList(donations.where((d) => d.status.toLowerCase() == 'completed').toList(), orgNames),
-                    _buildDonationList(donations.where((d) => d.status.toLowerCase() == 'cancelled').toList(), orgNames),
+                    _buildDonationList(
+                        donations
+                            .where((d) => d.status.toLowerCase() == 'pending')
+                            .toList(),
+                        orgNames),
+                    _buildDonationList(
+                        donations
+                            .where((d) => d.status.toLowerCase() == 'confirmed')
+                            .toList(),
+                        orgNames),
+                    _buildDonationList(
+                        donations
+                            .where((d) => d.status.toLowerCase() == 'scheduled')
+                            .toList(),
+                        orgNames),
+                    _buildDonationList(
+                        donations
+                            .where((d) => d.status.toLowerCase() == 'completed')
+                            .toList(),
+                        orgNames),
+                    _buildDonationList(
+                        donations
+                            .where((d) => d.status.toLowerCase() == 'cancelled')
+                            .toList(),
+                        orgNames),
                   ],
                 );
               },
@@ -84,16 +107,18 @@ class _ShowDonationsState extends State<ShowDonations> with SingleTickerProvider
     );
   }
 
-  Widget _buildDonationList(List<DonateData> donations, Map<String, String> orgNames) {
+  Widget _buildDonationList(
+      List<DonateData> donations, Map<String, String> orgNames) {
     if (donations.isEmpty) {
-      return Center(child: Text('No donations found'));
+      return const Center(child: Text('No donations found'));
     }
 
     return ListView.builder(
       itemCount: donations.length,
       itemBuilder: (context, index) {
         final currentDonation = donations[index];
-        final orgName = orgNames[currentDonation.orgId] ?? 'Unknown Organization';
+        final orgName =
+            orgNames[currentDonation.orgId] ?? 'Unknown Organization';
         IconData leadingIcon;
         Color statusColor;
 

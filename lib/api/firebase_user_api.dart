@@ -39,6 +39,7 @@ class FirebaseAuthAPI {
         'role': role,
         'status': role == 'org' ? 'pending' : '',
         'isOpen': false,
+        'description': '',
       });
 
       // print('Successfully signed up!');
@@ -83,15 +84,15 @@ class FirebaseAuthAPI {
           await getUserDetails(credential.user!.uid);
 
       // Check if org account is still pending before being able to login
-      if (currentUser['status'] == 'pending') {
-        await auth.signOut();
-        return {
-          'success': false,
-          'response': 'Your account is still pending approval.',
-        };
-      }
+      // if (currentUser['status'] == 'pending') {
+      //   await auth.signOut();
+      //   return {
+      //     'success': false,
+      //     'response': 'Your account is still pending approval.',
+      //   };
+      // }
       // Check if org account was rejected
-      else if (currentUser['status'] == 'rejected') {
+      if (currentUser['status'] == 'rejected') {
         await auth.signOut();
         return {
           'success': false,
@@ -155,9 +156,8 @@ class FirebaseAuthAPI {
     return userDoc.data()!['role'];
   }
 
-  // TODO: Add edit user function to update when org wants to accept donations, etc.
   // for org use to update their status
-  Future<String> editOrgStatus(
+  Future<String> editOrgIsOpen(
     String? orgId,
     bool isOpen,
   ) async {
@@ -173,6 +173,25 @@ class FirebaseAuthAPI {
     }
   }
 
+  Future<String> editOrgDetails(
+    String? orgId,
+    List<String> addresses,
+    String contactNum,
+    bool isOpen,
+  ) async {
+    try {
+      await db.collection("users").doc(orgId).update({
+        "addresses": addresses,
+        "contactNum": contactNum,
+        "isOpen": isOpen,
+      });
+
+      return "Successfully edited org org details!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
   Stream<QuerySnapshot> getOpenOrgs() {
     try {
       return db
@@ -181,6 +200,15 @@ class FirebaseAuthAPI {
           .snapshots();
     } catch (e) {
       throw "Failed to get open orgs: $e";
+    }
+  }
+
+  Future<DocumentSnapshot> getUserById(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await db.collection('users').doc(userId).get();
+      return userDoc;
+    } on FirebaseException catch (e) {
+      throw Exception("Failed to retrieve user: ${e.message}");
     }
   }
 }

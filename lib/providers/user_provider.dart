@@ -127,11 +127,23 @@ class MyAuthProvider with ChangeNotifier {
     }
   }
 
-  void editOrgStatus(
+  void editOrgIsOpen(
     String userId,
     bool isOpen,
   ) async {
-    String message = await authService.editOrgStatus(userId, isOpen);
+    String message = await authService.editOrgIsOpen(userId, isOpen);
+    print(message);
+    notifyListeners();
+  }
+
+  void editOrgDetails(
+    String userId,
+    List<String> addresses,
+    String contactNum,
+    bool isOpen,
+  ) async {
+    String message =
+        await authService.editOrgDetails(userId, addresses, contactNum, isOpen);
     print(message);
     notifyListeners();
   }
@@ -139,5 +151,13 @@ class MyAuthProvider with ChangeNotifier {
   void fetchOpenOrgs() {
     _openOrgsStream = authService.getOpenOrgs();
     notifyListeners();
+  }
+
+  Future<DocumentSnapshot> getUserById(String userId) async {
+    try {
+      return await authService.getUserById(userId);
+    } catch (e) {
+      throw Exception("Failed to retrieve user: ${e.toString()}");
+    }
   }
 }

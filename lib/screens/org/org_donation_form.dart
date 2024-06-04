@@ -1,12 +1,15 @@
 import 'package:donation_app/models/donation_model.dart';
+import 'package:donation_app/models/drive_model.dart';
 import 'package:donation_app/providers/donation_provider.dart';
-import 'package:donation_app/screens/donor_new/image_viewer.dart';
+import 'package:donation_app/providers/drive_provider.dart';
+import 'package:donation_app/screens/shared/image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
 import "package:firebase_auth/firebase_auth.dart";
-import "package:donation_app/models/user_model.dart" as user_model;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
+import 'dart:convert';
 
 // TODO: Add loading state for saving and loading image
 // TODO: Add snackbar to show successfully edited status
@@ -33,14 +36,12 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
   late String _photo;
   late String _photoDownloadURL;
   late String _status;
-  late DateTime _timestamp;
-  String _deletedPhoto = '';
-  File? _selectedPhoto;
+  // late DateTime _timestamp;
 
   Donation? _selectedDonation;
-  user_model.User? _selectedOrg;
   bool get isViewMode => true;
   final _formKey = GlobalKey<FormState>();
+  final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
 
   @override
   void initState() {
@@ -67,7 +68,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
     _photo = _selectedDonation!.photo;
     _photoDownloadURL = '';
     _status = _selectedDonation!.status;
-    _timestamp = _selectedDonation!.timestamp;
+    // _timestamp = _selectedDonation!.timestamp;
 
     _loadDownloadURLs();
   }
@@ -96,11 +97,177 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
     }
   }
 
-  void _addNewCategory(String category) {
-    setState(() {
-      _categories.add(category);
+  Future<void> _showDonationDrivesModal(BuildContext context) async {
+    // fetch drives
+    context.read<DriveProvider>().fetchDrivesByOrg(_currentUser!.uid);
+
+    // access drives in the provider
+    final DriveProvider driveProvider =
+        Provider.of<DriveProvider>(context, listen: false);
+
+    // get the stream of drives
+    Stream<QuerySnapshot> drivesStream = driveProvider.drivesByOrg;
+
+    // show loading indicator while fetching drives
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    // listen to the stream for changes
+    drivesStream.listen((QuerySnapshot snapshot) {
+      // convert data from drives stream to a list
+      List<Drive> drives = snapshot.docs.map((doc) {
+        Drive drive = Drive.fromJson(doc.data() as Map<String, dynamic>);
+        drive.id = doc.id;
+        return drive;
+      }).toList();
+
+      // filter open drives
+      DateTime now = DateTime.now();
+      List<Drive> openDrives =
+          drives.where((drive) => now.isBefore(drive.endDate)).toList();
+
+      // close loading dialog
+      Navigator.pop(context);
+
+      // show modal only if there are open drives
+      if (openDrives.isNotEmpty) {
+        showModalBottomSheet<String>(
+          context: context,
+          builder: (BuildContext context) {
+            return ListView.builder(
+              itemCount: openDrives.length,
+              itemBuilder: (BuildContext context, int index) {
+                Drive drive = openDrives[index];
+                return ListTile(
+                  title: Text(drive.title),
+                  onTap: () async {
+                    // show confirmation modal
+                    bool confirm = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Confirm Donation Drive Link'),
+                          content: Text(
+                              'Are you sure you want to link this donation to ${drive.title}?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(false); // return false on cancel
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(true); // return true on confirm
+                              },
+                              child: const Text('Confirm'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    // proceed if confirmed
+                    if (confirm == true) {
+                      // edit donation status to confirmed and link to drive
+                      if (!context.mounted) return; // mounted check
+                      context
+                          .read<DonationProvider>()
+                          .editDonationStatus("confirmed");
+                      context.read<DonationProvider>().linkToDrive(drive.id!);
+
+                      Navigator.of(context)
+                        ..pop()
+                        ..pop();
+                    }
+                  },
+                );
+              },
+            );
+          },
+        );
+      } else {
+        //  no open drives
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No open donation drives!'),
+          ),
+        );
+      }
     });
-    Navigator.pop(context); // close the modal
+  }
+
+  void _showDonationStatusModal(String newStatus) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          title: const Text('Change Donation Status'),
+          content:
+              Text('Are you sure you want to change the status to $newStatus?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<DonationProvider>().editDonationStatus(newStatus);
+
+                // TODO: if new status is completed, send notification to donor of donation
+                Navigator.of(context)
+                  ..pop()
+                  ..pop();
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleQRScan(String data) {
+    // parse the JSON data from the QR code
+    Map<String, dynamic> qrData = json.decode(data);
+
+    // check if the 'donationId' key exists in qrData
+    if (!qrData.containsKey('donationId')) {
+      // if 'donationId' is not present, invalid qr
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid QR code: Donation ID not found.'),
+        ),
+      );
+      return;
+    }
+
+    String donationId = qrData['donationId'];
+
+    // check if the donationId matches the selected donation
+    if (donationId == _selectedDonation!.id) {
+      //ask the user if they want to update the status
+      _showDonationStatusModal("completed");
+    } else {
+      // donationId doesn't match
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('The scanned QR code does not match the selected donation.'),
+        ),
+      );
+    }
   }
 
   Widget _buildImageContainer() {
@@ -117,7 +284,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
             ),
           ),
           const SizedBox(height: 8),
-          if (_photoDownloadURL != '' || _selectedPhoto != null)
+          if (_photoDownloadURL != '')
             Stack(
               children: [
                 InkWell(
@@ -125,9 +292,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ShowFullImage(
-                          image: _photoDownloadURL != ''
-                              ? _photoDownloadURL
-                              : _selectedPhoto,
+                          image: _photoDownloadURL,
                         ),
                       ),
                     );
@@ -137,43 +302,15 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       image: DecorationImage(
-                        image: _photoDownloadURL != ''
-                            ? NetworkImage(_photoDownloadURL)
-                            : FileImage(_selectedPhoto!)
-                                as ImageProvider<Object>,
+                        image: NetworkImage(_photoDownloadURL),
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
                 ),
-                if (!isViewMode)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _photo = '';
-                          _deletedPhoto = _photoDownloadURL;
-                          _photoDownloadURL = '';
-                          _selectedPhoto = null;
-                        });
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
-          if (_photoDownloadURL == '' && _selectedPhoto == null)
+          if (_photoDownloadURL == '')
             Container(
               height: 200,
               decoration: BoxDecoration(
@@ -272,7 +409,26 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    String buttonText = "";
+    VoidCallback? onPressed;
+
+    if (_status == "pending") {
+      buttonText = "Link to a Donation Drive";
+      onPressed = () => _showDonationDrivesModal(context);
+    } else if (_status == "confirmed" && _mode == "Pick-up") {
+      buttonText = "Schedule for Pick-up";
+      onPressed = () => _showDonationStatusModal("scheduled for pick-up");
+    } else if (_status == "scheduled for pick-up") {
+      buttonText = "Complete";
+      onPressed = () => _showDonationStatusModal("completed");
+    } else if (_status == "confirmed" && _mode == "Drop-off") {
+      buttonText = "Complete";
+      onPressed = () => _qrBarCodeScannerDialogPlugin.getScannedQrBarCode(
+          context: context,
+          onCode: (code) {
+            _handleQRScan(code!);
+          });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -280,7 +436,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
         "View Donation Details",
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          color: colorScheme.primary,
+          color: Theme.of(context).colorScheme.primary,
         ),
       )),
       body: SingleChildScrollView(
@@ -470,20 +626,22 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
             ),
             const SizedBox(height: 8),
             _buildImageContainer(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {},
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
+            const SizedBox(height: 8),
+            if (_status != 'completed' && _status != 'cancelled')
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: onPressed,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                    child: Text(buttonText),
                   ),
-                  child: const Text('Save'),
                 ),
               ),
-            ),
           ]),
         ),
       ),

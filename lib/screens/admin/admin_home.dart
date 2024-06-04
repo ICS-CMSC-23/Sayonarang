@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
-import '../../providers/user_provider.dart';
-import '../auth/login_page.dart';
 import 'admin_donors.dart';
-import 'admin_organizations.dart';
 import 'admin_profile.dart';
 import 'admin_waitlist.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,9 +16,9 @@ class AdminView extends StatelessWidget {
   ];
 
   static List<Widget> _AdminPages = <Widget>[
-    AdminApprovalWaitList(),
-    ViewDonors(),
-    ProfilePage()
+    const AdminApprovalWaitList(),
+    const ViewDonors(),
+    const ProfilePage()
   ];
 
   static const Color customRed = Color(0xFFF54741);

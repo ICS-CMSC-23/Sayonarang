@@ -62,7 +62,7 @@ class _PickImageState extends State<PickImage> {
             ),
           ],
         ),
-        if (_uploading) CircularProgressIndicator(),
+        if (_uploading) const CircularProgressIndicator(),
       ],
     );
   }
@@ -98,9 +98,8 @@ class _PickImageState extends State<PickImage> {
   Future<void> _uploadImageToFirebaseStorage(File imageFile) async {
     try {
       String fileName = 'images/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
-          .ref()
-          .child(fileName);
+      firebase_storage.Reference ref =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileName);
 
       await ref.putFile(imageFile);
 

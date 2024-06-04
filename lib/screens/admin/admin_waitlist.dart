@@ -21,7 +21,7 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
       length: 3,
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
+          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: Container(
             color: Colors.white,
             child: const TabBar(

@@ -1,7 +1,7 @@
+import "package:donation_app/screens/org/org_profile.dart";
 import "package:flutter/material.dart";
 import "package:donation_app/screens/org/org_home.dart";
 import "package:donation_app/screens/org/org_drives.dart";
-import "package:donation_app/screens/org/org_profile.dart";
 
 class OrgMainPage extends StatefulWidget {
   const OrgMainPage({super.key});
@@ -17,7 +17,7 @@ class _OrgMainPageState extends State<OrgMainPage> {
   List<Widget> pages = [
     const OrgHomePage(),
     const OrgDrivesPage(),
-    const OrgProfilePage()
+    const OrgProfilePage(mode: 'view'),
   ];
 
   @override

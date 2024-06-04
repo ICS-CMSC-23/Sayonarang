@@ -128,10 +128,18 @@ class DriveProvider with ChangeNotifier {
     for (String filename in filenames) {
       String downloadURL = await FirebaseStorage.instance
           .ref()
-          .child('drives/${filename}')
+          .child('drives/$filename')
           .getDownloadURL();
       downloadURLs.add(downloadURL);
     }
     return downloadURLs;
+  }
+
+  Future<DocumentSnapshot> getDriveById(String orgId) async {
+    try {
+      return await firebaseService.getDriveById(orgId);
+    } catch (e) {
+      throw Exception("Failed to retrieve drive: ${e.toString()}");
+    }
   }
 }

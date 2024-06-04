@@ -56,8 +56,8 @@ class DonorView extends StatelessWidget {
   }
 
   static List<Widget> _DonorPages = <Widget>[
-    ViewOrganizations(),
-    ShowDonations(),
-    DonorProfileWidget(),
+    const ViewOrganizations(),
+    const ShowDonations(),
+    const DonorProfileWidget(),
   ];
 }

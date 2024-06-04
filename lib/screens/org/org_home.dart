@@ -1,8 +1,6 @@
-import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
 import 'package:donation_app/screens/org/org_donation_form.dart';
 import 'package:flutter/material.dart';
 import 'package:donation_app/providers/user_provider.dart';
-import 'package:donation_app/screens/org/org_donation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +17,6 @@ class OrgHomePage extends StatefulWidget {
 
 class _OrgHomePageState extends State<OrgHomePage> {
   late User? _currentUser;
-  Map<String, dynamic>? _userDetails;
 
   @override
   void initState() {
@@ -28,7 +25,6 @@ class _OrgHomePageState extends State<OrgHomePage> {
     // fetch user details
     _currentUser = FirebaseAuth.instance.currentUser;
     if (_currentUser != null) {
-      _fetchUserDetails(); // TODO: Remove, move implementation to org profile page
       // execute initialization of the stream after the layout is completed
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<DonationProvider>().fetchDonationsToOrg(_currentUser!.uid);
@@ -36,19 +32,10 @@ class _OrgHomePageState extends State<OrgHomePage> {
     }
   }
 
-  // TODO: Remove, move implementation to org profile page
-  Future<void> _fetchUserDetails() async {
-    final details =
-        await context.read<MyAuthProvider>().getUserDetails(_currentUser!.uid);
-    setState(() {
-      _userDetails = details;
-    });
-  }
-
   Future<String> _fetchDonorName(String donorId) async {
-    final _userDetails =
+    final userDetails =
         await context.read<MyAuthProvider>().getUserDetails(donorId);
-    return _userDetails['name'] as String? ?? 'Unknown Donor';
+    return userDetails['name'] as String? ?? 'Unknown Donor';
   }
 
   Widget _buildDonationList(List<Donation> donations, String status) {
@@ -59,7 +46,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
     if (filteredDonations.isEmpty) {
       return Center(
         child: Text(
-          'No ${status.toLowerCase() == 'scheduled for pickup' ? 'scheduled' : status.toLowerCase()} donations yet!',
+          'No ${status.toLowerCase() == 'scheduled for pick-up' ? 'scheduled' : status.toLowerCase()} donations yet!',
           style: const TextStyle(fontSize: 18),
         ),
       );
@@ -145,7 +132,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
   }
 
   Widget _buildTruncatedChip(String text) {
-    final maxLength = 20;
+    const maxLength = 20;
     final truncatedText =
         text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 

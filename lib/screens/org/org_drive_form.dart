@@ -1,6 +1,6 @@
 import "package:donation_app/models/drive_model.dart";
 import "package:donation_app/providers/drive_provider.dart";
-import "package:donation_app/screens/org/image_slider.dart";
+import "package:donation_app/screens/shared/image_slider.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
@@ -253,9 +253,9 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Images",
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -585,7 +585,7 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {
+                            onPressed: () async {
                               context.read<DriveProvider>().deleteDrive();
                               Navigator.pop(context);
                             },

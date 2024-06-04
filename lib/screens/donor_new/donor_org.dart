@@ -1,31 +1,27 @@
-import 'package:flutter/cupertino.dart';
+import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/donor_new/donor_donation_form.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
 
-class PendingOrgDetailPage extends StatelessWidget {
-  final User org;
+class DonorOrgPage extends StatefulWidget {
+  const DonorOrgPage({super.key});
+  @override
+  _DonorOrgPageState createState() => _DonorOrgPageState();
+}
 
-  const PendingOrgDetailPage({Key? key, required this.org}) : super(key: key);
-
-  Color getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-        return Colors.orange;
-      case 'approved':
-        return Colors.green;
-      case 'rejected':
-        return Colors.red;
-      default:
-        return Colors.black;
-    }
+class _DonorOrgPageState extends State<DonorOrgPage> {
+  User? _selectedOrg;
+  @override
+  void initState() {
+    super.initState();
+    _selectedOrg = context.read<MyAuthProvider>().selected;
   }
 
   @override
   Widget build(BuildContext context) {
-    final adminProvider = Provider.of<AdminProvider>(context, listen: false);
+    Provider.of<AdminProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +54,7 @@ class PendingOrgDetailPage extends StatelessWidget {
                         size: 60,
                       ),
                       Text(
-                        org.name,
+                        _selectedOrg!.name,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -66,27 +62,11 @@ class PendingOrgDetailPage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        org.username,
+                        _selectedOrg!.username,
                         style: const TextStyle(
                             fontSize: 16,
                             color: Color(0xFF666666),
                             fontStyle: FontStyle.italic),
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: getStatusColor(org.status),
-                          borderRadius: BorderRadius.circular(50.0),
-                        ),
-                        child: Text(
-                          'Status: ${org.status}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -95,7 +75,7 @@ class PendingOrgDetailPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Description:',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -103,20 +83,19 @@ class PendingOrgDetailPage extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  org.description,
+                                  _selectedOrg!.description,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Color(0xFF666666),
                                   ),
                                   textAlign: TextAlign.justify,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                               ],
                             ),
                           ),
                         ],
                       ),
-
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -146,7 +125,7 @@ class PendingOrgDetailPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                org.contactNum,
+                                _selectedOrg!.contactNum,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   color: Color(0xFF666666),
@@ -155,7 +134,8 @@ class PendingOrgDetailPage extends StatelessWidget {
                               const SizedBox(height: 8),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: org.addresses.map((address) {
+                                children:
+                                    _selectedOrg!.addresses.map((address) {
                                   return Padding(
                                     padding:
                                         const EdgeInsets.only(bottom: 16.0),
@@ -173,76 +153,34 @@ class PendingOrgDetailPage extends StatelessWidget {
                           ))
                         ],
                       ),
-                      // const SizedBox(height: 8),
-                      const Row(
-                        children: [
-                          Text(
-                            'Proof:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      FutureBuilder<String?>(
-                        future: adminProvider.getProofImageUrl(org.proof),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            final imageUrl = snapshot.data;
-                            if (imageUrl != null) {
-                              return Image.network(
-                                imageUrl,
-                                width: 250,
-                                height: 250,
-                                fit: BoxFit.cover,
-                              );
-                            } else {
-                              return const Text('Image not found');
-                            }
-                          }
-                        },
-                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              // show only buttons if org is pending
-              if (org.status == 'pending')
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        adminProvider.updateOrgStatus(org.id!, 'approved');
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: const Color(0xFF4CAF50),
-                      ),
-                      child: const Text('Approve'),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // navigate to the create donation form page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const DonorDonationFormPage(mode: 'add'),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        adminProvider.updateOrgStatus(org.id!, 'rejected');
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: const Color(0xFFE53935),
-                      ),
-                      child: const Text('Disapprove'),
-                    ),
-                  ],
+                    child: const Text('Donate Now'),
+                  ),
                 ),
+              )
             ],
           ),
         ],
