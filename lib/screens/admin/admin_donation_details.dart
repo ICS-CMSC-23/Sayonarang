@@ -70,7 +70,7 @@ class DonationDetailScreen extends StatelessWidget {
                     children: [
                       const SizedBox(width: 25),
                       FutureBuilder<String?>(
-                        future: adminProvider.getDriveName(donation.driveId),
+                        future: adminProvider.getTitleName(donation.driveId),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {

@@ -111,7 +111,7 @@ class FirebaseAdminAPI {
   }
 
   // Retrieve drive name by id
-  Future<String?> getDriveNameById(String driveId) async {
+  Future<String?> getDriveTitleById(String driveId) async {
     try {
       DocumentSnapshot doc = await db.collection('drives').doc(driveId).get();
       if (doc.exists) {

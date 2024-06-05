@@ -126,7 +126,7 @@ class OrgDonationsList extends StatelessWidget {
         leadingIcon = Icons.check_circle;
         statusColor = Colors.blue;
         break;
-      case 'scheduled':
+      case 'scheduled for pick-up':
         leadingIcon = Icons.check_circle;
         statusColor = Colors.blue;
         break;

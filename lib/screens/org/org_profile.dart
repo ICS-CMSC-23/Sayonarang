@@ -480,7 +480,7 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                             child: ElevatedButton(
                               onPressed: () async {
                                 // if (_formKey.currentState!.validate()) {
-                                if (!context.mounted) return; // mounted check
+                                //   if (!context.mounted) return; // mounted check
                                 context.read<MyAuthProvider>().signOut();
                                 // }
                               },

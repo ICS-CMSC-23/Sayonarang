@@ -142,4 +142,8 @@ class DriveProvider with ChangeNotifier {
       throw Exception("Failed to retrieve drive: ${e.toString()}");
     }
   }
+
+  Future<String?> getDriveTitle(String driveId) async {
+    return firebaseService.getDriveTitleById(driveId);
+  }
 }

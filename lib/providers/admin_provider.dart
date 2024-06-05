@@ -75,7 +75,7 @@ class AdminProvider with ChangeNotifier {
     return firebaseService.getProofImageUrl(filename);
   }
 
-  Future<String?> getDriveName(String driveId) async {
-    return firebaseService.getDriveNameById(driveId);
+  Future<String?> getTitleName(String driveId) async {
+    return firebaseService.getDriveTitleById(driveId);
   }
 }

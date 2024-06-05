@@ -50,6 +50,7 @@ dependencies:
   screenshot: ^2.5.0
   permission_handler: ^11.3.1
   image_gallery_saver: ^2.0.3
+  telephony: ^0.2.0
 
 dev_dependencies:
   flutter_test:

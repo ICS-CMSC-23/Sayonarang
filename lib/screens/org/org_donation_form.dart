@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
+import 'package:telephony/telephony.dart';
 import 'dart:convert';
 
 // TODO: Add loading state for saving and loading image
@@ -38,9 +39,11 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
   // late DateTime _timestamp;
 
   Donation? _selectedDonation;
+  String? _driveTitle;
   bool get isViewMode => true;
   final _formKey = GlobalKey<FormState>();
   final _qrBarCodeScannerDialogPlugin = QrBarCodeScannerDialog();
+  final Telephony telephony = Telephony.instance;
 
   @override
   void initState() {
@@ -70,6 +73,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
     // _timestamp = _selectedDonation!.timestamp;
 
     _loadDownloadURLs();
+    _loadDriveTitle();
   }
 
   @override
@@ -94,6 +98,15 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
         _photoDownloadURL = downloadURL;
       });
     }
+  }
+
+  Future<void> _loadDriveTitle() async {
+    String? driveTitle = await context
+        .read<DriveProvider>()
+        .getDriveTitle(_selectedDonation!.driveId);
+    setState(() {
+      _driveTitle = driveTitle;
+    });
   }
 
   Future<void> _showDonationDrivesModal(BuildContext context) async {
@@ -221,15 +234,20 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 context.read<DonationProvider>().editDonationStatus(newStatus);
 
-
-                 ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Successfully edited the donation status!')),
-                      );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Successfully edited the donation status!')),
+                );
 
                 // TODO: if new status is completed, send notification to donor of donation
+                if (newStatus == "completed") {
+                  await _sendCompletionNotification();
+                }
+
                 Navigator.of(context)
                   ..pop()
                   ..pop();
@@ -240,6 +258,20 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
         );
       },
     );
+  }
+
+  // TODO
+  Future<void> _sendCompletionNotification() async {
+    final bool? result = await telephony.requestPhoneAndSmsPermissions;
+
+    if (result != null && result) {
+      final String donorContactNum = _contactNumController.text;
+      final String message =
+          "Your donation has been sent to Donation Drive: $_driveTitle. Thank you for your contribution!";
+
+      telephony.sendSms(to: donorContactNum, message: message);
+      print('SMS sent successfully');
+    }
   }
 
   void _handleQRScan(String data) {
