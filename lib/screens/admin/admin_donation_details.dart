@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/donation_model.dart';
+import '../../providers/admin_provider.dart';
 
 class DonationDetailScreen extends StatelessWidget {
   final Donation donation;
@@ -17,6 +19,8 @@ class DonationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final adminProvider = Provider.of<AdminProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -54,6 +58,53 @@ class DonationDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 15),
                   _buildStatusText(donation.status),
+                  const SizedBox(height: 15),
+                  const Text(
+                    'Donation Drive:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const SizedBox(width: 25),
+                      FutureBuilder<String?>(
+                        future: adminProvider.getDriveName(donation.driveId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text(
+                              'Error: ${snapshot.error}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF666666),
+                              ),
+                            );
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null) {
+                            return Text(
+                              snapshot.data!,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF666666),
+                              ),
+                            );
+                          } else {
+                            return const Text(
+                              'No Donation Drive',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF666666),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 15),
                   const Text(
                     'Categories:',
@@ -184,6 +235,10 @@ class DonationDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 15),
+
+                  //
+
                   const SizedBox(height: 15),
                 ],
               ),

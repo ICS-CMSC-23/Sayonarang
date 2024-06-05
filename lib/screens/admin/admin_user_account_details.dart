@@ -59,7 +59,7 @@ class UserAccountDetails extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: Colors.green,
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                       child: const Text(

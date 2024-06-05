@@ -109,4 +109,19 @@ class FirebaseAdminAPI {
       return null;
     }
   }
+
+  // Retrieve drive name by id
+  Future<String?> getDriveNameById(String driveId) async {
+    try {
+      DocumentSnapshot doc = await db.collection('drives').doc(driveId).get();
+      if (doc.exists) {
+        var data = doc.data() as Map<String, dynamic>;
+        return data['title'];
+      }
+      return null;
+    } catch (e) {
+      print("Failed to retrieve drive name: $e");
+      return null;
+    }
+  }
 }
