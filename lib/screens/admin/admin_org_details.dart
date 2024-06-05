@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
 
-class PendingOrgDetailPage extends StatelessWidget {
+class ViewOrgDetails extends StatelessWidget {
   final User org;
 
-  const PendingOrgDetailPage({Key? key, required this.org}) : super(key: key);
+  const ViewOrgDetails({Key? key, required this.org}) : super(key: key);
 
   Color getStatusColor(String status) {
     switch (status) {

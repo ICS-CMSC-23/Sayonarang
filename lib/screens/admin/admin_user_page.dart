@@ -4,16 +4,16 @@ import 'admin_donor_donations_list.dart';
 import 'admin_org_donations_list.dart';
 import 'admin_user_account_details.dart';
 
-class UserDetailsView extends StatefulWidget {
+class UserPage extends StatefulWidget {
   final User user;
 
-  const UserDetailsView({Key? key, required this.user}) : super(key: key);
+  const UserPage({Key? key, required this.user}) : super(key: key);
 
   @override
-  State<UserDetailsView> createState() => _UserDetailsViewState();
+  State<UserPage> createState() => _UserPageState();
 }
 
-class _UserDetailsViewState extends State<UserDetailsView> {
+class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -43,7 +43,7 @@ class _UserDetailsViewState extends State<UserDetailsView> {
             widget.user.role == 'org'
                 ? OrgDonationsList(orgId: widget.user.id!)
                 : DonorDonationsList(donorId: widget.user.id!),
-            UserAccountDetails(user: widget.user),
+            UserAccountDetails(user: widget.user)
           ],
         ),
       ),

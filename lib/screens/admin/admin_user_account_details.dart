@@ -54,6 +54,52 @@ class UserAccountDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+
+                  if (!isDonor) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                      child: Text(
+                        'Status: Verified',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Description:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                user.description,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                                textAlign: TextAlign.justify,
+                              ),
+                              SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -112,12 +158,16 @@ class UserAccountDetails extends StatelessWidget {
 
                   if (!isDonor) ...[
                     const SizedBox(height: 15),
-                    const Text(
-                      'Proof:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const Row(
+                      children: [
+                        Text(
+                          'Proof:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                     FutureBuilder<String?>(
                       future: adminProvider.getProofImageUrl(user.proof),
