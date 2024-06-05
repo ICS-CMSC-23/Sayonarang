@@ -44,10 +44,10 @@ class DriveProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void editDrive(String title, String description, List<String> donationIds,
-      DateTime endDate, List<String> photos) async {
+  void editDrive(String title, String description, DateTime endDate,
+      List<String> photos) async {
     String message = await firebaseService.editDrive(
-        _selectedDrive!.id, title, description, donationIds, endDate, photos);
+        _selectedDrive!.id, title, description, endDate, photos);
     print(message);
     notifyListeners();
   }

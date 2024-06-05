@@ -5,10 +5,8 @@ class FirebaseDriveAPI {
 
   Future<String> addDrive(Map<String, dynamic> drive) async {
     try {
-      DocumentReference docRef = await db.collection("drives").add(drive);
-      // Update the document with the generated ID
-      await docRef.update({'id': docRef.id});
-      return "Successfully added donation drive with ID: ${docRef.id}";
+      await db.collection("drives").add(drive);
+      return "Successfully added donation drive!";
     } on FirebaseException catch (e) {
       return "Failed with error '${e.code}: ${e.message}";
     }
@@ -30,12 +28,11 @@ class FirebaseDriveAPI {
   }
 
   Future<String> editDrive(String? id, String title, String description,
-      List<String> donationIds, DateTime endDate, List<String> photos) async {
+      DateTime endDate, List<String> photos) async {
     try {
       await db.collection("drives").doc(id).update({
         "title": title,
         "description": description,
-        "donationIds": donationIds,
         "endDate": endDate,
         "photos": photos,
       });

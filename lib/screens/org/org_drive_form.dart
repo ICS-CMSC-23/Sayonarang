@@ -480,6 +480,12 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
 
                                 if (!context.mounted) return; // mounted check
                                 context.read<DriveProvider>().addDrive(drive);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Successfully created a new donation drive!')),
+                                );
                                 Navigator.pop(context);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -516,15 +522,16 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                                 context.read<DriveProvider>().editDrive(
                                       _titleController.text,
                                       _descriptionController.text,
-                                      _donationIds,
                                       DateFormat('yyyy-MM-dd')
                                           .parse(_endDateController.text),
                                       updatedPhotos,
                                     );
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Successfully edited the donation drive!')),
-                                    );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Successfully edited the donation drive!')),
+                                );
 
                                 // TODO: find fix for when going back to the view details page from edit, the details page is updated
                                 // current solution is to pop twice to go back to the donation drives page
@@ -589,8 +596,22 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () async {
-                              context.read<DriveProvider>().deleteDrive();
-                              Navigator.pop(context);
+                              // cannot delete donation drive if there are linked donations
+                              if (_donationIds.isEmpty) {
+                                context.read<DriveProvider>().deleteDrive();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Successfully deleted donation drive!')),
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Cannot delete donation drive with donation!')),
+                                );
+                              }
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor:
