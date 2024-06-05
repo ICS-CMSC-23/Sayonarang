@@ -84,6 +84,11 @@ class DonorQRCodeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 await saveImage();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Successfully saved QR Code Image!')),
+                
+              );
               },
               child: const Text('Save as Image'),
             ),
