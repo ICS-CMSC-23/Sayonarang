@@ -212,7 +212,7 @@ class _DonorDonationsPageState extends State<DonorDonationsPage> {
               children: [
                 _buildDonationList(donations, 'pending'),
                 _buildDonationList(donations, 'confirmed'),
-                _buildDonationList(donations, 'scheduled for pickup'),
+                _buildDonationList(donations, 'scheduled for pick-up'),
                 _buildDonationList(donations, 'completed'),
                 _buildDonationList(donations, 'cancelled'),
               ],
