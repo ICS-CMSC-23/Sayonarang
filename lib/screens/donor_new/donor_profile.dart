@@ -16,6 +16,7 @@ class DonorProfileWidget extends StatefulWidget {
 class _DonorProfileWidgetState extends State<DonorProfileWidget> {
   late User? _currentUser;
   late Future<DocumentSnapshot> _userDocFuture;
+
   @override
   void initState() {
     super.initState();
@@ -46,25 +47,25 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                         snapshot.data!.data() as Map<String, dynamic>;
                     final donorProfile = DonorProfileModel.fromMap(userData);
 
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 25),
-                          ProfileHeader(
-                            donorName: donorProfile.name,
-                            username: donorProfile.username,
+                    return Column(
+                      children: [
+                        const SizedBox(height: 25),
+                        ProfileHeader(
+                          donorName: donorProfile.name,
+                          username: donorProfile.username,
+                          contactNum: donorProfile.contactNum,
+                          addresses: donorProfile.addresses,
+                        ),
+                        const SizedBox(height: 10),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<MyAuthProvider>().signOut();
+                            },
+                            child: const Text('Logout'),
                           ),
-                          const SizedBox(height: 10),
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.read<MyAuthProvider>().signOut();
-                              },
-                              child: const Text('Logout'),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   }
                 },
