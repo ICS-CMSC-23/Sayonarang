@@ -423,9 +423,11 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                                         _isOpen,
                                       );
 
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Successfully edited the profile!')),
-                                        );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Successfully edited the profile!')),
+                                  );
                                   Navigator.of(context)
                                       .pop(); // TODO: Fix changes not reflecting after editing org
                                 }
@@ -448,20 +450,25 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                           child: SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const OrgProfilePage(mode: "edit"),
-                                  ),
-                                );
-                              },
+                              onPressed: _status == 'approved'
+                                  ? () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              OrgProfilePage(mode: "edit"),
+                                        ),
+                                      );
+                                    }
+                                  : null, // disable the button if status is not 'approved'
                               style: OutlinedButton.styleFrom(
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor: _status == 'approved'
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.grey,
                                 side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color: _status == 'approved'
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey,
                                   width: 2.0,
                                 ),
                               ),
@@ -477,10 +484,8 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  if (!context.mounted) return; // mounted check
-                                  context.read<MyAuthProvider>().signOut();
-                                }
+                                if (!context.mounted) return; // mounted check
+                                context.read<MyAuthProvider>().signOut();
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor:

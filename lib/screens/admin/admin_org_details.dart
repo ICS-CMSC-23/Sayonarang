@@ -1,3 +1,4 @@
+import 'package:donation_app/screens/shared/image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
@@ -101,7 +102,9 @@ class ViewOrgDetails extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  org.description,
+                                  org.description == ''
+                                      ? "No description yet."
+                                      : org.description,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Color(0xFF666666),
@@ -193,11 +196,22 @@ class ViewOrgDetails extends StatelessWidget {
                           } else {
                             final imageUrl = snapshot.data;
                             if (imageUrl != null) {
-                              return Image.network(
-                                imageUrl,
-                                width: 250,
-                                height: 250,
-                                fit: BoxFit.cover,
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ShowFullImage(
+                                        image: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Image.network(
+                                  imageUrl,
+                                  width: 250,
+                                  height: 250,
+                                  fit: BoxFit.cover,
+                                ),
                               );
                             } else {
                               return const Text('Image not found');

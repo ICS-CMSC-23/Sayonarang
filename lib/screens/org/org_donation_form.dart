@@ -224,10 +224,11 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
               onPressed: () {
                 context.read<DonationProvider>().editDonationStatus(newStatus);
 
-
-                 ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Successfully edited the donation status!')),
-                      );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Successfully edited the donation status!')),
+                );
 
                 // TODO: if new status is completed, send notification to donor of donation
                 Navigator.of(context)
@@ -289,30 +290,26 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
           ),
           const SizedBox(height: 8),
           if (_photoDownloadURL != '')
-            Stack(
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ShowFullImage(
-                          image: _photoDownloadURL,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      image: DecorationImage(
-                        image: NetworkImage(_photoDownloadURL),
-                        fit: BoxFit.cover,
-                      ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ShowFullImage(
+                      image: _photoDownloadURL,
                     ),
                   ),
+                );
+              },
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: NetworkImage(_photoDownloadURL),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ],
+              ),
             ),
           if (_photoDownloadURL == '')
             Container(
