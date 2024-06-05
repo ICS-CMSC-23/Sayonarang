@@ -3,10 +3,14 @@
 
 **Collaborators:**  
 
-**DEV 1:** CAOILE, Ralph Philip Mdera
+**DEV 1:** CAOILE, Ralph Philip Madera
+
 **DEV 2:** DOMINGO, Reinalyn Andal
+
 **DEV 3:** MADRID, Reamonn Lois Atibagos
+
 **DEV 4:** SILAPAN, Francheska Marie Alipio
+
 
 **Section:** U-3L
 
