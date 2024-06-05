@@ -270,7 +270,7 @@ class OrgDonationsList extends StatelessWidget {
   Widget _buildDriveListItem(
       BuildContext context, Drive drive, AdminProvider adminProvider) {
     return FutureBuilder<DocumentSnapshot>(
-      future: adminProvider.getOrgById(drive.orgId!),
+      future: adminProvider.getOrgById(drive.orgId),
       builder: (context, orgSnapshot) {
         if (orgSnapshot.connectionState == ConnectionState.waiting) {
           return Card(

@@ -19,7 +19,7 @@ class DonationDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Convert the donation.date string to a DateTime object
     // Format the DateTime object to the desired format
-    String formattedDate = DateFormat('MMMM dd, yyyy').format(donation.date);
+    // String formattedDate = DateFormat('MMMM dd, yyyy').format(donation.date);
 
     return Scaffold(
       appBar: AppBar(
