@@ -203,7 +203,7 @@ class DonationDetailScreen extends StatelessWidget {
 
     switch (status) {
       case 'pending':
-        statusColor = const Color.fromARGB(255, 213, 138, 26);
+        statusColor = Colors.orange;
         break;
       case 'confirmed':
         statusColor = Colors.blue;

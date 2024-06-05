@@ -59,7 +59,7 @@ class DonorDonationsList extends StatelessWidget {
             switch (donation.status) {
               case 'pending':
                 leadingIcon = Icons.remove_circle;
-                statusColor = const Color.fromARGB(255, 213, 138, 26);
+                statusColor = Colors.orange;
                 break;
               case 'confirmed':
                 leadingIcon = Icons.check_circle;

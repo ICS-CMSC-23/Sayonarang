@@ -6,22 +6,21 @@ import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
 import 'admin_user_page.dart';
 
-class ViewDonors extends StatefulWidget {
-  const ViewDonors({Key? key}) : super(key: key);
+class ViewOrganizations extends StatefulWidget {
+  const ViewOrganizations({Key? key}) : super(key: key);
 
   @override
-  State<ViewDonors> createState() => _ViewDonorsState();
+  State<ViewOrganizations> createState() => _ViewOrganizationsState();
 }
 
-class _ViewDonorsState extends State<ViewDonors> {
+class _ViewOrganizationsState extends State<ViewOrganizations> {
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> donorsStream =
-        context.watch<AdminProvider>().donorList;
+    Stream<QuerySnapshot> orgsStream = context.watch<AdminProvider>().orgList;
 
     return Scaffold(
       body: StreamBuilder(
-        stream: donorsStream,
+        stream: orgsStream,
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -35,7 +34,7 @@ class _ViewDonorsState extends State<ViewDonors> {
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text(
-                'No donors yet!',
+                'No organizations yet!',
                 style: TextStyle(fontSize: 20, fontStyle: FontStyle.italic),
               ),
             );
@@ -45,24 +44,32 @@ class _ViewDonorsState extends State<ViewDonors> {
             padding: const EdgeInsets.all(8.0),
             itemCount: snapshot.data?.docs.length,
             itemBuilder: (context, index) {
-              User donor = User.fromJson(
+              User org = User.fromJson(
                   snapshot.data!.docs[index].data() as Map<String, dynamic>);
-              donor.id = snapshot.data!.docs[index].id;
+              org.id = snapshot.data!.docs[index].id;
 
               return Card(
                 surfaceTintColor: Colors.transparent,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 elevation: 4,
                 child: ListTile(
-                  leading: const Icon(Icons.account_box_rounded,
-                      size: 40, color: Color(0xFF4CAF50)),
+                  leading: Container(
+                    width: 35,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4CAF50),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Icon(Icons.business,
+                        size: 30, color: Colors.white),
+                  ),
                   title: Text(
-                    donor.name,
+                    org.name,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    donor.username,
+                    org.username,
                     style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   ),
                   trailing:
@@ -71,7 +78,7 @@ class _ViewDonorsState extends State<ViewDonors> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => UserPage(user: donor),
+                        builder: (context) => UserPage(user: org),
                       ),
                     );
                   },

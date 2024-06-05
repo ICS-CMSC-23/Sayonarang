@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import 'admin_donors.dart';
 import 'admin_profile.dart';
-import 'admin_waitlist.dart';
+import 'admin_organizations.dart';
 import 'package:flutter/cupertino.dart';
 
 class AdminView extends StatelessWidget {
@@ -15,8 +15,8 @@ class AdminView extends StatelessWidget {
     'Profile'
   ];
 
-  static List<Widget> _AdminPages = <Widget>[
-    const AdminApprovalWaitList(),
+  static List<Widget> _AdminScreens = <Widget>[
+    const ViewOrganizations(),
     const ViewDonors(),
     const ProfilePage()
   ];
@@ -38,7 +38,7 @@ class AdminView extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
       ),
-      body: _AdminPages.elementAt(provider.selectedIndex),
+      body: _AdminScreens.elementAt(provider.selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
