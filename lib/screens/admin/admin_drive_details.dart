@@ -93,7 +93,7 @@ class DriveDetailScreen extends StatelessWidget {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.handshake,
                       size: 50,
                       color: Colors.white,

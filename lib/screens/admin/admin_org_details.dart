@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
@@ -95,7 +93,7 @@ class ViewOrgDetails extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Description:',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -110,13 +108,12 @@ class ViewOrgDetails extends StatelessWidget {
                                   ),
                                   textAlign: TextAlign.justify,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                               ],
                             ),
                           ),
                         ],
                       ),
-
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -173,7 +170,6 @@ class ViewOrgDetails extends StatelessWidget {
                           ))
                         ],
                       ),
-                      // const SizedBox(height: 8),
                       const Row(
                         children: [
                           Text(

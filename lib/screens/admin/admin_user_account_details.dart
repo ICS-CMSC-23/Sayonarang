@@ -54,7 +54,6 @@ class UserAccountDetails extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-
                   if (!isDonor) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -63,9 +62,9 @@ class UserAccountDetails extends StatelessWidget {
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(50.0),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Status: Verified',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
                         ),
@@ -78,7 +77,7 @@ class UserAccountDetails extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Description:',
                                 style: TextStyle(
                                   fontSize: 16,
@@ -93,7 +92,7 @@ class UserAccountDetails extends StatelessWidget {
                                 ),
                                 textAlign: TextAlign.justify,
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
@@ -155,7 +154,6 @@ class UserAccountDetails extends StatelessWidget {
                       ))
                     ],
                   ),
-
                   if (!isDonor) ...[
                     const SizedBox(height: 15),
                     const Row(
@@ -193,7 +191,7 @@ class UserAccountDetails extends StatelessWidget {
                       },
                     ),
                   ],
-                  // const SizedBox(height: 15),
+                  const SizedBox(height: 15),
                 ],
               ),
             ),
