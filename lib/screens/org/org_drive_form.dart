@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 // TODO: Add loading state for saving and loading images
-// TODO: Add snackbar to show successfully edited or successfully saved
 
 class OrgDriveFormPage extends StatefulWidget {
   final String mode; // add, edit, view
@@ -521,6 +520,10 @@ class OrgDriveFormPageState extends State<OrgDriveFormPage> {
                                       DateFormat('yyyy-MM-dd')
                                           .parse(_endDateController.text),
                                       updatedPhotos,
+                                    );
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Successfully edited the donation drive!')),
                                     );
 
                                 // TODO: find fix for when going back to the view details page from edit, the details page is updated
