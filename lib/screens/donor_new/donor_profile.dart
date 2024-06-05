@@ -47,25 +47,26 @@ class _DonorProfileWidgetState extends State<DonorProfileWidget> {
                         snapshot.data!.data() as Map<String, dynamic>;
                     final donorProfile = DonorProfileModel.fromMap(userData);
 
-                    return Column(
-                      children: [
-                        const SizedBox(height: 25),
-                        ProfileHeader(
-                          donorName: donorProfile.name,
-                          username: donorProfile.username,
-                          contactNum: donorProfile.contactNum,
-                          addresses: donorProfile.addresses,
-                        ),
-                        const SizedBox(height: 10),
-                        Center(
-                          child: ElevatedButton(
+                    return Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 25),
+                          ProfileHeader(
+                            donorName: donorProfile.name,
+                            username: donorProfile.username,
+                            contactNum: donorProfile.contactNum,
+                            addresses: donorProfile.addresses,
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
                             onPressed: () {
                               context.read<MyAuthProvider>().signOut();
                             },
                             child: const Text('Logout'),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   }
                 },
