@@ -25,7 +25,12 @@ class ProfileHeader extends StatelessWidget {
             padding: EdgeInsets.all(Dimensions.padding),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: AssetImage('assets/images/placeholder.jpg'),
+              backgroundColor: Color.fromARGB(255, 245, 243, 243),
+              child: Icon(
+                Icons.person,
+                size: 60,
+                color: Color.fromRGBO(245, 71, 65, 1), 
+              ),
             ),
           ),
           Column(
