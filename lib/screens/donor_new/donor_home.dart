@@ -71,7 +71,7 @@ class _DonorHomePageState extends State<DonorHomePage> {
               maxLines: 1, // limit name to one line
             ),
             subtitle: Text(
-              org.description,
+              org.description == '' ? "No description yet." : org.description,
               style: const TextStyle(fontSize: 16),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,

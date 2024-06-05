@@ -83,7 +83,9 @@ class _DonorOrgPageState extends State<DonorOrgPage> {
                                   ),
                                 ),
                                 Text(
-                                  _selectedOrg!.description,
+                                  _selectedOrg!.description == ''
+                                      ? "No description yet."
+                                      : _selectedOrg!.description,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Color(0xFF666666),

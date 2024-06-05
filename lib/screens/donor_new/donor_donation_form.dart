@@ -173,8 +173,9 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                     .editDonationStatus("cancelled");
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Successfully cancelled the donation!')),
-              );
+                  const SnackBar(
+                      content: Text('Successfully cancelled the donation!')),
+                );
 
                 Navigator.of(context)
                   ..pop()
@@ -862,11 +863,10 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                     .addDonation(newDonation);
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar
-                                    (content: Text('Successfully added donation!')
-                                  ),
+                                  const SnackBar(
+                                      content:
+                                          Text('Successfully added donation!')),
                                 );
-
                               } else if (widget.mode == 'edit') {
                                 String fileName = _photo;
                                 if (_selectedPhoto != null) {
@@ -901,17 +901,15 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                     );
 
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar
-                                    (content: Text('Successfully edited donation!')
-                                  ),
+                                  const SnackBar(
+                                      content: Text(
+                                          'Successfully edited donation!')),
                                 );
 
                                 Navigator.of(context)
                                   ..pop()
                                   ..pop();
-
                               }
-
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -929,8 +927,6 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
-
-                        
                         child: const Text('Save'),
                       ),
                     ),
@@ -1012,9 +1008,11 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                     .read<DonationProvider>()
                                     .deleteDonation();
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Successfully deleted the donation!')),
-                                      );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Successfully deleted the donation!')),
+                                );
                                 Navigator.pop(context);
                               },
                               style: OutlinedButton.styleFrom(
@@ -1052,8 +1050,8 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                       ),
                     ),
                   const SizedBox(height: 8),
-                  // only show donation drive when status is completed
-                  if (_status == 'completed') ...[
+                  // only show donation drive when status is not pending or cancelled
+                  if (_status != 'pending' && _status != 'cancelled') ...[
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).push(

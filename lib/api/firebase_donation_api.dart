@@ -111,6 +111,7 @@ class FirebaseDonationAPI {
         "driveId": driveId,
       });
       // add donation id to drive's list of donation ids
+      // TODO: Fix error
       // List<String> donationIds = [];
 
       // await db
@@ -124,18 +125,18 @@ class FirebaseDonationAPI {
 
       // print(donationIds);
 
-      DocumentSnapshot docSnapshot =
-          await db.collection('drives').doc(driveId).get();
+      // DocumentSnapshot docSnapshot =
+      //     await db.collection('drives').doc(driveId).get();
 
-      if (docSnapshot.exists) {
-        List<dynamic> donationIds = docSnapshot.get('donationIds');
-        print(donationIds);
-        await db.collection("drives").doc(driveId).update({
-          "donationIds": [...donationIds, id]
-        });
-      } else {
-        print('Document does not exist on the database');
-      }
+      // if (docSnapshot.exists) {
+      //   List<dynamic> donationIds = docSnapshot.get('donationIds');
+      //   print(donationIds);
+      //   await db.collection("drives").doc(driveId).update({
+      //     "donationIds": [...donationIds, id]
+      //   });
+      // } else {
+      //   print('Document does not exist on the database');
+      // }
 
       return "Successfully linked donation to $driveId!";
     } on FirebaseException catch (e) {

@@ -423,9 +423,11 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                                         _isOpen,
                                       );
 
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Successfully edited the profile!')),
-                                        );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Successfully edited the profile!')),
+                                  );
                                   Navigator.of(context)
                                       .pop(); // TODO: Fix changes not reflecting after editing org
                                 }
@@ -477,10 +479,8 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  if (!context.mounted) return; // mounted check
-                                  context.read<MyAuthProvider>().signOut();
-                                }
+                                if (!context.mounted) return; // mounted check
+                                context.read<MyAuthProvider>().signOut();
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor:
