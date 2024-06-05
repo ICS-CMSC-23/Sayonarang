@@ -128,28 +128,15 @@ class _LoginPageState extends State<LoginPage> {
                               _passwordController.text.trim(),
                             );
 
-                            // check if sign in is successful and get the role
-                            // if (myAuthProvider.userDetails['success']) {
-                            //   String userRole = myAuthProvider
-                            //       .userDetails['response']['role'];
-
-                            //   if (userRole == 'admin') {
-                            //     Navigator.pushReplacementNamed(
-                            //         context, '/admin');
-                            //   } else if (userRole == 'donor') {
-                            //     Navigator.pushReplacementNamed(
-                            //         context, '/donor');
-                            //   } else if (userRole == 'org') {
-                            //     Navigator.pushReplacementNamed(context, '/org');
-                            //   }
-                            // } else {
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //     SnackBar(
-                            //       content: Text(
-                            //           'Error: ${myAuthProvider.userDetails['response']}'),
-                            //     ),
-                            //   );
-                            // }
+                            // check if log in is not successful
+                            if (!myAuthProvider.userDetails['success']) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      '${myAuthProvider.userDetails['response']}'),
+                                ),
+                              );
+                            }
                           }
                         },
                         child: const Text('Log In',
