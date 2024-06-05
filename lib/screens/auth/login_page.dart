@@ -77,7 +77,11 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title: const Text('App Name'),
+        title: Image.asset(
+          'assets/images/logo.png',
+          fit: BoxFit.contain,
+          height: MediaQuery.of(context).size.height * 0.30,
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         toolbarHeight: MediaQuery.of(context).size.height * 0.5,
         centerTitle: true,
