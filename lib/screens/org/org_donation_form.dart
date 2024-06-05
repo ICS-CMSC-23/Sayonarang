@@ -12,7 +12,6 @@ import 'package:qr_bar_code_scanner_dialog/qr_bar_code_scanner_dialog.dart';
 import 'dart:convert';
 
 // TODO: Add loading state for saving and loading image
-// TODO: Add snackbar to show successfully edited status
 
 class OrgDonationFormPage extends StatefulWidget {
   const OrgDonationFormPage({super.key});
@@ -224,6 +223,11 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
             TextButton(
               onPressed: () {
                 context.read<DonationProvider>().editDonationStatus(newStatus);
+
+
+                 ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Successfully edited the donation status!')),
+                      );
 
                 // TODO: if new status is completed, send notification to donor of donation
                 Navigator.of(context)
