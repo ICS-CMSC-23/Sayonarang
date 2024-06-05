@@ -101,11 +101,41 @@ class FirebaseDonationAPI {
     String? id,
     String driveId,
   ) async {
+    if (id == null) {
+      return "Donation ID is null and cannot be linked to the drive.";
+    }
     try {
       print("Drive ID: $driveId");
+      print("id: $id");
       await db.collection("donations").doc(id).update({
         "driveId": driveId,
       });
+      // add donation id to drive's list of donation ids
+      // List<String> donationIds = [];
+
+      // await db
+      //     .collection('drives')
+      //     .doc(id)
+      //     .get()
+      //     .then((DocumentSnapshot ds) {
+      //   // donationIds = (ds.data as DocumentSnapshot)['donationIds'];
+      //   donationIds = ds.data()!['donationIds'];
+      // });
+
+      // print(donationIds);
+
+      DocumentSnapshot docSnapshot =
+          await db.collection('drives').doc(driveId).get();
+
+      if (docSnapshot.exists) {
+        List<dynamic> donationIds = docSnapshot.get('donationIds');
+        print(donationIds);
+        await db.collection("drives").doc(driveId).update({
+          "donationIds": [...donationIds, id]
+        });
+      } else {
+        print('Document does not exist on the database');
+      }
 
       return "Successfully linked donation to $driveId!";
     } on FirebaseException catch (e) {

@@ -224,10 +224,11 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
               onPressed: () {
                 context.read<DonationProvider>().editDonationStatus(newStatus);
 
-
-                 ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Successfully edited the donation status!')),
-                      );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Successfully edited the donation status!')),
+                );
 
                 // TODO: if new status is completed, send notification to donor of donation
                 Navigator.of(context)
