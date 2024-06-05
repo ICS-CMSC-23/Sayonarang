@@ -5,9 +5,9 @@
 
 **DEV 1:** CAOILE, Ralph Philip Madera
 
-**DEV 2:** DOMINGO, Reinalyn Andal
+**DEV 2:** DOMINGO, Reamonn Lois Atibagos
 
-**DEV 3:** MADRID, Reamonn Lois Atibagos
+**DEV 3:** MADRID, Reinalyn Andal
 
 **DEV 4:** SILAPAN, Francheska Marie Alipio
 
