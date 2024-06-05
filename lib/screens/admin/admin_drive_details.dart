@@ -84,78 +84,97 @@ class DriveDetailScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  Center(
-                    child: Text(
-                      drive.title,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.handshake,
+                      size: 50,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Organization',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const SizedBox(width: 15),
-                      Text(
-                        userName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Description:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   Text(
-                    drive.description,
+                    drive.title,
                     style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF666666),
-                    ),
-                    softWrap: true,
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'End Date',
-                    style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(width: 15),
-                      Text(
-                        DateFormat('MMMM dd, yyyy').format(drive.endDate),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Organization',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Description:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Text(
+                            drive.description,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'End Date',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const SizedBox(width: 15),
+                          Text(
+                            DateFormat('MMMM dd, yyyy').format(drive.endDate),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -220,7 +239,7 @@ class DriveDonationsList extends StatelessWidget {
             switch (donation.status) {
               case 'pending':
                 leadingIcon = Icons.remove_circle;
-                statusColor = const Color.fromARGB(255, 213, 138, 26);
+                statusColor = Colors.orange;
                 break;
               case 'confirmed':
                 leadingIcon = Icons.check_circle;

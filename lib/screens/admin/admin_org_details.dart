@@ -1,15 +1,13 @@
 import 'package:donation_app/screens/shared/image_viewer.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
 
-class PendingOrgDetailPage extends StatelessWidget {
+class ViewOrgDetails extends StatelessWidget {
   final User org;
 
-  const PendingOrgDetailPage({Key? key, required this.org}) : super(key: key);
+  const ViewOrgDetails({Key? key, required this.org}) : super(key: key);
 
   Color getStatusColor(String status) {
     switch (status) {
@@ -96,7 +94,7 @@ class PendingOrgDetailPage extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Description:',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -113,13 +111,12 @@ class PendingOrgDetailPage extends StatelessWidget {
                                   ),
                                   textAlign: TextAlign.justify,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                               ],
                             ),
                           ),
                         ],
                       ),
-
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -176,7 +173,6 @@ class PendingOrgDetailPage extends StatelessWidget {
                           ))
                         ],
                       ),
-                      // const SizedBox(height: 8),
                       const Row(
                         children: [
                           Text(

@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
-import 'admin_waitlist_details.dart';
+import 'admin_user_page.dart';
+import 'admin_org_details.dart';
 
-class AdminApprovalWaitList extends StatefulWidget {
-  const AdminApprovalWaitList({Key? key}) : super(key: key);
+class ViewOrganizations extends StatefulWidget {
+  const ViewOrganizations({Key? key}) : super(key: key);
 
   @override
-  State<AdminApprovalWaitList> createState() => _AdminApprovalWaitListState();
+  State<ViewOrganizations> createState() => _ViewOrganizationsState();
 }
 
-class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
+class _ViewOrganizationsState extends State<ViewOrganizations> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<AdminProvider>(context);
@@ -29,8 +30,8 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
               unselectedLabelColor: Colors.grey,
               indicatorColor: Color(0xFFF54642),
               tabs: [
-                Tab(text: 'Pending'),
                 Tab(text: 'Approved'),
+                Tab(text: 'Pending'),
                 Tab(text: 'Rejected'),
               ],
             ),
@@ -40,17 +41,17 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
           children: [
             _buildOrganizationList(
               context,
-              provider.pendingList,
-              'Pending Organizations',
-              Icons.access_time,
-              Colors.orange,
-            ),
-            _buildOrganizationList(
-              context,
               provider.orgList,
               'Approved Organizations',
               Icons.check_circle,
               Colors.green,
+            ),
+            _buildOrganizationList(
+              context,
+              provider.pendingList,
+              'Pending Organizations',
+              Icons.access_time,
+              Colors.orange,
             ),
             _buildOrganizationList(
               context,
@@ -119,35 +120,42 @@ class _AdminApprovalWaitListState extends State<AdminApprovalWaitList> {
                   const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               elevation: 4,
               child: ListTile(
-                leading: Icon(
-                  icon,
-                  size: 40,
-                  color: iconColor,
-                ),
-                title: Text(
-                  org.name,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                  leading: Icon(
+                    icon,
+                    size: 40,
+                    color: iconColor,
                   ),
-                ),
-                subtitle: Text(
-                  org.username,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-                trailing:
-                    const Icon(Icons.arrow_forward_ios, color: Colors.grey),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PendingOrgDetailPage(org: org),
+                  title: Text(
+                    org.name,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
-              ),
+                  ),
+                  subtitle: Text(
+                    org.username,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  trailing:
+                      const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                  onTap: () {
+                    if (org.status == 'approved') {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => UserPage(user: org),
+                        ),
+                      );
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ViewOrgDetails(org: org),
+                        ),
+                      );
+                    }
+                  }),
             );
           },
         );

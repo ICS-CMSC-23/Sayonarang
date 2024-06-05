@@ -120,7 +120,7 @@ class OrgDonationsList extends StatelessWidget {
     switch (donation.status) {
       case 'pending':
         leadingIcon = Icons.remove_circle;
-        statusColor = const Color.fromARGB(255, 213, 138, 26);
+        statusColor = Colors.orange;
         break;
       case 'confirmed':
         leadingIcon = Icons.check_circle;
@@ -148,6 +148,7 @@ class OrgDonationsList extends StatelessWidget {
       builder: (context, donorSnapshot) {
         if (donorSnapshot.connectionState == ConnectionState.waiting) {
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.all(8.0),
             child: Padding(
@@ -172,6 +173,7 @@ class OrgDonationsList extends StatelessWidget {
           );
         } else if (donorSnapshot.hasError) {
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.all(8.0),
             child: Padding(
@@ -199,6 +201,7 @@ class OrgDonationsList extends StatelessWidget {
           String donorName = donorData?['name'] ?? 'Unknown Organization';
 
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: ListTile(
@@ -274,6 +277,7 @@ class OrgDonationsList extends StatelessWidget {
       builder: (context, orgSnapshot) {
         if (orgSnapshot.connectionState == ConnectionState.waiting) {
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.all(8.0),
             child: Padding(
@@ -300,6 +304,7 @@ class OrgDonationsList extends StatelessWidget {
           );
         } else if (orgSnapshot.hasError) {
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.all(8.0),
             child: Padding(
@@ -329,6 +334,7 @@ class OrgDonationsList extends StatelessWidget {
           String orgName = orgData?['name'] ?? 'Unknown Organization';
 
           return Card(
+            surfaceTintColor: Colors.transparent,
             elevation: 4,
             margin: const EdgeInsets.all(8.0),
             child: ListTile(

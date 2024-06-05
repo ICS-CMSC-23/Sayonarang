@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/user_model.dart';
 import '../../providers/admin_provider.dart';
-import 'admin_user_details.dart';
+import 'admin_user_page.dart';
 
 class ViewDonors extends StatefulWidget {
   const ViewDonors({Key? key}) : super(key: key);
@@ -71,7 +71,7 @@ class _ViewDonorsState extends State<ViewDonors> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => UserDetailsView(user: donor),
+                        builder: (context) => UserPage(user: donor),
                       ),
                     );
                   },

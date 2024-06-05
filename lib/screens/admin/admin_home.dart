@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/admin_provider.dart';
 import 'admin_donors.dart';
 import 'admin_profile.dart';
-import 'admin_waitlist.dart';
-import 'package:flutter/cupertino.dart';
+import 'admin_org.dart';
 
 class AdminView extends StatelessWidget {
   const AdminView({super.key});
@@ -15,8 +14,8 @@ class AdminView extends StatelessWidget {
     'Profile'
   ];
 
-  static List<Widget> _AdminPages = <Widget>[
-    const AdminApprovalWaitList(),
+  static final List<Widget> _AdminScreens = <Widget>[
+    const ViewOrganizations(),
     const ViewDonors(),
     const ProfilePage()
   ];
@@ -38,7 +37,7 @@ class AdminView extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
       ),
-      body: _AdminPages.elementAt(provider.selectedIndex),
+      body: _AdminScreens.elementAt(provider.selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -55,7 +54,7 @@ class AdminView extends StatelessWidget {
           ),
         ],
         currentIndex: provider.selectedIndex,
-        selectedItemColor: customRed, // Set the selected item color to Red
+        selectedItemColor: customRed,
         onTap: (index) => provider.updateIndex(index),
         showSelectedLabels: false,
         showUnselectedLabels: false,
