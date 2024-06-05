@@ -422,6 +422,10 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                                         _contactNumController.text,
                                         _isOpen,
                                       );
+
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Successfully edited the profile!')),
+                                        );
                                   Navigator.of(context)
                                       .pop(); // TODO: Fix changes not reflecting after editing org
                                 }
