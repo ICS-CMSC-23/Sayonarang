@@ -108,14 +108,14 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
     Stream<QuerySnapshot> drivesStream = driveProvider.drivesByOrg;
 
     // show loading indicator while fetching drives
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return const Center(
+    //       child: CircularProgressIndicator(),
+    //     );
+    //   },
+    // );
 
     // listen to the stream for changes
     drivesStream.listen((QuerySnapshot snapshot) {
@@ -132,7 +132,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
           drives.where((drive) => now.isBefore(drive.endDate)).toList();
 
       // close loading dialog
-      Navigator.pop(context);
+      // Navigator.pop(context);
 
       // show modal only if there are open drives
       if (openDrives.isNotEmpty) {
@@ -178,10 +178,13 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
                     if (confirm == true) {
                       // edit donation status to confirmed and link to drive
                       if (!context.mounted) return; // mounted check
+                      // context
+                      //     .read<DonationProvider>()
+                      //     .editDonationStatus("confirmed");
+                      // context.read<DonationProvider>().linkToDrive(drive.id!);
                       context
                           .read<DonationProvider>()
-                          .editDonationStatus("confirmed");
-                      context.read<DonationProvider>().linkToDrive(drive.id!);
+                          .editAndLink("confirmed", drive.id!);
 
                       Navigator.of(context)
                         ..pop()

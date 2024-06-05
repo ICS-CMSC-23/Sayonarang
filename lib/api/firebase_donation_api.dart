@@ -144,6 +144,34 @@ class FirebaseDonationAPI {
     }
   }
 
+  String editAndLink(
+    String? id,
+    String status,
+    String driveId,
+  ) {
+    try {
+      print(">> Status: $status");
+      print(">> Drive id: $driveId");
+      print(">> Donation id: $id");
+
+      db.collection("donations").doc(id).update({
+        "status": status,
+      });
+
+      db.collection("donations").doc(id).update({
+        "driveId": driveId,
+      });
+
+      db.collection("drives").doc(driveId).update({
+        "driveIds": FieldValue.arrayUnion([id]),
+      });
+
+      return "Successfully linked donation status to $driveId!!";
+    } on FirebaseException catch (e) {
+      return "Failed with error '${e.code}: ${e.message}";
+    }
+  }
+
   Future<String> deleteDonation(String? id) async {
     try {
       await db.collection("donations").doc(id).delete();
