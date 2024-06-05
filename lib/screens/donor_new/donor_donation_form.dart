@@ -13,7 +13,6 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:donation_app/models/user_model.dart" as user_model;
 
 // TODO: Add loading state for saving and loading image
-// TODO: Add snackbar to show successfully edited or successfully saved
 // TODO: Show details of organization before donating
 
 class DonorDonationFormPage extends StatefulWidget {
@@ -172,6 +171,11 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                 context
                     .read<DonationProvider>()
                     .editDonationStatus("cancelled");
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Successfully cancelled the donation!')),
+              );
+
                 Navigator.of(context)
                   ..pop()
                   ..pop();
@@ -851,12 +855,18 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                   photo: fileName,
                                   timestamp: _timestamp,
                                 );
-                                if (!context.mounted) return; // mounted check
 
+                                if (!context.mounted) return; // mounted check
                                 context
                                     .read<DonationProvider>()
                                     .addDonation(newDonation);
                                 Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar
+                                    (content: Text('Successfully added donation!')
+                                  ),
+                                );
+
                               } else if (widget.mode == 'edit') {
                                 String fileName = _photo;
                                 if (_selectedPhoto != null) {
@@ -889,10 +899,19 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                       _timeController.text,
                                       fileName,
                                     );
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar
+                                    (content: Text('Successfully edited donation!')
+                                  ),
+                                );
+
                                 Navigator.of(context)
                                   ..pop()
                                   ..pop();
+
                               }
+
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -910,6 +929,8 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                         ),
+
+                        
                         child: const Text('Save'),
                       ),
                     ),
@@ -990,6 +1011,10 @@ class DonorDonationFormPageState extends State<DonorDonationFormPage> {
                                 context
                                     .read<DonationProvider>()
                                     .deleteDonation();
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Successfully deleted the donation!')),
+                                      );
                                 Navigator.pop(context);
                               },
                               style: OutlinedButton.styleFrom(
