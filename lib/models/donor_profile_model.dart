@@ -1,13 +1,22 @@
 class DonorProfileModel {
   final String name;
   final String username;
+  final String contactNum;
+  final List<String> addresses; 
 
-  DonorProfileModel({required this.name, required this.username});
+  DonorProfileModel({
+    required this.name,
+    required this.username,
+    required this.contactNum,
+    required this.addresses,
+  });
 
-  factory DonorProfileModel.fromMap(Map<String, dynamic> data) {
+  factory DonorProfileModel.fromMap(Map<String, dynamic> map) {
     return DonorProfileModel(
-      name: data['name'],
-      username: data['username'],
+      name: map['name'],
+      username: map['username'],
+      contactNum: map['contactNum'],
+      addresses: List<String>.from(map['addresses']),
     );
   }
 }
