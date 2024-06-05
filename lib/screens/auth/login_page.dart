@@ -77,15 +77,19 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title: const Text('App Name'),
+        title: Image.asset(
+          'assets/images/logo.png',
+          fit: BoxFit.contain,
+          height: MediaQuery.of(context).size.height * 0.30,
+        ),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        toolbarHeight: MediaQuery.of(context).size.height * 0.5,
+        toolbarHeight: MediaQuery.of(context).size.height * 0.40,
         centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.5,
+            height: MediaQuery.of(context).size.height * 0.60,
             child: Card(
               color: Colors.white,
               shape: const RoundedRectangleBorder(
@@ -93,9 +97,11 @@ class _LoginPageState extends State<LoginPage> {
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40))),
               child: Padding(
-                padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
+                padding: const EdgeInsets.only(
+                    top: 30, left: 16, right: 16, bottom: 20),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  // crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     textField('Email', _emailController, false, isEmailValid,
                         'Email is required'),
