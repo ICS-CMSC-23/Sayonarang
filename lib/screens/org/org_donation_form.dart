@@ -247,7 +247,7 @@ class OrgDonationFormPageState extends State<OrgDonationFormPage> {
                 );
 
                 // TODO: if new status is completed, send notification to donor of donation
-                if (newStatus == "completed") {
+                if (newStatus == "confirmed") {
                   await _sendCompletionNotification();
                 }
 

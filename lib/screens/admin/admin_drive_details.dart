@@ -107,31 +107,38 @@ class DriveDetailScreen extends StatelessWidget {
                       color: Color(0xFF333333),
                     ),
                   ),
+                  Text(
+                    'By: $userName',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF666666),
+                    ),
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-                      const Text(
-                        'Organization',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          Text(
-                            userName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF666666),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
+                      // const Text(
+                      //   'Organization',
+                      //   style: TextStyle(
+                      //     fontSize: 18,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 8),
+                      // Row(
+                      //   children: [
+                      //     const SizedBox(width: 15),
+                      //     Text(
+                      //       userName,
+                      //       style: const TextStyle(
+                      //         fontSize: 16,
+                      //         color: Color(0xFF666666),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 15),
                       const Text(
                         'Description:',
                         style: TextStyle(
