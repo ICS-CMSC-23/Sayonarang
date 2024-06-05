@@ -150,6 +150,16 @@ class _LoginPageState extends State<LoginPage> {
                             //     ),
                             //   );
                             // }
+
+                            // check if log in is not successful
+                            if (!myAuthProvider.userDetails['success']) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      '${myAuthProvider.userDetails['response']}'),
+                                ),
+                              );
+                            }
                           }
                         },
                         child: const Text('Log In',
