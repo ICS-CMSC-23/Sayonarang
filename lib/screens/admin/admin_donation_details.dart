@@ -35,216 +35,218 @@ class DonationDetailScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(children: [
-          Card(
-            surfaceTintColor: Colors.transparent,
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Text(
-                      userRole == 'Donor'
-                          ? 'Organization: $userName'
-                          : 'Donor: $userName',
-                      style: const TextStyle(
-                        fontSize: 22,
+        child: ListView(
+          children: [
+            Card(
+              surfaceTintColor: Colors.transparent,
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Text(
+                        userRole == 'Donor'
+                            ? 'Organization: $userName'
+                            : 'Donor: $userName',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    _buildStatusText(donation.status),
+                    const SizedBox(height: 15),
+                    const Text(
+                      'Donation Drive:',
+                      style: TextStyle(
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 15),
-                  _buildStatusText(donation.status),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Donation Drive:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        const SizedBox(width: 25),
+                        FutureBuilder<String?>(
+                          future: adminProvider.getTitleName(donation.driveId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text(
+                                'Error: ${snapshot.error}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                              );
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null) {
+                              return Text(
+                                snapshot.data!,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                              );
+                            } else {
+                              return const Text(
+                                'No Donation Drive',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 25),
-                      FutureBuilder<String?>(
-                        future: adminProvider.getTitleName(donation.driveId),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text(
-                              'Error: ${snapshot.error}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF666666),
-                              ),
-                            );
-                          } else if (snapshot.hasData &&
-                              snapshot.data != null) {
-                            return Text(
-                              snapshot.data!,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF666666),
-                              ),
-                            );
-                          } else {
-                            return const Text(
-                              'No Donation Drive',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Color(0xFF666666),
-                              ),
-                            );
-                          }
-                        },
+                    const SizedBox(height: 15),
+                    const Text(
+                      'Categories:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Categories:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: donation.categories.map((categories) {
-                      return Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: donation.categories.map((category) {
+                        return Row(
+                          children: [
+                            const SizedBox(width: 25),
+                            Text(
+                              category,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF666666),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 15),
+                    if (donation.mode == 'Pick-up') ...[
+                      const Text(
+                        'Addresses:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: donation.addresses.map((address) {
+                          return Row(
+                            children: [
+                              const SizedBox(width: 25),
+                              Text(
+                                address,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF666666),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 15),
+                    ],
+                    const Text(
+                      'Mode:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 25),
+                        Text(
+                          donation.mode,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF666666),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    const Text(
+                      'Weight:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 25),
+                        Text(
+                          donation.weight.toString(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF666666),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    if (donation.mode == 'Pick-up') ...[
+                      const Text(
+                        'Contact Number:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
                         children: [
                           const SizedBox(width: 25),
                           Text(
-                            categories,
+                            donation.contactNum,
                             style: const TextStyle(
                               fontSize: 16,
                               color: Color(0xFF666666),
                             ),
                           ),
                         ],
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Addresses:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      ),
+                      const SizedBox(height: 15),
+                    ],
+                    const Text(
+                      'Date:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: donation.addresses.map((address) {
-                      return Row(
-                        children: [
-                          const SizedBox(width: 25),
-                          Text(
-                            address,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF666666),
-                            ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 25),
+                        Text(
+                          DateFormat('MMMM dd, yyyy').format(donation.date),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFF666666),
                           ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Mode:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 25),
-                      Text(
-                        donation.mode,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Weight:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 25),
-                      Text(
-                        donation.weight.toString(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Contact Number:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 25),
-                      Text(
-                        donation.contactNum,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    'Date:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(width: 25),
-                      Text(
-                        DateFormat('MMMM dd, yyyy').format(donation.date),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF666666),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-
-                  //
-
-                  const SizedBox(height: 15),
-                ],
+                    const SizedBox(height: 15),
+                  ],
+                ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
