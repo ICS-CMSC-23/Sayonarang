@@ -138,12 +138,13 @@ class MyAuthProvider with ChangeNotifier {
 
   void editOrgDetails(
     String userId,
+    String description,
     List<String> addresses,
     String contactNum,
     bool isOpen,
   ) async {
-    String message =
-        await authService.editOrgDetails(userId, addresses, contactNum, isOpen);
+    String message = await authService.editOrgDetails(
+        userId, description, addresses, contactNum, isOpen);
     print(message);
     notifyListeners();
   }
