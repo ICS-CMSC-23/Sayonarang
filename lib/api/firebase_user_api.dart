@@ -157,12 +157,14 @@ class FirebaseAuthAPI {
 
   Future<String> editOrgDetails(
     String? orgId,
+    String description,
     List<String> addresses,
     String contactNum,
     bool isOpen,
   ) async {
     try {
       await db.collection("users").doc(orgId).update({
+        "description": description,
         "addresses": addresses,
         "contactNum": contactNum,
         "isOpen": isOpen,

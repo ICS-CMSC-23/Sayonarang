@@ -1,4 +1,5 @@
 import 'package:donation_app/providers/user_provider.dart';
+import 'package:donation_app/screens/org/org_main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -415,6 +416,7 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                                   if (!context.mounted) return; // mounted check
                                   context.read<MyAuthProvider>().editOrgDetails(
                                         _currentUser!.uid,
+                                        _descriptionController.text,
                                         _addressControllers
                                             .map(
                                                 (controller) => controller.text)
@@ -428,8 +430,15 @@ class OrgProfilePageState extends State<OrgProfilePage> {
                                         content: Text(
                                             'Successfully edited the profile!')),
                                   );
-                                  Navigator.of(context)
-                                      .pop(); // TODO: Fix changes not reflecting after editing org
+                                  // Navigator.of(context)
+                                  //     .pop(); // TODO: Fix changes not reflecting after editing org
+                                  // Navigator.of(context).pop();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrgMainPage(),
+                                    ),
+                                  );
                                 }
                               },
                               style: ElevatedButton.styleFrom(
